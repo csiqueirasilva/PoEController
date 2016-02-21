@@ -6,6 +6,13 @@
 	var menuCanvas = document.getElementById('reference-img');
 	var ctx = menuCanvas.getContext('2d');
 
+	var MenuInputCoordinates = {};
+	
+	MenuInputCoordinates['xbox'] = {};
+	
+	MenuInputCoordinates['xbox'].Img = xboxImg;
+	MenuInputCoordinates['xbox'].MouseCursor = [0.577, 0.55, 0.577, 0.62];
+	
 	function drawControllerReferencemenuCanvas(op) {
 		
 		menuCanvas.width = window.innerWidth;
@@ -13,24 +20,18 @@
 		
 		ctx.clearRect(0, 0, menuCanvas.width, menuCanvas.height);
 		
-		var bgImg = op === 'xbox' ? xboxImg : ps3Img;
-		
-		ctx.drawImage(bgImg, menuCanvas.width * 0.2, menuCanvas.height * 0.1, menuCanvas.width * 0.6, menuCanvas.height * 0.6);
-		
-		if(op === 'xbox') {
-			// mouse cursor
-			drawInputLine(0.577, 0.55, 0.577, 0.62, 'MOUSE CURSOR');
-		} else /* PS3 */ {
-		}
-		
+		ctx.drawImage(MenuInputCoordinates[op].Img, menuCanvas.width * 0.2, menuCanvas.height * 0.1, menuCanvas.width * 0.6, menuCanvas.height * 0.6);
+
+		// mouse cursor
+		drawInputLine(MenuInputCoordinates[op].MouseCursor, 'MOUSE CURSOR');
 	}
 
-	function drawInputLine(iniX, iniY, endX, endY, txt) {
+	function drawInputLine(coords, txt) {
 	
-		var iX = iniX * window.innerWidth;
-		var iY = iniY * window.innerHeight;
-		var eX = endX * window.innerWidth;
-		var eY = endY * window.innerHeight;
+		var iX = coords[0] * window.innerWidth;
+		var iY = coords[1] * window.innerHeight;
+		var eX = coords[2] * window.innerWidth;
+		var eY = coords[3] * window.innerHeight;
 		
 		ctx.beginPath();
 			ctx.moveTo(iX, iY);
