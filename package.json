@@ -1,0 +1,25 @@
+{
+  "name": "poe-controller",
+  "version": "1.0.0",
+  "description": "Use a joystick to play Path of Exile.",
+  "main": "Main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "Joystick",
+    "PathOfExile"
+  ],
+  "author": "Caio Siqueira da Silva",
+  "license": "ISC",
+  "main": "src/index.html",
+  "window": {
+	"fullscreen": false,
+    "frame": true,
+    "toolbar": true,
+	"always-on-top": true,
+	"resizable": true,
+	"transparent": false,
+	"show_in_taskbar": true
+  }
+}
