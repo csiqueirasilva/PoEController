@@ -12,6 +12,7 @@
 	
 	MenuInputCoordinates['xbox'].Img = xboxImg;
 	MenuInputCoordinates['xbox'].MouseCursor = [0.577, 0.55, 0.577, 0.62];
+	MenuInputCoordinates['xbox'].CharacterMovement = [0.3275, 0.425, 0.2, 0.525];
 	
 	function drawControllerReferencemenuCanvas(op) {
 		
@@ -24,6 +25,10 @@
 
 		// mouse cursor
 		drawInputLine(MenuInputCoordinates[op].MouseCursor, 'MOUSE CURSOR');
+		
+		// mouse cursor
+		drawInputLine(MenuInputCoordinates[op].CharacterMovement, 'CHARACTER MOVEMENT');
+		
 	}
 
 	function drawInputLine(coords, txt) {
@@ -33,6 +38,8 @@
 		var eX = coords[2] * window.innerWidth;
 		var eY = coords[3] * window.innerHeight;
 		
+		ctx.strokeStyle = '#000000';
+		
 		ctx.beginPath();
 			ctx.moveTo(iX, iY);
 			ctx.lineTo(eX, eY);
@@ -40,7 +47,7 @@
 		
 		if(txt !== undefined) {
 			ctx.textBaseline="hanging"; 
-			var textSize = window.innerHeight / 22;
+			var textSize = window.innerHeight / 50;
 			ctx.font = 'bold ' + textSize + 'px Verdana';
 			var halfTxtWidth = ctx.measureText(txt).width / 2;
 			ctx.fillStyle = '#000000';
