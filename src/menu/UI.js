@@ -13,6 +13,13 @@
 	MenuInputCoordinates['xbox'].Img = xboxImg;
 	MenuInputCoordinates['xbox'].MouseCursor = [0.577, 0.55, 0.577, 0.62];
 	MenuInputCoordinates['xbox'].CharacterMovement = [0.3275, 0.425, 0.2, 0.525];
+	MenuInputCoordinates['xbox'].MouseClick = [0.3275, 0.425, 0.2, 0.525];
+	MenuInputCoordinates['xbox'].LootKey = [0.3275, 0.425, 0.2, 0.525];
+	MenuInputCoordinates['xbox'].OpenMenu = [0.3275, 0.425, 0.2, 0.525];
+	MenuInputCoordinates['xbox'].EscapeKey = [0.3275, 0.425, 0.2, 0.525];
+
+	MenuInputCoordinates['ps3'] = {};
+	MenuInputCoordinates['ps3'].Img = ps3Img;
 	
 	function drawControllerReferencemenuCanvas(op) {
 		
@@ -24,9 +31,12 @@
 		ctx.drawImage(MenuInputCoordinates[op].Img, menuCanvas.width * 0.2, menuCanvas.height * 0.1, menuCanvas.width * 0.6, menuCanvas.height * 0.6);
 
 		// mouse cursor
-		drawInputLine(MenuInputCoordinates[op].MouseCursor, 'MOUSE CURSOR');
+		drawInputLine(MenuInputCoordinates[op].MouseCursor, 'MOUSE CURSOR (Pressed: Hold CTRL)');
 		
-		// mouse cursor
+		// character movement
+		drawInputLine(MenuInputCoordinates[op].CharacterMovement, 'CHARACTER MOVEMENT');
+		
+		// character movement
 		drawInputLine(MenuInputCoordinates[op].CharacterMovement, 'CHARACTER MOVEMENT');
 		
 	}

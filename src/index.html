@@ -5,8 +5,10 @@
 
 		<script src="../lib/jquery/jquery.min.js"></script>
 		<script src="../lib/bootstrap/bootstrap.min.js"></script>
+		<script src="../lib/select2/select2.min.js"></script>
 		
 		<link rel="stylesheet" type="text/css" href="../lib/bootstrap/bootstrap.min.css" />
+		<link rel="stylesheet" type="text/css" href="../lib/select2/select2.min.css" />
 		
 		<script src="../src/game/Main.js"></script>
 		
@@ -25,6 +27,113 @@
 				left: 1%;
 				top: 1%;
 			}
+			
+			.button-input {
+				min-width: 160px;
+				position: absolute;
+			}
+			
+			label {
+				color: #000;
+				text-shadow: 2px 0 0 #fff, -2px 0 0 #fff, 0 2px 0 #fff, 0 -2px 0 #fff, 1px 1px #fff, -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff;
+			}
+			
+			#button-dpad-up {
+				top: 50%;
+				left: 1%;
+			}
+			
+			#button-dpad-left {
+				top: 62%;
+				left: 1%;
+			}
+			
+			#button-dpad-right {
+				top: 74%;
+				left: 1%;
+			}
+			
+			#button-dpad-down {
+				top: 86%;
+				left: 1%;
+			}
+
+			#button-shoulder-left {
+				top: 38%;
+				left: 1%;
+			}
+
+			#button-shoulder-right {
+				top: 38%;
+				right: 1%;
+				text-align: right;
+			}
+
+			#button-key-up {
+				top: 50%;
+				right: 1%;
+				text-align: right;
+			}
+			
+			#button-key-left {
+				top: 62%;
+				right: 1%;
+				text-align: right;				
+			}
+			
+			#button-key-right {
+				top: 74%;
+				right: 1%;
+				text-align: right;				
+			}
+			
+			#button-key-down {
+				top: 86%;
+				right: 1%;
+				text-align: right;				
+			}
+			
+			#button-key-l3 {
+				top: 26%;
+				left: 1%;
+			}
+			
+			#label-char-movement {
+				position: absolute;
+				left: 20%;
+				top: 80%;
+			}
+			
+			#label-loot-position {
+				position: absolute;
+				left: 40%;
+				top: 10%;
+			}
+			
+			#label-escape {
+				position: absolute;
+				left: 30%;
+				top: 1%;
+			}
+			
+			#label-mouse-click {
+				position: absolute;
+				right: 10%;
+				top: 9%;
+			}
+			
+			#label-mouse-cursor {
+				position: absolute;
+				right: 35%;
+				top: 70%;
+			}			
+
+			#label-open-menu {
+				position: absolute;
+				right: 35%;
+				top: 1%;
+			}			
+			
 		</style>
 		
 	</head>
@@ -40,7 +149,114 @@
 					<option value="xbox">XBOX</option>
 					<option value="ps3">PS3</option>
 				</select>
+
 			</div>
+
+			<div id="button-dpad-up" class="button-input">
+				<label>DPAD UP</label>
+				<div>
+					<select>
+						<option>Do something</option>
+					</select>
+				</div>
+			</div>
+
+			<div id="button-dpad-down" class="button-input">
+				<label>DPAD DOWN</label>
+				<div>
+					<select>
+						<option>Do something</option>
+					</select>
+				</div>
+			</div>			
+			
+			<div id="button-dpad-left" class="button-input">
+				<label>DPAD LEFT</label>
+				<div>
+					<select>
+						<option>Do something</option>
+					</select>
+				</div>
+			</div>
+			
+			<div id="button-dpad-right" class="button-input">
+				<label>DPAD RIGHT</label>
+				<div>
+					<select>
+						<option>Do something</option>
+					</select>
+				</div>
+			</div>
+			
+			<div id="button-key-up" class="button-input">
+				<label>KEY UP</label>
+				<div>
+					<select>
+						<option>Do something</option>
+					</select>
+				</div>
+			</div>
+
+			<div id="button-key-down" class="button-input">
+				<label>KEY DOWN</label>
+				<div>
+					<select>
+						<option>Do something</option>
+					</select>
+				</div>
+			</div>			
+			
+			<div id="button-key-left" class="button-input">
+				<label>KEY LEFT</label>
+				<div>
+					<select>
+						<option>Do something outrageos</option>
+					</select>
+				</div>
+			</div>
+			
+			<div id="button-key-right" class="button-input">
+				<label>KEY RIGHT</label>
+				<div>
+					<select>
+						<option>Do something outrageos</option>
+					</select>
+				</div>
+			</div>
+			
+			<div id="button-shoulder-right" class="button-input">
+				<label>KEY SHOULDER RIGHT</label>
+				<div>
+					<select>
+						<option>Do something outrageos</option>
+					</select>
+				</div>
+			</div>
+			
+			<div id="button-shoulder-left" class="button-input">
+				<label>KEY SHOULDER LEFT</label>
+				<div>
+					<select>
+						<option>Do something outrageos</option>
+					</select>
+				</div>
+			</div>
+			
+			<div id="button-key-l3" class="button-input">
+				<label>KEY L3</label>
+				<div>
+					<select>
+						<option>Do something outrageos</option>
+					</select>
+				</div>
+			</div>
+			
+			<label id="label-char-movement">CHARACTER MOVEMENT</label>
+			<label id="label-mouse-cursor">MOUSE CURSOR (R3: CTRL)</label>
+			<label id="label-mouse-click">MOUSE CLICK (WITH ALT)</label>
+			<label id="label-escape">ESCAPE</label>
+			<label id="label-loot-position">LOOT POSITION</label>
+			<label id="label-open-menu">OPEN MENU</label>
 			
 			<canvas id="reference-img"></canvas>
 		</div>
@@ -53,6 +269,8 @@
 		<script src="../src/menu/UI.js"></script>
 		
 		<script>
+	
+			$('.button-input select').select2();
 	
 			$('#select-input-method').change();
 	

@@ -24,6 +24,8 @@ var GAME_MODE = {
 };
 
 var KEYS = {
+	L3: 1,
+	R3: 2,
 	DPAD_UP: 4,
 	DPAD_RIGHT: 12,
 	DPAD_DOWN: 20,
@@ -1541,7 +1543,7 @@ var GAME_MODE_ARPG = (function() {
 	var DPADOfExile = {
 		1: '5',
 		2: 'control',
-		4: '4',                    
+		4: '4',
 		12: '3',
 		20: '2',
 		28: '1'
