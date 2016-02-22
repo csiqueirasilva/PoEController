@@ -100,8 +100,8 @@
 			
 			#label-char-movement {
 				position: absolute;
-				left: 20%;
-				top: 80%;
+				left: 3%;
+				top: 20%;
 			}
 			
 			#label-loot-position {
@@ -118,7 +118,7 @@
 			
 			#label-mouse-click {
 				position: absolute;
-				right: 10%;
+				right: 3%;
 				top: 9%;
 			}
 			
@@ -137,7 +137,7 @@
 		</style>
 		
 	</head>
-	<body style="overflow: hidden; margin: 0; width: 100%; height: 100%;">
+	<body style="overflow: hidden; margin: 0; width: 100%; height: 100%; -moz-user-select: none; -webkit-user-select: none; -ms-user-select:none; user-select:none;-o-user-select:none;" unselectable="on" onselectstart="return false;">
 		<canvas id="main-canvas" style="display: none;"></canvas>
 		
 		<div id="main-menu" class="container-fluid">
@@ -153,16 +153,16 @@
 			</div>
 
 			<div id="button-dpad-up" class="button-input">
-				<label>DPAD UP</label>
+				<label>DPAD UP (4)</label>
 				<div>
 					<select>
-						<option>Do something</option>
+						<option title="Tooltip">Do something</option>
 					</select>
 				</div>
 			</div>
 
 			<div id="button-dpad-down" class="button-input">
-				<label>DPAD DOWN</label>
+				<label>DPAD DOWN (2)</label>
 				<div>
 					<select>
 						<option>Do something</option>
@@ -171,7 +171,7 @@
 			</div>			
 			
 			<div id="button-dpad-left" class="button-input">
-				<label>DPAD LEFT</label>
+				<label>DPAD LEFT (1)</label>
 				<div>
 					<select>
 						<option>Do something</option>
@@ -180,7 +180,7 @@
 			</div>
 			
 			<div id="button-dpad-right" class="button-input">
-				<label>DPAD RIGHT</label>
+				<label>DPAD RIGHT (3)</label>
 				<div>
 					<select>
 						<option>Do something</option>
@@ -189,7 +189,7 @@
 			</div>
 			
 			<div id="button-key-up" class="button-input">
-				<label>KEY UP</label>
+				<label>KEY UP (Q)</label>
 				<div>
 					<select>
 						<option>Do something</option>
@@ -198,7 +198,7 @@
 			</div>
 
 			<div id="button-key-down" class="button-input">
-				<label>KEY DOWN</label>
+				<label>KEY DOWN (MOUSE MIDDLE)</label>
 				<div>
 					<select>
 						<option>Do something</option>
@@ -207,7 +207,7 @@
 			</div>			
 			
 			<div id="button-key-left" class="button-input">
-				<label>KEY LEFT</label>
+				<label>KEY LEFT (E)</label>
 				<div>
 					<select>
 						<option>Do something outrageos</option>
@@ -216,7 +216,7 @@
 			</div>
 			
 			<div id="button-key-right" class="button-input">
-				<label>KEY RIGHT</label>
+				<label>KEY RIGHT (MOUSE RIGHT)</label>
 				<div>
 					<select>
 						<option>Do something outrageos</option>
@@ -225,7 +225,7 @@
 			</div>
 			
 			<div id="button-shoulder-right" class="button-input">
-				<label>KEY SHOULDER RIGHT</label>
+				<label>KEY SHOULDER RIGHT (W)</label>
 				<div>
 					<select>
 						<option>Do something outrageos</option>
@@ -234,7 +234,7 @@
 			</div>
 			
 			<div id="button-shoulder-left" class="button-input">
-				<label>KEY SHOULDER LEFT</label>
+				<label>KEY SHOULDER LEFT (R)</label>
 				<div>
 					<select>
 						<option>Do something outrageos</option>
@@ -243,7 +243,7 @@
 			</div>
 			
 			<div id="button-key-l3" class="button-input">
-				<label>KEY L3</label>
+				<label>KEY L3 (5)</label>
 				<div>
 					<select>
 						<option>Do something outrageos</option>
