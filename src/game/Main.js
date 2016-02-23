@@ -53,6 +53,10 @@ robot.setKeyboardDelay(0);
 var w = robot.getScreenSize().width;
 var h = robot.getScreenSize().height;
 
+var fileResolutionPrefix = w + 'x' + h;
+
+console.log('using screen resolution: ' + fileResolutionPrefix);
+
 var halfScreenDiagonal = Math.sqrt(w * w + h * h) / 2;
 
 var BasePosition = {
@@ -420,7 +424,7 @@ var GAME_MODE_INVENTORY = (function() {
 	var CurrentSubSection = null;
 	var CURRENT_AREA = null;
 		
-	fs.readFile("inventory-signatures.json", 'utf8', function(err, data) {
+	fs.readFile("signatures/" + fileResolutionPrefix + "inventory-signatures.json", 'utf8', function(err, data) {
 		if(err) {
 			return console.log(err);
 		} else {
@@ -1259,56 +1263,170 @@ var GAME_MODE_DEBUG = (function() {
 	
 	var InputKeys = {};
 	
-	var KeysOfExile = {
-		32: 'PrintCursorData',
-		64: 'CapturePixelSignature',
-		128: 'DetectPixelSignature'
-	};
+	var KeysOfExile = {};
+	
+	KeysOfExile[KEYS.KEY_START] = 'Debug.DetectPixelSignature';
 	
 	var BehaviorOfExile = {
-		'CapturePixelSignature': ["Debug.CapturePixelSignature"],
-		'DetectPixelSignature': ["Debug.DetectPixelSignature"],
-		'PrintCursorData': ["Debug.PrintCursorData"]
+		'Debug.CapturePixelSignature': [null, "Debug.CapturePixelSignature"],
+		'Debug.DetectPixelSignature': [null, "Debug.DetectPixelSignature"],
+		'Debug.PrintCursorData': [null, "Debug.PrintCursorData"]
 	};
+
+	var SIGNATURE_CAPTURE_ORDER = [{
+		filename: 'signatures.json',
+		mode: [
+			GAME_MODE.INVENTORY,
+			GAME_MODE_PASSIVE_SKILL_TREE,
+			GAME_MODE.WORLD_MAP
+		]
+	},
+	{
+		filename: 'inventory-signatures.json',
+		mode: [
+			GAME_MODE.STASH,
+			GAME_MODE.SELL,
+			GAME_MODE.CRAFT_SCREEN,
+			GAME_MODE.REWARD_SCREEN
+		]
+	}];
+
+	var SIGNATURE_CAPTURE_STATE = null;
 	
 	DefaultBehaviours["Debug.PrintCursorData"] = function () {
 		var c = robot.getMousePos();
 		console.log(c);
 	};
+
+	var supportedAspects = [
+		{
+			aspect: 16/9,
+			coords: {}
+		}
+	];
+
+	supportedAspects[0].coords[GAME_MODE.INVENTORY] = {x: 0.978125, y: 0.7944444444444444};
+	supportedAspects[0].coords[GAME_MODE_PASSIVE_SKILL_TREE] = {x: 0.5036458333333333, y: 0.027777777777777776};
+	supportedAspects[0].coords[GAME_MODE.WORLD_MAP] = {x: 0.1734375, y: 0.024074074074074074};
+	supportedAspects[0].coords[GAME_MODE.STASH] = {x: 0.029166666666666667, y: 0.7453703703703703};
+	supportedAspects[0].coords[GAME_MODE.SELL] = {x: 0.31875, y: 0.08796296296296297};
+	supportedAspects[0].coords[GAME_MODE.CRAFT_SCREEN] = {x: 0.32447916666666665, y: 0.09907407407407408};
+	supportedAspects[0].coords[GAME_MODE.REWARD_SCREEN] = {x: 0.4484375, y: 0.6259259259259259};
+	
+	var LastCapturedSignatures = [];
+	
+	function FindAspectRatio(aspect) {
+		var ret = -1;
+		
+		for(var i = 0; i < supportedAspects.length && ret === -1; i++) {
+			if(supportedAspects[i].aspect === aspect) {
+				ret = i;
+			}
+		}
+		
+		return ret;
+	}
+	
+	function GetCaptureCoordinates(mode) {
+		var aspectRatioIndex = FindAspectRatio(w / h);
+		var coords = null;
+		if(aspectRatioIndex !== -1) /* supported */ {
+			coords = supportedAspects[aspectRatioIndex].coords[mode];
+			coords.x *= Math.round(w);
+			coords.y *= Math.round(h);
+		} else {
+			console.error('unsupported aspect ratio for capture');
+		}
+		return coords;
+	}
 	
 	DefaultBehaviours["Debug.DetectPixelSignature"] = function () {
-		var ret = DetectPixelSignature();
-		if(ret !== null) {
-			console.log(ret.name);
-		} else {
-			console.log("signature not detected");
+		if(SIGNATURE_CAPTURE_STATE !== null) {
+
+			var groupIndex = SIGNATURE_CAPTURE_STATE.group;
+			var modeIndex = SIGNATURE_CAPTURE_STATE.mode;
+		
+			var group = SIGNATURE_CAPTURE_ORDER[groupIndex];
+		
+			var captureFrame = group.mode[modeIndex];
+			
+			var name = IndexOf(GAME_MODE, captureFrame);
+		
+			console.log("Capturing " + name);
+		
+			var coords = GetCaptureCoordinates(captureFrame);
+		
+			var sig = CaptureSignatureAt(coords.x, coords.y);
+		
+			LastCapturedSignatures.push(sig);				
+		
+			SIGNATURE_CAPTURE_STATE.mode++;
+
+			var nextMode = group.mode[SIGNATURE_CAPTURE_STATE.mode];
+			
+			if(nextMode) {
+				name = IndexOf(GAME_MODE, nextMode);
+				console.log('open ' + name + ' screen');
+			} else /* Go to another group */ {
+				SignatureDetectionWorker.postMessage({cmd: 'persist', data: {sigs: LastCapturedSignatures, filename: w + 'x' + h + group.filename}});
+
+				LastCapturedSignatures = [];
+				SIGNATURE_CAPTURE_STATE.mode = 0;
+				SIGNATURE_CAPTURE_STATE.group++;
+				
+				var nextGroup = SIGNATURE_CAPTURE_ORDER[SIGNATURE_CAPTURE_STATE.group];
+				
+				if(!nextGroup) /* finished capturing */ {
+					SIGNATURE_CAPTURE_STATE = null;
+					console.log('finished capturing');
+				} else {
+					nextMode = nextGroup.mode[SIGNATURE_CAPTURE_STATE.mode];
+					name = IndexOf(GAME_MODE, nextMode);
+					console.log('open ' + name + ' screen');
+				}
+			}
+			
+		} else /* start capturing */ {
+			SIGNATURE_CAPTURE_STATE = {group: 0, mode: 0};
+			
+			var captureFrame = SIGNATURE_CAPTURE_ORDER[0].mode[0];
+			var name = IndexOf(GAME_MODE, captureFrame);
+		
+			console.log('open ' + name + ' screen');
 		}
 	};
+	
+	function CaptureSignatureAt(x, y) {
+		var sigWidth = parseInt(w * 0.04);
+		var mouse = robot.getMousePos();
+		var sigMax = parseInt(mouse.x + sigWidth / 2)
+		var sigMin = parseInt(mouse.x - sigWidth / 2);
+
+		var sig = {};
+		
+		sig.y = mouse.y;
+		sig.x = [];
+		
+		var sigPart = parseInt(sigWidth / 6);
+		
+		for(var i = sigMin; i < sigMax; i = i + sigPart) {
+			var c = robot.getPixelColor(i, mouse.y);
+			var sigComponent = {};
+			sigComponent.x = i;
+			sigComponent.color = parseInt(c, 16);
+			sig.x.push(sigComponent);
+		}
+		
+		return sig;
+	}
 	
 	var capturing = false;
 	
 	DefaultBehaviours["Debug.CapturePixelSignature"] = function () {
 		if(!capturing) {
 			capturing = true;
-			var sigWidth = parseInt(w * 0.04);
-			var mouse = robot.getMousePos();
-			var sigMax = parseInt(mouse.x + sigWidth / 2)
-			var sigMin = parseInt(mouse.x - sigWidth / 2);
 
-			var sig = {};
-			
-			sig.y = mouse.y;
-			sig.x = [];
-			
-			var sigPart = parseInt(sigWidth / 6);
-			
-			for(var i = sigMin; i < sigMax; i = i + sigPart) {
-				var c = robot.getPixelColor(i, mouse.y);
-				var sigComponent = {};
-				sigComponent.x = i;
-				sigComponent.color = parseInt(c, 16);
-				sig.x.push(sigComponent);
-			}
+			var sig = CaptureSignatureAt(mouse.x, mouse.y);
 			
 			var stdin = process.openStdin();
 
@@ -1341,7 +1459,7 @@ var GAME_MODE_DEBUG = (function() {
 		
 		for(var i = 128; i >= 1; i = i / 2) {
 			var pressed = buttons - i >= 0;
-			ActivateKey(KeysOfExile, InputKeys, BehaviorOfExile, i, pressed, true);
+			ActivateKey(KeysOfExile, InputKeys, BehaviorOfExile, i, pressed);
 			buttons = buttons >= i ? buttons - i : buttons;
 		}
 
@@ -1700,8 +1818,8 @@ var GAME_MODE_ARPG = (function() {
 	
 })();
 
-var CURRENT_GAME_MODE = GAME_MODE.ARPG;
-var GAME_MODE_OBJECT = GAME_MODE_ARPG;
+var CURRENT_GAME_MODE = GAME_MODE.DEBUG;
+var GAME_MODE_OBJECT = GAME_MODE_DEBUG;
 
 /* END OF GAME MODES */
 
@@ -1806,7 +1924,7 @@ function ControllerListener (data) {
 
 function StartControllerListener() {
 	xbox.HIDController.addListener('data', ControllerListener);
-	SignatureDetectionWorker.postMessage({cmd: 'init', data: {defaultGameMode: GAME_MODE.ARPG}});
+	SignatureDetectionWorker.postMessage({cmd: 'init', data: {defaultGameMode: GAME_MODE.ARPG, resolutionPrefix: fileResolutionPrefix}});
 	
 	LoadInterval = setInterval(function() {
 		if(LastInputData !== null) {

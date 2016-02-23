@@ -1,8 +1,8 @@
 var fs = require('fs');
 var robot = require("robotjs");
 
-function PersistSignatureToFile() {
-	fs.writeFile("signatures.json", JSON.stringify(PIXEL_SIGNATURES), function(err) {
+function PersistSignatureToFile(filename, data) {
+	fs.writeFile("signatures/" + (filename || "signatures.json"), JSON.stringify(data), function(err) {
 		if(err) {
 			return console.log(err);
 		}
@@ -11,14 +11,10 @@ function PersistSignatureToFile() {
 	}); 
 }
 
-function ReadSignatureFile() {
-	fs.readFile("signatures.json", 'utf8', function(err, data) {
+function ReadSignatureFile(filename) {
+	fs.readFile("signatures/" + (filename || "signatures.json"), 'utf8', function(err, data) {
 		if(err) {
-			if(err.errno === -4058) /* No file on disk */ {
-				PersistSignatureToFile();
-			} else {
-				return console.log(err);
-			}
+			return console.log(err);
 		} else {
 			PIXEL_SIGNATURES = JSON.parse(data);
 			console.log("Read signature file from disk.");
@@ -60,6 +56,7 @@ var IsDefaultMode = true;
 
 var TRANSIENT_SIGNATURES = null;
 var PIXEL_SIGNATURES = [];
+var resolutionPrefix = null;
 
 self.onmessage = function(event) {
 	var cmd = event.data.cmd;
@@ -109,13 +106,14 @@ self.onmessage = function(event) {
 			}
 			
 			break;
+				
 		case 'persist':
-			PIXEL_SIGNATURES.push(data);
-			PersistSignatureToFile();
+			PersistSignatureToFile(data.filename, data.sigs);
 			break;
 		case 'init':
 			DEFAULT_GAME_MODE = data.defaultGameMode;
-			ReadSignatureFile();
+			resolutionPrefix = data.resolutionPrefix;
+			ReadSignatureFile(resolutionPrefix + "signatures.json");
 			self.postMessage({cmd: 'init'});
 	}
 
