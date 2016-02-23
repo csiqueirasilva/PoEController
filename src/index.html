@@ -134,6 +134,12 @@
 				top: 1%;
 			}			
 			
+			#btn-start {
+				position: absolute;
+				bottom: 1%;
+				left: 42.5%;
+			}
+			
 		</style>
 		
 	</head>
@@ -228,6 +234,8 @@
 			<label id="label-open-menu">OPEN MENU</label>
 			
 			<canvas id="reference-img"></canvas>
+			
+			<button id="btn-start" class="btn btn-default">Start gamepad</button>
 		</div>
 
 		<!-- imgs -->
@@ -264,6 +272,25 @@
 				context.stroke();
 				context.closePath();
 			}
+	
+			$('#btn-start').click(function() {
+				if($(this).html() === "Stop gamepad") {
+					RemoveControllerListener();
+					$(this).html("Start gamepad");
+				} else {
+					var qBehavior = $('#button-key-up select').val();
+					var wBehavior = $('#button-shoulder-left select').val();
+					var eBehavior = $('#button-key-left select').val();
+					var rBehavior = $('#button-shoulder-right select').val();
+					var rightBehavior = $('#button-key-right select').val();
+					var middleBehavior = $('#button-key-down select').val();
+					
+					GAME_MODE_ARPG.SetBehavior(qBehavior, wBehavior, eBehavior, rBehavior, rightBehavior, middleBehavior)
+
+					StartControllerListener();
+					$(this).html("Stop gamepad");
+				}
+			});
 	
 		</script>
 		

@@ -1810,16 +1810,26 @@ var GAME_MODE_ARPG = (function() {
 		ClearHeldInput(KeysOfExile, InputKeys, DPADOfExile, InputDPAD, BehaviorOfExile);
 	}
 	
+	function SetBehavior(qBehavior, wBehavior, eBehavior, rBehavior, rightBehavior, middleBehavior) {
+		BehaviorOfExile['q'][0] = qBehavior;
+		BehaviorOfExile['w'][0] = wBehavior;
+		BehaviorOfExile['e'][0] = eBehavior;
+		BehaviorOfExile['r'][0] = rBehavior;
+		BehaviorOfExile['right'][0] = rightBehavior;
+		BehaviorOfExile['middle'][0] = middleBehavior;
+	};
+	
 	return {
 		EnterArea: EnterArea,
 		ResolveInput: ResolveDataInput,
-		LeaveArea: LeaveArea
+		LeaveArea: LeaveArea,
+		SetBehavior: SetBehavior
 	};
 	
 })();
 
-var CURRENT_GAME_MODE = GAME_MODE.DEBUG;
-var GAME_MODE_OBJECT = GAME_MODE_DEBUG;
+var CURRENT_GAME_MODE = GAME_MODE.ARPG;
+var GAME_MODE_OBJECT = GAME_MODE_ARPG;
 
 /* END OF GAME MODES */
 
@@ -1938,7 +1948,15 @@ function StartControllerListener() {
 				
 				GAME_MODE_OBJECT.ResolveInput(LastInputData);
 			}, InputInterval);
+			
 			clearInterval(LoadInterval);
+			
+			exec("start steam://rungameid/238960", function(error, stdout, stderr) {
+				console.log(stdout);
+				if(error) {
+					return console.error(stderr);
+				}
+			});
 		}
 	}, 100);
 }
@@ -1982,13 +2000,6 @@ var EXPORTED_INPUT_MODES = {
 		}
 	]
 };
-
-/*exec("start steam://rungameid/238960", function(error, stdout, stderr) {
-	console.log(stdout);
-	if(error) {
-		return console.error(stderr);
-	}
-});*/
 
 /*exec("nw . --disable-gpu --force-cpu-draw", function(error, stdout, stderr) {
 	console.log(stdout);
