@@ -58,6 +58,27 @@
 	MenuInputCoordinates['ps3'] = {};
 	MenuInputCoordinates['ps3'].Img = ps3Img;
 	
+	MenuInputCoordinates['ps3'].KEY_L3 = [0.405, 0.63];
+	MenuInputCoordinates['ps3'].MOUSE_CURSOR = [0.605, 0.615];
+	MenuInputCoordinates['ps3'].CHAR_MOVEMENT = [0.405, 0.63];
+	MenuInputCoordinates['ps3'].MOUSE_CLICK = [0.72, 0.12];
+	MenuInputCoordinates['ps3'].LOOT_POSITION = [0.445, 0.445];
+	MenuInputCoordinates['ps3'].OPEN_MENU = [0.56, 0.445];
+	MenuInputCoordinates['ps3'].KEY_ESCAPE = [0.33, 0.12];
+
+	MenuInputCoordinates['ps3'].DPAD_UP = [0.3075, 0.38];
+	MenuInputCoordinates['ps3'].DPAD_LEFT = [0.27, 0.44];
+	MenuInputCoordinates['ps3'].DPAD_RIGHT = [0.345, 0.44];
+	MenuInputCoordinates['ps3'].DPAD_DOWN = [0.3075, 0.5];
+	
+	MenuInputCoordinates['ps3'].SHOULDER_LEFT = [0.3075, 0.165];
+	MenuInputCoordinates['ps3'].SHOULDER_RIGHT = [0.6975, 0.165];
+	
+	MenuInputCoordinates['ps3'].KEY_UP = [0.6975, 0.38];
+	MenuInputCoordinates['ps3'].KEY_LEFT = [0.645, 0.44];
+	MenuInputCoordinates['ps3'].KEY_RIGHT = [0.75, 0.44];
+	MenuInputCoordinates['ps3'].KEY_DOWN = [0.6975, 0.5];
+	
 	function drawControllerReferencemenuCanvas(op) {
 		
 		menuCanvas.width = window.innerWidth;
