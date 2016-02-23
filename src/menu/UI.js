@@ -127,4 +127,23 @@
 		return {x:x, y:y};
 	}
 	
+	var options = [];
+	
+	for(var key in EXPORTED_INPUT_MODES) {
+		var arr = EXPORTED_INPUT_MODES[key];
+		var group = document.createElement('optgroup');
+		group.label = key;
+		for(var i = 0; i < arr.length; i++) {
+			var o = document.createElement('option');
+			var v = arr[i];
+			o.innerHTML = v.name;
+			o.title = v.help;
+			o.value = v.key;
+			group.appendChild(o);
+		}
+		options.push(group);
+	}
+	
+	$('.button-input-type').append(options);
+	
 })();

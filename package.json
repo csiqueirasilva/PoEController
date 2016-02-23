@@ -17,9 +17,12 @@
 	"fullscreen": false,
     "frame": true,
     "toolbar": true,
-	"always-on-top": true,
+	"always-on-top": false,
 	"resizable": true,
 	"transparent": false,
-	"show_in_taskbar": true
+	"show_in_taskbar": true,
+	"position": "center",
+	"width": 900,
+	"height": 660
   }
 }

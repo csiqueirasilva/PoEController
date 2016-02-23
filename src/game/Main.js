@@ -53,6 +53,8 @@ robot.setKeyboardDelay(0);
 var w = robot.getScreenSize().width;
 var h = robot.getScreenSize().height;
 
+var halfScreenDiagonal = Math.sqrt(w * w + h * h) / 2;
+
 var BasePosition = {
 	x: w / 2,
 	y: h * 0.44
@@ -92,11 +94,7 @@ function IsInsideScreen(x, y) {
 function ChangeGameMode(NewGameMode) {
 
 	var oldGameMode = CURRENT_GAME_MODE;
-	
-	//console.log('out: ' + IndexOf(GAME_MODE, oldGameMode));
-	//console.log('in: ' + IndexOf(GAME_MODE, NewGameMode));
-	
-	//console.log('calling leave area: ', !!GAME_MODE_OBJECT, GAME_MODE_OBJECT.LeaveArea instanceof Function);
+
 	if(GAME_MODE_OBJECT && GAME_MODE_OBJECT.LeaveArea instanceof Function) {
 		GAME_MODE_OBJECT.LeaveArea();
 	}
@@ -1513,7 +1511,6 @@ var GAME_MODE_WORLD_MAP = (function () {
 	};
 })();
 
-
 var GAME_MODE_ARPG = (function() {
 	
 	var BehaviorOfExile = {
@@ -1522,7 +1519,7 @@ var GAME_MODE_ARPG = (function() {
 		'e': ["MouseNeutral"],
 		'r': [],
 		'right': [],
-		'middle': ["MouseLastAngle"],
+		'middle': ["MouseLastAngleLow"],
 		'ARPG.OptionsMenu': [null, 'ARPG.OptionsMenu'],
 		'ARPG.FetchLoot': ["ARPG.FetchLootHold", "ARPG.FetchLootRelease"],
 		'1': [],
@@ -1576,8 +1573,20 @@ var GAME_MODE_ARPG = (function() {
 
 	var LEFT_THUMBSTICK_THRESHOLD = 0.25;
 
-	DefaultBehaviours.MouseLastAngle = function (args, key) {
-		var R = 100;
+	DefaultBehaviours.MouseLastAngleLow = function (args, key) {
+		var R = h * 0.1;
+		robot.moveMouse(BasePosition.x + R * Math.cos(lastAngle), BasePosition.y + R * Math.sin(lastAngle));
+		ActionKey(key, "down");
+	}
+
+	DefaultBehaviours.MouseLastAngleMid = function (args, key) {
+		var R = h * 0.225;
+		robot.moveMouse(BasePosition.x + R * Math.cos(lastAngle), BasePosition.y + R * Math.sin(lastAngle));
+		ActionKey(key, "down");
+	}
+
+	DefaultBehaviours.MouseLastAngleHigh = function (args, key) {
+		var R = h * 0.35;
 		robot.moveMouse(BasePosition.x + R * Math.cos(lastAngle), BasePosition.y + R * Math.sin(lastAngle));
 		ActionKey(key, "down");
 	}
@@ -1823,6 +1832,38 @@ function RemoveControllerListener() {
 	DetectPollingInterval = null;
 	LoadInterval = null;
 }
+
+var EXPORTED_INPUT_MODES = {
+	"Simple": [
+		{
+			name: "Just press",
+			key: "nothing",
+			help: "Just press the key. Use the last mouse cursor position for some abilities. Good for generic ranged attacks."
+		},
+		{
+			name: "Center mouse and press",
+			key: "MouseNeutral",
+			help: "Move the mouse to the center position and press the key. Good for melee attacks (use game client's aim bot)."
+		}
+	],
+	"Increment": [
+		{
+			name: "Small increment to cursor position",
+			key: "MouseLastAngleLow",
+			help: "Use a small increment to the cursor position last angle before pressing the button. Good for totems and traps"
+		},
+		{
+			name: "Medium increment to cursor position",
+			key: "MouseLastAngleMid",
+			help: "Use a medium increment to the cursor position last angle before pressing the button. Good for totems, traps and skills like leap slam"		
+		},
+		{
+			name: "High increment to cursor position",
+			key: "MouseLastAngleHigh",
+			help: "Use a high increment to the cursor position last angle before pressing the button. Good for totems, traps and skills like leap slam"		
+		}
+	]
+};
 
 /*exec("start steam://rungameid/238960", function(error, stdout, stderr) {
 	console.log(stdout);
