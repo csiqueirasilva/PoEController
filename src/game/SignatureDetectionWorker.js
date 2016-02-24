@@ -104,9 +104,9 @@ self.onmessage = function(event) {
 					console.log('Signature not detected. Going into default game mode.');
 				}
 			}
-			
+
 			break;
-				
+
 		case 'persist':
 			PersistSignatureToFile(data.filename, data.sigs);
 			break;

@@ -1,6 +1,7 @@
-var DETECTION_INTERVAL_MS = 800;
+var DETECTION_INTERVAL_MS = 500;
 var RepeatActionInterval = 90;
 var InputInterval = 15;
+var DEBUG_MODE = false;
 
 var GAME_MODE = {
 	DEBUG: 0,
@@ -99,38 +100,44 @@ function ChangeGameMode(NewGameMode) {
 
 	var oldGameMode = CURRENT_GAME_MODE;
 
-	if(GAME_MODE_OBJECT && GAME_MODE_OBJECT.LeaveArea instanceof Function) {
-		GAME_MODE_OBJECT.LeaveArea();
-	}
-	
-	var mode = null;
-	
-	switch(NewGameMode) {
-		case GAME_MODE.DEBUG:
-			mode = GAME_MODE_DEBUG;
-			break;
-		case GAME_MODE.INVENTORY:
-			mode = GAME_MODE_INVENTORY;
-			break;
-		case GAME_MODE.OPTIONS_MENU:
-			mode = GAME_MODE_OPTIONS_MENU;
-			break;
-		case GAME_MODE.PASSIVE_SKILL_TREE:
-			mode = GAME_MODE_PASSIVE_SKILL_TREE;
-			break;
-		case GAME_MODE.WORLD_MAP:
-			mode = GAME_MODE_WORLD_MAP;
-			break;
-		default:
-			mode = GAME_MODE_ARPG;
-	}
-	
-	CURRENT_GAME_MODE = NewGameMode;
+	console.log(IndexOf(GAME_MODE, NewGameMode));
 
-	GAME_MODE_OBJECT = mode;
+	if(oldGameMode !== NewGameMode) {
 	
-	if(oldGameMode !== CURRENT_GAME_MODE && mode.EnterArea instanceof Function) {
-		mode.EnterArea();
+		if(GAME_MODE_OBJECT && GAME_MODE_OBJECT.LeaveArea instanceof Function) {
+			GAME_MODE_OBJECT.LeaveArea();
+		}
+		
+		var mode = null;
+		
+		switch(NewGameMode) {
+			case GAME_MODE.DEBUG:
+				mode = GAME_MODE_DEBUG;
+				break;
+			case GAME_MODE.INVENTORY:
+				mode = GAME_MODE_INVENTORY;
+				break;
+			case GAME_MODE.OPTIONS_MENU:
+				mode = GAME_MODE_OPTIONS_MENU;
+				break;
+			case GAME_MODE.PASSIVE_SKILL_TREE:
+				mode = GAME_MODE_PASSIVE_SKILL_TREE;
+				break;
+			case GAME_MODE.WORLD_MAP:
+				mode = GAME_MODE_WORLD_MAP;
+				break;
+			default:
+				mode = GAME_MODE_ARPG;
+		}
+		
+		CURRENT_GAME_MODE = NewGameMode;
+
+		GAME_MODE_OBJECT = mode;
+		
+		if(oldGameMode !== CURRENT_GAME_MODE && mode.EnterArea instanceof Function) {
+			mode.EnterArea();
+		}
+	
 	}
 	
 }
@@ -270,7 +277,7 @@ SignatureDetectionWorker.onmessage = function(event) {
 	
 	switch(cmd) {
 		case 'detect-sub':
-			//console.log('detect-sub', IndexOf(GAME_MODE, data));
+			console.log('detect-sub', IndexOf(GAME_MODE, data));
 			if(GAME_MODE_OBJECT.SubSection instanceof Function) {
 				GAME_MODE_OBJECT.SubSection(data);
 			}
@@ -286,11 +293,7 @@ SignatureDetectionWorker.onmessage = function(event) {
 var DetectPollingInterval = null;
 var RightThumbstickMouseInterval = null;
 
-function InitGame() {
-	DetectPollingInterval = setInterval(function() {
-		SignatureDetectionWorker.postMessage({cmd: 'detect', data: {CURRENT_GAME_MODE: CURRENT_GAME_MODE, isBlockedGameMode: IsBlockedGameMode()}});
-	}, DETECTION_INTERVAL_MS);
-	
+function PollGamepadEvents() {
 	RightThumbstickMouseInterval = setInterval(function() {
 		
 		if(LastInputData !== null) {
@@ -305,6 +308,14 @@ function InitGame() {
 		}
 		
 	}, InputInterval);
+}
+
+function InitGame() {
+	DetectPollingInterval = setInterval(function() {
+		SignatureDetectionWorker.postMessage({cmd: 'detect', data: {CURRENT_GAME_MODE: CURRENT_GAME_MODE, isBlockedGameMode: IsBlockedGameMode()}});
+	}, DETECTION_INTERVAL_MS);
+	
+	PollGamepadEvents();
 		
 	exec("start steam://rungameid/238960", function(error, stdout, stderr) {
 		console.log(stdout);
@@ -1259,7 +1270,7 @@ var GAME_MODE_INVENTORY = (function() {
 	function EnterArea() {
 		//console.log('enter area');
 		//robot.mouseToggle("up");
-		console.log('set subsigs');
+		//console.log('set subsigs');
 		SignatureDetectionWorker.postMessage({cmd: 'set-subsigs', data: SubSectionSignatures});
 		SubSectionDetectionInterval = setInterval(function () {
 			SignatureDetectionWorker.postMessage({cmd: 'detect-sub'});
@@ -1300,7 +1311,7 @@ var GAME_MODE_DEBUG = (function() {
 		filename: 'signatures.json',
 		mode: [
 			GAME_MODE.INVENTORY,
-			GAME_MODE_PASSIVE_SKILL_TREE,
+			GAME_MODE.PASSIVE_SKILL_TREE,
 			GAME_MODE.WORLD_MAP
 		]
 	},
@@ -1329,7 +1340,7 @@ var GAME_MODE_DEBUG = (function() {
 	];
 
 	supportedAspects[0].coords[GAME_MODE.INVENTORY] = {x: 0.978125, y: 0.7944444444444444};
-	supportedAspects[0].coords[GAME_MODE_PASSIVE_SKILL_TREE] = {x: 0.5036458333333333, y: 0.027777777777777776};
+	supportedAspects[0].coords[GAME_MODE.PASSIVE_SKILL_TREE] = {x: 0.5036458333333333, y: 0.027777777777777776};
 	supportedAspects[0].coords[GAME_MODE.WORLD_MAP] = {x: 0.1734375, y: 0.024074074074074074};
 	supportedAspects[0].coords[GAME_MODE.STASH] = {x: 0.029166666666666667, y: 0.7453703703703703};
 	supportedAspects[0].coords[GAME_MODE.SELL] = {x: 0.31875, y: 0.08796296296296297};
@@ -1380,7 +1391,10 @@ var GAME_MODE_DEBUG = (function() {
 			var coords = GetCaptureCoordinates(captureFrame);
 		
 			var sig = CaptureSignatureAt(coords.x, coords.y);
-		
+			
+			sig.gameMode = captureFrame;
+			sig.name = name;
+			
 			LastCapturedSignatures.push(sig);				
 		
 			SIGNATURE_CAPTURE_STATE.mode++;
@@ -1422,18 +1436,18 @@ var GAME_MODE_DEBUG = (function() {
 	function CaptureSignatureAt(x, y) {
 		var sigWidth = parseInt(w * 0.04);
 		var mouse = robot.getMousePos();
-		var sigMax = parseInt(mouse.x + sigWidth / 2)
-		var sigMin = parseInt(mouse.x - sigWidth / 2);
+		var sigMax = parseInt(x + sigWidth / 2)
+		var sigMin = parseInt(x - sigWidth / 2);
 
 		var sig = {};
 		
-		sig.y = mouse.y;
+		sig.y = y;
 		sig.x = [];
 		
-		var sigPart = parseInt(sigWidth / 6);
+		var sigPart = parseInt(sigWidth / 10);
 		
 		for(var i = sigMin; i < sigMax; i = i + sigPart) {
-			var c = robot.getPixelColor(i, mouse.y);
+			var c = robot.getPixelColor(i, y);
 			var sigComponent = {};
 			sigComponent.x = i;
 			sigComponent.color = parseInt(c, 16);
@@ -1733,7 +1747,7 @@ var GAME_MODE_ARPG = (function() {
 	}
 	
 	function move(angle, extMoving) {
-		var R = 78;
+		var R = h * 0.0908;
 		robot.moveMouse(BasePosition.x + R * Math.cos(angle), BasePosition.y + R * Math.sin(angle));
 		if(!extMoving) {
 			moving = true;
@@ -1954,9 +1968,11 @@ function ControllerListener (data) {
 	LastInputData = data;
 }
 
-function StartControllerListener() {
+function StartControllerListener(DEBUG_MODE) {
 	xbox.HIDController.addListener('data', ControllerListener);
-	SignatureDetectionWorker.postMessage({cmd: 'init', data: {defaultGameMode: GAME_MODE.ARPG, resolutionPrefix: fileResolutionPrefix}});
+	if(!DEBUG_MODE) {
+		SignatureDetectionWorker.postMessage({cmd: 'init', data: {defaultGameMode: GAME_MODE.ARPG, resolutionPrefix: fileResolutionPrefix}});
+	}
 }
 
 function RemoveControllerListener() {
@@ -1999,6 +2015,13 @@ var EXPORTED_INPUT_MODES = {
 		}
 	]
 };
+
+if(DEBUG_MODE) {
+	CURRENT_GAME_MODE = GAME_MODE.DEBUG;
+	GAME_MODE_OBJECT = GAME_MODE_DEBUG;
+	StartControllerListener();
+	PollGamepadEvents();
+}
 
 /*exec("nw . --disable-gpu --force-cpu-draw", function(error, stdout, stderr) {
 	console.log(stdout);
