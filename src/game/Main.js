@@ -1,4 +1,4 @@
-var DETECTION_INTERVAL_MS = 500;
+var DETECTION_INTERVAL_MS = 750;
 var RepeatActionInterval = 90;
 var InputInterval = 15;
 var DEBUG_MODE = false;
@@ -100,9 +100,9 @@ function ChangeGameMode(NewGameMode) {
 
 	var oldGameMode = CURRENT_GAME_MODE;
 
-	console.log(IndexOf(GAME_MODE, NewGameMode));
-
 	if(oldGameMode !== NewGameMode) {
+
+		//console.log(IndexOf(GAME_MODE, oldGameMode) + " to " + IndexOf(GAME_MODE, NewGameMode));
 	
 		if(GAME_MODE_OBJECT && GAME_MODE_OBJECT.LeaveArea instanceof Function) {
 			GAME_MODE_OBJECT.LeaveArea();
@@ -1841,6 +1841,7 @@ var GAME_MODE_ARPG = (function() {
 
 	function EnterArea() {
 		robot.moveMouse(BasePosition.x, BasePosition.y);
+		SignatureDetectionWorker.postMessage({cmd: 'clear-lastsig'});
 	}
 	
 	function LeaveArea() {

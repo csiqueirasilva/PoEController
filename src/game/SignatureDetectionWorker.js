@@ -87,6 +87,10 @@ self.onmessage = function(event) {
 			}
 			break;
 			
+		case 'clear-lastsig':
+			LastDetectedSig = null;
+			break;
+			
 		case 'detect':
 		
 			if(!data.isBlockedGameMode) {
