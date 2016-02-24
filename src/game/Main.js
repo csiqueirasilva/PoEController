@@ -319,10 +319,15 @@ function InitGame() {
 		
 	exec("start steam://rungameid/238960", function(error, stdout, stderr) {
 		console.log(stdout);
+		
 		if(error) {
 			return console.error(stderr);
 		}
 	});
+	
+	if(cbInitGame instanceof Function) {
+		cbInitGame();
+	}
 }
 
 /* SKILL BEHAVIOR BEFORE USING */
@@ -1969,8 +1974,11 @@ function ControllerListener (data) {
 	LastInputData = data;
 }
 
-function StartControllerListener(DEBUG_MODE) {
+var cbInitGame = null;
+
+function StartControllerListener(DEBUG_MODE, callbackInitGame) {
 	xbox.HIDController.addListener('data', ControllerListener);
+	cbInitGame = callbackInitGame;
 	if(!DEBUG_MODE) {
 		SignatureDetectionWorker.postMessage({cmd: 'init', data: {defaultGameMode: GAME_MODE.ARPG, resolutionPrefix: fileResolutionPrefix}});
 	}

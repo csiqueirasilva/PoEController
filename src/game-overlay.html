@@ -14,6 +14,8 @@
 		
 		<script>
 		
+			var gui = require('nw.gui');
+		
 			function drawOverlayCanvas () {
 		
 				var canvas = document.getElementById('main-canvas');
@@ -37,6 +39,36 @@
 			}
 			
 			drawOverlayCanvas();
+
+			global.gameOverlay = gui.Window.get();
+			
+			global.menuWindow = gui.Window.open('index.html', {
+				toolbar: true,
+				frame: false,
+				position: 'center',
+				fullscreen: false,
+				always_on_top: false,
+				resizable: false,
+				show_in_taskbar: true,
+				width: 1173,
+				height: 660
+			});
+			
+			function hideGameOverlay() {
+				var canvas = document.getElementById('main-canvas');
+				canvas.style.display = 'none';
+			}
+
+			function showGameOverlay() {
+				var canvas = document.getElementById('main-canvas');
+				canvas.style.display = 'block';
+			}
+			
+			global.hideGameOverlay = hideGameOverlay;
+			global.showGameOverlay = showGameOverlay;
+			
+			global.hideGameOverlay();
+			
 		</script>
 	
 	</body>

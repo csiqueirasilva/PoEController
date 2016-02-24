@@ -13,6 +13,36 @@
 		<script src="../src/game/Main.js"></script>
 		
 		<style>
+		
+			@font-face {
+				font-family: "Fontin";
+				src: url("../font/Fontin-Regular.ttf")
+			}
+			
+			@font-face {
+				font-family: "FontinBold";
+				src: url("../font/Fontin-Bold.ttf")
+			}
+		
+			* {
+				font-family: "Fontin";
+				color: #ffc;
+			}
+		
+			#close-btn:hover {
+				background-image: url("../imgs/close-over.png");
+				cursor: pointer;
+			}
+		
+			#close-btn {
+				width: 28px;
+				height: 28px;
+				background-image: url("../imgs/close.png");
+				position: absolute;
+				top: 1%;
+				right: 1%;
+			}
+		
 			.ui-element {
 				position: absolute;
 			}
@@ -34,8 +64,8 @@
 			}
 			
 			label {
-				color: #000;
-				text-shadow: 2px 0 0 #fff, -2px 0 0 #fff, 0 2px 0 #fff, 0 -2px 0 #fff, 1px 1px #fff, -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff;
+/*				text-shadow: 2px 0 0 #fff, -2px 0 0 #fff, 0 2px 0 #fff, 0 -2px 0 #fff, 1px 1px #fff, -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff; */
+				
 			}
 			
 			#button-dpad-up {
@@ -156,6 +186,8 @@
 		
 		<div id="main-menu" class="container-fluid">
 			
+			<div id="close-btn"></div>
+			
 			<div class="ui-element" id="select-input-method-box">
 				<label>Input Method</label>
 
@@ -255,14 +287,13 @@
 		
 		<script>
 	
-			var gui = require('nw.gui');
-	
 			$('.button-input select').select2();
 	
 			$('#select-input-method').change();
 	
 			$('#btn-start').click(function() {
 				if($(this).html() === "Stop gamepad") {
+					global.hideGameOverlay();
 					RemoveControllerListener();
 					$(this).html("Start gamepad");
 				} else {
@@ -275,13 +306,19 @@
 					
 					GAME_MODE_ARPG.SetBehavior(qBehavior, wBehavior, eBehavior, rBehavior, rightBehavior, middleBehavior)
 
-					StartControllerListener();
+					StartControllerListener(false, function() {
+						global.showGameOverlay();
+						global.gameOverlay.focus();
+					});
+					
 					$(this).html("Stop gamepad");
 				}
 			});
 	
-			var new_win = gui.Window.open('game-overlay.html', {toolbar:false, frame:false});
-			new_win.setTransparent(true);
+			$('#close-btn').click(function() {
+				global.gameOverlay.close();
+				global.menuWindow.close();
+			});
 	
 		</script>
 		
