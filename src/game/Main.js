@@ -279,16 +279,39 @@ SignatureDetectionWorker.onmessage = function(event) {
 			ChangeGameMode(data);
 			break;
 		case 'init':
-			StartDetectionPolling();
+			InitGame();
 	}
 };
 
 var DetectPollingInterval = null;
+var RightThumbstickMouseInterval = null;
 
-function StartDetectionPolling() {
+function InitGame() {
 	DetectPollingInterval = setInterval(function() {
 		SignatureDetectionWorker.postMessage({cmd: 'detect', data: {CURRENT_GAME_MODE: CURRENT_GAME_MODE, isBlockedGameMode: IsBlockedGameMode()}});
 	}, DETECTION_INTERVAL_MS);
+	
+	RightThumbstickMouseInterval = setInterval(function() {
+		
+		if(LastInputData !== null) {
+			// resolve right thumb axis
+			MoveThumbstick(LastInputData[5], LastInputData[7], 
+				MAX_INPUT_THUMBSTICK, 
+				RIGHT_THUMBSTICK_THRESHOLD,
+				RightThumbIfCallback,
+				RightThumbElseCallback);
+			
+			GAME_MODE_OBJECT.ResolveInput(LastInputData);
+		}
+		
+	}, InputInterval);
+		
+	exec("start steam://rungameid/238960", function(error, stdout, stderr) {
+		console.log(stdout);
+		if(error) {
+			return console.error(stderr);
+		}
+	});
 }
 
 /* SKILL BEHAVIOR BEFORE USING */
@@ -1926,7 +1949,6 @@ function RightThumbElseCallback() {
 }
 
 var LastInputData = null;
-var LoadInterval = null;
 
 function ControllerListener (data) {
 	LastInputData = data;
@@ -1935,38 +1957,15 @@ function ControllerListener (data) {
 function StartControllerListener() {
 	xbox.HIDController.addListener('data', ControllerListener);
 	SignatureDetectionWorker.postMessage({cmd: 'init', data: {defaultGameMode: GAME_MODE.ARPG, resolutionPrefix: fileResolutionPrefix}});
-	
-	LoadInterval = setInterval(function() {
-		if(LastInputData !== null) {
-			setInterval(function() {
-				// resolve right thumb axis
-				MoveThumbstick(LastInputData[5], LastInputData[7], 
-					MAX_INPUT_THUMBSTICK, 
-					RIGHT_THUMBSTICK_THRESHOLD,
-					RightThumbIfCallback,
-					RightThumbElseCallback);
-				
-				GAME_MODE_OBJECT.ResolveInput(LastInputData);
-			}, InputInterval);
-			
-			clearInterval(LoadInterval);
-			
-			exec("start steam://rungameid/238960", function(error, stdout, stderr) {
-				console.log(stdout);
-				if(error) {
-					return console.error(stderr);
-				}
-			});
-		}
-	}, 100);
 }
 
 function RemoveControllerListener() {
 	xbox.HIDController.removeListener('data', ControllerListener);
-	clearInterval(LoadInterval);
 	clearInterval(DetectPollingInterval);
+	clearInterval(RightThumbstickMouseInterval);
 	DetectPollingInterval = null;
-	LoadInterval = null;
+	RightThumbstickMouseInterval = null;
+	LastInputData = null;
 }
 
 var EXPORTED_INPUT_MODES = {
