@@ -1,0 +1,43 @@
+<html>
+	<head>
+		<style>
+			body {
+				margin: 0;
+				padding: 0;
+			}
+		</style>
+	</head>
+	
+	<body>
+		
+		<canvas id="main-canvas"></canvas>
+		
+		<script>
+		
+			function drawOverlayCanvas () {
+		
+				var canvas = document.getElementById('main-canvas');
+				
+				canvas.width = window.innerWidth;
+				canvas.height = window.innerHeight;
+				
+				var context = canvas.getContext('2d');
+				
+				var posX = canvas.width * 0.5;
+				var posY = canvas.height * 0.44;
+				var h = canvas.height * 0.005;
+				
+				context.lineWidth = 2;
+				
+				context.beginPath();
+				context.arc(posX, posY, h, 0, 2 * Math.PI, false);
+				context.strokeStyle = "#FF0000";
+				context.stroke();
+				context.closePath();
+			}
+			
+			drawOverlayCanvas();
+		</script>
+	
+	</body>
+</html>
