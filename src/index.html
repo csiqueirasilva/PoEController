@@ -142,7 +142,7 @@
 	
 			$('#btn-start').click(function() {
 			
-				UserSettings.Save();
+			UserSettings.Save();
 			
 				var otherInputs = $('select, button').not(this);
 			
@@ -165,7 +165,6 @@
 
 					StartControllerListener(false, function() {
 						global.showGameOverlay();
-						global.menuWindow.minimize();
 						global.gameOverlay.focus();
 					});
 					
