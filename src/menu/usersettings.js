@@ -1,4 +1,4 @@
-var Persistence = (function() {
+var UserSettings = (function() {
 
 	var fs = require('fs');
 

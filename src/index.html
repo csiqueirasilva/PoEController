@@ -125,7 +125,8 @@
 		<!-- imgs -->
 
 		<script src="menu/UI.js"></script>
-		<script src="menu/persistence.js"></script>
+		<script src="menu/usersettings.js"></script>
+		<script src="menu/poesettings.js"></script>
 
 		<script>
 	
@@ -141,7 +142,7 @@
 	
 			$('#btn-start').click(function() {
 			
-				Persistence.Save();
+				UserSettings.Save();
 			
 				var otherInputs = $('select, button').not(this);
 			
@@ -164,6 +165,7 @@
 
 					StartControllerListener(false, function() {
 						global.showGameOverlay();
+						global.menuWindow.minimize();
 						global.gameOverlay.focus();
 					});
 					
@@ -172,17 +174,20 @@
 			});
 	
 			$('#close-btn').click(function() {
-				Persistence.Save(function() {
-					global.gameOverlay.close();
+				UserSettings.Save(function() {
+					PoESettings.restoreConfigFile();
 					global.menuWindow.close();
+					global.gameOverlay.close();
 				});
 			});
 	
-	
 			$(window).load(function() {
-				Persistence.Load(function() {
+				PoESettings.getFilePath();
+				PoESettings.rewriteConfigFile();
+				UserSettings.Load(function() {
 					$('#main-menu-body').show();
 					$('#select-input-method').trigger('change');
+					global.menuWindow.focus();
 				});
 			});
 	
