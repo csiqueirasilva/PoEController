@@ -15,7 +15,7 @@
 		<link rel="stylesheet" type="text/css" href="../src/style.css" />
 		
 	</head>
-	<body id="main-menu-body" unselectable="on" onselectstart="return false;">
+	<body id="main-menu-body" style="display: none;" unselectable="on" onselectstart="return false;">
 		
 		<div id="main-menu" class="container-fluid">
 			
@@ -125,6 +125,7 @@
 		<!-- imgs -->
 
 		<script src="../src/menu/UI.js"></script>
+		<script src="../src/menu/persistence.js"></script>
 
 		<script>
 	
@@ -139,6 +140,9 @@
 			$('#select-input-method').change();
 	
 			$('#btn-start').click(function() {
+			
+				Persistence.Save();
+			
 				var otherInputs = $('select, button').not(this);
 			
 				if($(this).html() === "Stop gamepad") {
@@ -168,8 +172,18 @@
 			});
 	
 			$('#close-btn').click(function() {
-				global.gameOverlay.close();
-				global.menuWindow.close();
+				Persistence.Save(function() {
+					global.gameOverlay.close();
+					global.menuWindow.close();
+				});
+			});
+	
+	
+			$(window).load(function() {
+				Persistence.Load(function() {
+					$('#main-menu-body').show();
+					$('#select-input-method').trigger('change');
+				});
 			});
 	
 		</script>
