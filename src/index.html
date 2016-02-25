@@ -164,10 +164,17 @@
 				top: 1%;
 			}			
 			
+			#btn-start:hover {
+				background-color: #a71;
+				color: #000;
+			}
+			
 			#btn-start {
 				position: absolute;
 				bottom: 1%;
 				left: 42.5%;
+				border-color: #a71;
+				background-color: #000;
 			}
 			
 			body {
@@ -177,6 +184,24 @@
 				background-attachment: fixed;
 				background-position: center; 
 				background-size: auto 100%;
+			}
+			
+			.select2-container--default .select2-selection--single .select2-selection__rendered {
+				color: #ffc;
+			}
+			
+			.select2-container--default .select2-selection--single, .select2-dropdown, .select2-search--dropdown .select2-search__field {
+				background-color: #000;
+				border: 1px solid #a71;
+			}
+			
+			.select2-container--default .select2-results__option[aria-selected=true] {
+				background-color: #a71;
+			}
+			
+			.select2-container--default .select2-results__option--highlighted[aria-selected] {
+				background-color: #d95;
+				color: #000;
 			}
 			
 		</style>
@@ -275,7 +300,7 @@
 			
 			<canvas id="reference-img"></canvas>
 			
-			<button id="btn-start" class="btn btn-primary">Start gamepad</button>
+			<button id="btn-start" class="btn">Start gamepad</button>
 		</div>
 
 		<!-- imgs -->
@@ -287,7 +312,7 @@
 		
 		<script>
 	
-			$('.button-input select').select2();
+			$('select').select2();
 	
 			$('#select-input-method').change();
 	
