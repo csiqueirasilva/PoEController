@@ -1,0 +1,211 @@
+@font-face {
+	font-family: "Fontin";
+	src: url("../font/Fontin-Regular.ttf")
+}
+
+@font-face {
+	font-family: "FontinBold";
+	src: url("../font/Fontin-Bold.ttf")
+}
+
+* {
+	font-family: "Fontin";
+	color: #ffc;
+}
+
+#close-btn:hover {
+	background-image: url("../imgs/close-over.png");
+	cursor: pointer;
+}
+
+#close-btn {
+	width: 28px;
+	height: 28px;
+	background-image: url("../imgs/close.png");
+	position: absolute;
+	top: 1%;
+	right: 1%;
+}
+
+.ui-element {
+	position: absolute;
+}
+
+#main-menu {
+	margin: 0px;
+	padding: 0px;
+}
+
+#select-input-method-box {
+	width: 100px;
+	left: 1%;
+	top: 1%;
+}
+
+.button-input {
+	min-width: 160px;
+	position: absolute;
+}
+
+label {
+/*				text-shadow: 2px 0 0 #fff, -2px 0 0 #fff, 0 2px 0 #fff, 0 -2px 0 #fff, 1px 1px #fff, -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff; */
+	
+}
+
+#button-dpad-up {
+	bottom: 16%;
+	left: 1%;
+}
+
+#button-dpad-left {
+	bottom: 11%;
+	left: 1%;
+}
+
+#button-dpad-right {
+	bottom: 6%;
+	left: 1%;
+}
+
+#button-dpad-down {
+	bottom: 1%;
+	left: 1%;
+}
+
+#button-shoulder-left {
+	top: 38%;
+	left: 1%;
+}
+
+#button-shoulder-right {
+	bottom: 49%;
+	right: 1%;
+	text-align: right;
+}
+
+#button-key-up {
+	bottom: 37%;
+	right: 1%;
+	text-align: right;
+}
+
+#button-key-left {
+	bottom: 25%;
+	right: 1%;
+	text-align: right;				
+}
+
+#button-key-right {
+	bottom: 13%;
+	right: 1%;
+	text-align: right;				
+}
+
+#button-key-down {
+	bottom: 1%;
+	right: 1%;
+	text-align: right;				
+}
+
+#button-key-l3 {
+	bottom: 21%;
+	left: 1%;
+}
+
+#label-char-movement {
+	position: absolute;
+	left: 3%;
+	top: 20%;
+}
+
+#label-loot-position {
+	position: absolute;
+	left: 40%;
+	top: 10%;
+}
+
+#label-escape {
+	position: absolute;
+	left: 30%;
+	top: 1%;
+}
+
+#label-mouse-click {
+	position: absolute;
+	right: 3%;
+	top: 9%;
+}
+
+#label-mouse-cursor {
+	position: absolute;
+	right: 35%;
+	top: 70%;
+}			
+
+#label-open-menu {
+	position: absolute;
+	right: 35%;
+	top: 1%;
+}			
+
+#btn-start:hover {
+	background-color: #a71;
+	color: #000;
+}
+
+#start-area {
+	position: absolute;
+	bottom: 1%;
+	width: 100%;
+	text-align: center;
+}
+
+#start-area a {
+	color: #ffc;
+	font-family: 'FontinBold';
+}
+
+#btn-start {
+	border-color: #a71;
+	background-color: #000;
+}
+
+#main-menu-body {
+	overflow: hidden; 
+	margin: 0; 
+	width: 100%; 
+	height: 100%; 
+	-moz-user-select: none; 
+	-webkit-user-select: none; 
+	-ms-user-select:none; 
+	user-select:none;
+	-o-user-select:none;
+	background-color: transparent;
+	background-image: url('../imgs/bg.jpg');
+	background-repeat: no-repeat;
+	background-attachment: fixed;
+	background-position: center; 
+	background-size: auto 100%;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__rendered {
+	color: #ffc;
+}
+
+.select2-container--default .select2-selection--single, .select2-dropdown, .select2-search--dropdown .select2-search__field {
+	background-color: #000;
+	border: 1px solid #a71;
+}
+
+.select2-container--default .select2-results__option[aria-selected=true] {
+	background-color: #a71;
+}
+
+.select2-container--default .select2-results__option--highlighted[aria-selected] {
+	background-color: #d95;
+	color: #000;
+}
+
+.select2-container--default.select2-container--disabled .select2-selection--single {
+	background-color: #fc1;
+} 
