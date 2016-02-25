@@ -169,10 +169,19 @@
 				color: #000;
 			}
 			
-			#btn-start {
+			#start-area {
 				position: absolute;
 				bottom: 1%;
-				left: 42.5%;
+				width: 100%;
+				text-align: center;
+			}
+			
+			#start-area a {
+				color: #ffc;
+				font-family: 'FontinBold';
+			}
+			
+			#btn-start {
 				border-color: #a71;
 				background-color: #000;
 			}
@@ -305,7 +314,15 @@
 			
 			<canvas id="reference-img"></canvas>
 			
-			<button id="btn-start" class="btn">Start gamepad</button>
+			<div id="start-area">
+				<div>
+					<span id="flash-msg"></span>
+				</div>
+				<div>
+					<a target="_blank" href="https://github.com/csiqueirasilva/PoEController/blob/master/README.md">Click here to check the README file for more information</a>
+				</div>
+				<button id="btn-start" class="btn">Start gamepad</button>
+			</div>
 		</div>
 
 		<!-- imgs -->
@@ -314,8 +331,13 @@
 		<!-- imgs -->
 
 		<script src="../src/menu/UI.js"></script>
-		
+
 		<script>
+	
+			$('a[target=_blank]').on('click', function(){
+				require('nw.gui').Shell.openExternal( this.href );
+				return false;
+			});
 	
 			$('select').select2();
 	
