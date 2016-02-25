@@ -203,8 +203,13 @@
 				background-color: #d95;
 				color: #000;
 			}
-			
+		
+			.select2-container--default.select2-container--disabled .select2-selection--single {
+				background-color: #fc1;
+			} 
+		
 		</style>
+		
 		
 	</head>
 	<body style="overflow: hidden; margin: 0; width: 100%; height: 100%; -moz-user-select: none; -webkit-user-select: none; -ms-user-select:none; user-select:none;-o-user-select:none;" unselectable="on" onselectstart="return false;">
@@ -317,11 +322,16 @@
 			$('#select-input-method').change();
 	
 			$('#btn-start').click(function() {
+				var otherInputs = $('select, button').not(this);
+			
 				if($(this).html() === "Stop gamepad") {
 					global.hideGameOverlay();
 					RemoveControllerListener();
 					$(this).html("Start gamepad");
+					otherInputs.prop('disabled', false);
 				} else {
+					otherInputs.prop('disabled', true);
+
 					var qBehavior = $('#button-key-up select').val();
 					var wBehavior = $('#button-shoulder-left select').val();
 					var eBehavior = $('#button-key-left select').val();
