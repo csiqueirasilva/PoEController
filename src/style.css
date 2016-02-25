@@ -1,11 +1,11 @@
 @font-face {
 	font-family: "Fontin";
-	src: url("../font/Fontin-Regular.ttf")
+	src: url("font/Fontin-Regular.ttf")
 }
 
 @font-face {
 	font-family: "FontinBold";
-	src: url("../font/Fontin-Bold.ttf")
+	src: url("font/Fontin-Bold.ttf")
 }
 
 * {
@@ -14,14 +14,14 @@
 }
 
 #close-btn:hover {
-	background-image: url("../imgs/close-over.png");
+	background-image: url("imgs/close-over.png");
 	cursor: pointer;
 }
 
 #close-btn {
 	width: 28px;
 	height: 28px;
-	background-image: url("../imgs/close.png");
+	background-image: url("imgs/close.png");
 	position: absolute;
 	top: 1%;
 	right: 1%;
@@ -181,7 +181,7 @@ label {
 	user-select:none;
 	-o-user-select:none;
 	background-color: transparent;
-	background-image: url('../imgs/bg.jpg');
+	background-image: url('imgs/bg.jpg');
 	background-repeat: no-repeat;
 	background-attachment: fixed;
 	background-position: center; 
