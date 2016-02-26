@@ -12,19 +12,16 @@
 		
 		<canvas id="main-canvas"></canvas>
 		
+		<img id="buttons-image" src="imgs/buttons.png" style="display: none;" />
+		
 		<script>
 		
 			var gui = require('nw.gui');
 		
-			function drawOverlayCanvas () {
+			var context = null;
+			var canvas = null;
 		
-				var canvas = document.getElementById('main-canvas');
-				
-				canvas.width = window.innerWidth;
-				canvas.height = window.innerHeight;
-				
-				var context = canvas.getContext('2d');
-				
+			function drawOverlayCanvas () {
 				var posX = canvas.width * 0.5;
 				var posY = canvas.height * 0.44;
 				var h = canvas.height * 0.005;
@@ -38,30 +35,34 @@
 				context.closePath();
 			}
 			
-			drawOverlayCanvas();
-
 			global.gameOverlay = gui.Window.get();
 			
-			global.menuWindow = gui.Window.open('index.html', {
-				toolbar: true,
-				frame: false,
-				position: 'center',
-				fullscreen: false,
-				always_on_top: false,
-				transparent: true,
-				resizable: false,
-				show_in_taskbar: true,
-				width: 1173,
-				height: 660
-			});
+			window.onload = function() {
+			
+				global.menuWindow = gui.Window.open('index.html', {
+					toolbar: true,
+					frame: false,
+					position: 'center',
+					fullscreen: false,
+					always_on_top: false,
+					transparent: true,
+					resizable: false,
+					show_in_taskbar: true,
+					width: 1173,
+					height: 660
+				});
+			
+			};
 			
 			function hideGameOverlay() {
 				var canvas = document.getElementById('main-canvas');
 				canvas.style.display = 'none';
 			}
 
-			function showGameOverlay() {
+			function showGameOverlay(input) {
+				YIndex = input === "ps3" ? 0 : imageXSize; // select buttons in texture
 				var canvas = document.getElementById('main-canvas');
+				updateOverlayCanvas();
 				canvas.style.display = 'block';
 			}
 			
@@ -69,6 +70,79 @@
 			global.showGameOverlay = showGameOverlay;
 			
 			global.hideGameOverlay();
+
+			var XIndex = {
+				DPAD_UP: 1,
+				DPAD_DOWN: 2,
+				DPAD_LEFT: 3,
+				DPAD_RIGHT: 4,
+				L3: 7,
+				R3: 8,
+				KEY_DOWN: 9,
+				KEY_RIGHT: 10,
+				KEY_UP: 11,
+				KEY_LEFT: 12,
+				KEY_SELECT: 13,
+				KEY_START: 14,
+				SHOULDER_LEFT: 15,
+				SHOULDER_RIGHT: 16,
+				TRIGGER_LEFT: 17,
+				TRIGGER_RIGHT: 18
+			};
+			
+			var YIndex = 52 * 1;
+			var imageXSize = 52;
+			var buttonSize = window.innerWidth * 0.015;
+			
+			var buttonImage = document.getElementById('buttons-image');
+			
+			function drawButton(btn, x, y) {
+
+				var posX = window.innerWidth * x;
+				var posY = window.innerHeight * y;
+				
+				context.fillStyle = "#FFFFFF";
+				context.beginPath();
+				context.arc(posX + buttonSize * 0.5, posY + buttonSize * 0.5, buttonSize * 0.4, 0, 2 * Math.PI);
+				context.fill();
+			
+				context.drawImage(buttonImage,
+					imageXSize * btn, YIndex,
+					imageXSize, imageXSize,
+					posX, posY,
+					buttonSize,
+					buttonSize);
+			}
+			
+			function updateOverlayCanvas () {
+				buttonSize = window.innerWidth * 0.015;
+				
+				canvas = document.getElementById('main-canvas');
+				
+				canvas.width = window.innerWidth;
+				canvas.height = window.innerHeight;
+				
+				context = canvas.getContext('2d');
+
+				context.clearRect(0, 0, canvas.width, canvas.height);
+
+				drawOverlayCanvas();
+				
+				drawButton(XIndex.DPAD_LEFT, 0.1575, 0.97);
+				drawButton(XIndex.DPAD_DOWN, 0.18, 0.97);
+				drawButton(XIndex.DPAD_RIGHT, 0.205, 0.97);
+				drawButton(XIndex.DPAD_UP, 0.23, 0.97);
+				drawButton(XIndex.L3, 0.255, 0.97);
+				
+				drawButton(XIndex.KEY_DOWN, 0.8215, 0.905);
+				drawButton(XIndex.KEY_RIGHT, 0.849, 0.905);
+
+				drawButton(XIndex.KEY_UP, 0.8215 - 0.02875 * 3, 0.97);
+				drawButton(XIndex.SHOULDER_LEFT, 0.8215 - 0.02875 * 2, 0.97);
+				drawButton(XIndex.KEY_LEFT, 0.8215 - 0.02875, 0.97);
+				drawButton(XIndex.SHOULDER_RIGHT, 0.8215, 0.97);
+
+			}
 			
 		</script>
 	

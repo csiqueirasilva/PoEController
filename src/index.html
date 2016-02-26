@@ -80,7 +80,7 @@
 			</div>
 			
 			<div id="button-shoulder-right" class="button-input">
-				<label>KEY SHOULDER RIGHT (W)</label>
+				<label>KEY SHOULDER RIGHT (R)</label>
 				<div>
 					<select class="button-input-type">
 					</select>
@@ -88,7 +88,7 @@
 			</div>
 			
 			<div id="button-shoulder-left" class="button-input">
-				<label>KEY SHOULDER LEFT (R)</label>
+				<label>KEY SHOULDER LEFT (W)</label>
 				<div>
 					<select class="button-input-type">
 					</select>
@@ -164,7 +164,7 @@
 					GAME_MODE_ARPG.SetBehavior(qBehavior, wBehavior, eBehavior, rBehavior, rightBehavior, middleBehavior)
 
 					StartControllerListener(false, function() {
-						global.showGameOverlay();
+						global.showGameOverlay($('#select-input-method').val());
 						global.gameOverlay.focus();
 					});
 					

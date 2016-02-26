@@ -1712,8 +1712,8 @@ var GAME_MODE_ARPG = (function() {
 		2: 'right',
 		4: 'e',
 		8: 'q',
-		16: 'r',
-		32: 'w',
+		16: 'w',
+		32: 'r',
 		64: 'ARPG.FetchLoot',
 		128: 'ARPG.OptionsMenu'
 	};
