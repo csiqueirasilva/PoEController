@@ -1671,6 +1671,9 @@ var GAME_MODE_WORLD_MAP = (function () {
 	};
 })();
 
+var GLOBAL_MOVE_ANGLE = 0;
+var GLOBAL_MOVE_RADIUS = null;
+
 var GAME_MODE_ARPG = (function() {
 	
 	var BehaviorOfExile = {
@@ -1679,7 +1682,7 @@ var GAME_MODE_ARPG = (function() {
 		'e': ["MouseNeutral"],
 		'r': [],
 		'right': [],
-		'middle': ["MouseLastAngleLow"],
+		'middle': [],
 		'ARPG.OptionsMenu': [null, 'ARPG.OptionsMenu'],
 		'ARPG.FetchLoot': ["ARPG.FetchLootHold", "ARPG.FetchLootRelease"],
 		'1': [],
@@ -1729,30 +1732,53 @@ var GAME_MODE_ARPG = (function() {
 	
 	var moving = false;
 	var lastTimeClick = 0;
-	var lastAngle = 0;
 
 	var LEFT_THUMBSTICK_THRESHOLD = 0.25;
 
-	DefaultBehaviours.MouseLastAngleLow = function (args, key) {
-		var R = h * 0.1;
-		robot.moveMouse(BasePosition.x + R * Math.cos(lastAngle), BasePosition.y + R * Math.sin(lastAngle));
-		ActionKey(key, "down");
+	var LastIncrementActionTimeout = null;
+	
+	function MouseWithIncrementKeyDown(R, key) {
+		if(LastIncrementActionTimeout === null) {
+			GLOBAL_MOVE_RADIUS = R;
+			robot.moveMouse(BasePosition.x + R * Math.cos(GLOBAL_MOVE_ANGLE), BasePosition.y + R * Math.sin(GLOBAL_MOVE_ANGLE));
+			
+			LastIncrementActionTimeout = setTimeout(function() {
+				ActionKey(key, "down");
+				LastIncrementActionTimeout = null;
+			}, InputInterval * 1.5);
+		}
 	}
 
-	DefaultBehaviours.MouseLastAngleMid = function (args, key) {
-		var R = h * 0.225;
-		robot.moveMouse(BasePosition.x + R * Math.cos(lastAngle), BasePosition.y + R * Math.sin(lastAngle));
-		ActionKey(key, "down");
+	function MouseWithIncrementKeyUp() {
+		GLOBAL_MOVE_RADIUS = null;	
+	}
+	
+	DefaultBehaviours['arpg.MouseLastAngleLow.KeyDown'] = function (args, key) {
+		MouseWithIncrementKeyDown(h * 0.1, key);
 	}
 
-	DefaultBehaviours.MouseLastAngleHigh = function (args, key) {
-		var R = h * 0.35;
-		robot.moveMouse(BasePosition.x + R * Math.cos(lastAngle), BasePosition.y + R * Math.sin(lastAngle));
-		ActionKey(key, "down");
+	DefaultBehaviours['arpg.MouseLastAngleLow.KeyUp'] = function (args, key) {
+		MouseWithIncrementKeyUp();
+	}
+	
+	DefaultBehaviours['arpg.MouseLastAngleMid.KeyDown'] = function (args, key) {
+		MouseWithIncrementKeyDown(h * 0.225, key);
+	}
+
+	DefaultBehaviours['arpg.MouseLastAngleMid.KeyUp'] = function (args, key) {
+		MouseWithIncrementKeyUp();
+	}
+	
+	DefaultBehaviours['arpg.MouseLastAngleHigh.KeyDown'] = function (args, key) {
+		MouseWithIncrementKeyDown(h * 0.35, key);
+	}
+	
+	DefaultBehaviours['arpg.MouseLastAngleHigh.KeyUp'] = function (args, key) {
+		MouseWithIncrementKeyUp();
 	}
 	
 	function move(angle, extMoving) {
-		var R = h * 0.0908;
+		var R = GLOBAL_MOVE_RADIUS || (h * 0.0908);
 		robot.moveMouse(BasePosition.x + R * Math.cos(angle), BasePosition.y + R * Math.sin(angle));
 		if(!extMoving) {
 			moving = true;
@@ -1770,8 +1796,8 @@ var GAME_MODE_ARPG = (function() {
 	}
 	
 	function LeftThumbIfCallback (x, y) {
-		lastAngle = Math.atan2(y, x);
-		move(lastAngle, moving);
+		GLOBAL_MOVE_ANGLE = Math.atan2(y, x);
+		move(GLOBAL_MOVE_ANGLE, moving);
 	}
 	
 	function LeftThumbElseCallback() {		
@@ -1853,13 +1879,26 @@ var GAME_MODE_ARPG = (function() {
 		ClearHeldInput(KeysOfExile, InputKeys, DPADOfExile, InputDPAD, BehaviorOfExile);
 	}
 	
+	function SetBehaviorFunction(idx, fnc) {
+		var matchKeyDown = fnc.match(/.KeyDown$/g);
+		
+		BehaviorOfExile[idx] = [];
+		
+		if(matchKeyDown !== null) {
+			BehaviorOfExile[idx][0] = fnc;
+			BehaviorOfExile[idx][1] = fnc.replace(/.KeyDown$/g, '.KeyUp');
+		} else {
+			BehaviorOfExile[idx][0] = fnc;
+		}
+	}
+	
 	function SetBehavior(qBehavior, wBehavior, eBehavior, rBehavior, rightBehavior, middleBehavior) {
-		BehaviorOfExile['q'][0] = qBehavior;
-		BehaviorOfExile['w'][0] = wBehavior;
-		BehaviorOfExile['e'][0] = eBehavior;
-		BehaviorOfExile['r'][0] = rBehavior;
-		BehaviorOfExile['right'][0] = rightBehavior;
-		BehaviorOfExile['middle'][0] = middleBehavior;
+		SetBehaviorFunction('q', qBehavior);
+		SetBehaviorFunction('w', wBehavior);
+		SetBehaviorFunction('e', eBehavior);
+		SetBehaviorFunction('r', rBehavior);
+		SetBehaviorFunction('right', rightBehavior);
+		SetBehaviorFunction('middle', middleBehavior);
 	};
 	
 	return {
@@ -2009,17 +2048,17 @@ var EXPORTED_INPUT_MODES = {
 	"Increment": [
 		{
 			name: "Small increment to cursor position",
-			key: "MouseLastAngleLow",
+			key: "arpg.MouseLastAngleLow.KeyDown",
 			help: "Use a small increment to the cursor position last angle before pressing the button. Good for totems and traps"
 		},
 		{
 			name: "Medium increment to cursor position",
-			key: "MouseLastAngleMid",
+			key: "arpg.MouseLastAngleMid.KeyDown",
 			help: "Use a medium increment to the cursor position last angle before pressing the button. Good for totems, traps and skills like leap slam"		
 		},
 		{
 			name: "High increment to cursor position",
-			key: "MouseLastAngleHigh",
+			key: "arpg.MouseLastAngleHigh.KeyDown",
 			help: "Use a high increment to the cursor position last angle before pressing the button. Good for totems, traps and skills like leap slam"		
 		}
 	]
