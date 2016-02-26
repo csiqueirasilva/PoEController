@@ -193,6 +193,8 @@ function ResolveDpadInput (data, DpadMapping, InputMapping, BehaviorMapping, ski
 }
 
 function ClearHeldInput (KeysOfExile, InputKeys, DPADOfExile, InputDPAD, BehaviorOfExile) {
+	robot.mouseToggle("up");
+
 	for(var key in BehaviorOfExile) {
 		var ref = IndexOf(KeysOfExile, key);
 		if(ref === -1) {
@@ -443,12 +445,11 @@ var GAME_MODE_OPTIONS_MENU = (function() {
 	
 	function EnterArea() {
 		blockInputs = true;
-	
-		robot.mouseToggle("up");
 		
 		robot.moveMouse(CURSOR_X_INITIAL, CURSOR_Y_INITIAL);
-		
+	
 		setTimeout(function() {
+			
 			robot.mouseClick("left");
 			setTimeout(function() {
 			
@@ -459,8 +460,8 @@ var GAME_MODE_OPTIONS_MENU = (function() {
 				
 				blockInputs = false;
 			}, 30);
+			
 		}, 30);
-		
 	}
 	
 	function LeaveArea() {
@@ -1823,8 +1824,12 @@ var GAME_MODE_ARPG = (function() {
 		}
 	}
 
+	var LastTimestampStart = 0;
+	
 	function ResolveDataInput(data) {
 
+		var CurrentTimestampStart = new Date().getTime();
+	
 		// resolve buttons
 		
 		var buttons = data[10];
@@ -1845,8 +1850,11 @@ var GAME_MODE_ARPG = (function() {
 			
 			// clear dpad
 			ResolveDpadInput(0, DPADOfExile, InputDPAD, BehaviorOfExile);
+
+			LastTimestampStart = CurrentTimestampStart;
 			
-		} else {
+		} else if (CurrentTimestampStart - LastTimestampStart > 300) {
+		
 			for(var i = 64; i >= 1; i = i / 2) {
 				var pressed = buttons - i >= 0;
 				ActivateKey(KeysOfExile, InputKeys, BehaviorOfExile, i, pressed);
@@ -1914,7 +1922,6 @@ var GAME_MODE_ARPG = (function() {
 	}
 	
 	function LeaveArea() {
-		console.log('leaving arpg');
 		ClearHeldInput(KeysOfExile, InputKeys, DPADOfExile, InputDPAD, BehaviorOfExile);
 	}
 	
