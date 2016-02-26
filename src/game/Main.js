@@ -83,7 +83,7 @@ function IsMouseInput(Key) {
 function ActionKey(Key, Action) {
 	if(IsMouseInput(Key)) {
 		robot.mouseToggle(Action, Key);
-	} else if(Key.match(/\w+/) !== null) {
+	} else if(Key.match(/\./) === null) {
 		robot.keyToggle(Key, Action);
 	}
 }
@@ -390,24 +390,26 @@ var GAME_MODE_OPTIONS_MENU = (function() {
 	};
 	
 	var KeysOfExile = {};
-	
-	KeysOfExile[KEYS.KEY_DOWN] = "OptionsMenu.Confirm";
-	KeysOfExile[KEYS.KEY_RIGHT] = "OptionsMenu.Cancel";
-	KeysOfExile[KEYS.KEY_START] = "OptionsMenu.Cancel";
 		
 	var DPADOfExile = {};
 	
-	DPADOfExile = {};
+	function SetOptionKeys() {
+		KeysOfExile[KEYS.KEY_DOWN] = "OptionsMenu.Confirm";
+		KeysOfExile[KEYS.KEY_RIGHT] = "OptionsMenu.Cancel";
+		KeysOfExile[KEYS.KEY_START] = "OptionsMenu.Cancel";
+		
+		DPADOfExile[KEYS.DPAD_UP] = "OptionsMenu.Up";
+		DPADOfExile[KEYS.DPAD_DOWN] = "OptionsMenu.Down";
+		
+		BehaviorOfExile = {
+			"OptionsMenu.Up": ["OptionsMenu.Up"],
+			"OptionsMenu.Down": ["OptionsMenu.Down"],
+			"OptionsMenu.Cancel": [null, "OptionsMenu.Cancel"],
+			"OptionsMenu.Confirm": [null, "OptionsMenu.Confirm"]
+		};
+	}
 	
-	DPADOfExile[KEYS.DPAD_UP] = "OptionsMenu.Up";
-	DPADOfExile[KEYS.DPAD_DOWN] = "OptionsMenu.Down";
-	
-	var BehaviorOfExile = {
-		"OptionsMenu.Up": ["OptionsMenu.Up"],
-		"OptionsMenu.Down": ["OptionsMenu.Down"],
-		"OptionsMenu.Cancel": [null, "OptionsMenu.Cancel"],
-		"OptionsMenu.Confirm": [null, "OptionsMenu.Confirm"]
-	};
+	var BehaviorOfExile = {};
 	
 	var InputDPAD = {};
 	
@@ -423,20 +425,25 @@ var GAME_MODE_OPTIONS_MENU = (function() {
 	var CURSOR_Y_INITIAL = parseInt(h * 0.9287);
 	
 	function ResolveInput(data) {
-		
-		var buttons = data[10];
-		
-		for(var i = 128; i >= 1; i = i / 2) {
-			var pressed = buttons - i >= 0;
-			ActivateKey(KeysOfExile, InputKeys, BehaviorOfExile, i, pressed);
-			buttons = buttons >= i ? buttons - i : buttons;
+		if(!blockInputs) {
+			var buttons = data[10];
+			
+			for(var i = 128; i >= 1; i = i / 2) {
+				var pressed = buttons - i >= 0;
+				ActivateKey(KeysOfExile, InputKeys, BehaviorOfExile, i, pressed);
+				buttons = buttons >= i ? buttons - i : buttons;
+			}
+			
+			// solve dpad
+			ResolveDpadInput(data[11], DPADOfExile, InputDPAD, BehaviorOfExile, true);
 		}
-		
-		// solve dpad
-		ResolveDpadInput(data[11], DPADOfExile, InputDPAD, BehaviorOfExile, true);
 	}
 	
+	var blockInputs;
+	
 	function EnterArea() {
+		blockInputs = true;
+	
 		robot.mouseToggle("up");
 		
 		robot.moveMouse(CURSOR_X_INITIAL, CURSOR_Y_INITIAL);
@@ -444,16 +451,28 @@ var GAME_MODE_OPTIONS_MENU = (function() {
 		setTimeout(function() {
 			robot.mouseClick("left");
 			setTimeout(function() {
+			
 				CURSOR_INDEX = 0;
 				robot.moveMouse(CURSOR_X_POSITION, CURSOR_Y_POSITION);
+				
+				SetOptionKeys();
+				
+				blockInputs = false;
 			}, 30);
 		}, 30);
 		
 	}
 	
+	function LeaveArea() {
+		BehaviorOfExile = {};
+		KeysOfExile = {};
+		DPADOfExile = {};
+	}
+	
 	return {
 		ResolveInput: ResolveInput,
-		EnterArea: EnterArea
+		EnterArea: EnterArea,
+		LeaveArea: LeaveArea
 	};
 })();
 
@@ -1805,66 +1824,87 @@ var GAME_MODE_ARPG = (function() {
 	}
 
 	function ResolveDataInput(data) {
-		
-		// resolve left thumb axis
-		
-		MoveThumbstick(data[1], data[3], 
-			MAX_INPUT_THUMBSTICK, 
-			LEFT_THUMBSTICK_THRESHOLD, 
-			LeftThumbIfCallback,
-			LeftThumbElseCallback);
 
 		// resolve buttons
 		
 		var buttons = data[10];
 		
-		for(var i = 128; i >= 1; i = i / 2) {
-			var pressed = buttons - i >= 0;
-			ActivateKey(KeysOfExile, InputKeys, BehaviorOfExile, i, pressed);
-			buttons = buttons >= i ? buttons - i : buttons;
-		}
-
-		// resolve r3 and l3
-
-		buttons = data[11] % 4;
-
-		if(DPADOfExile[buttons]) /* Cases 1 or 2 */ {
-			var key = DPADOfExile[buttons];
-			ActivateKey(DPADOfExile, InputDPAD, BehaviorOfExile, buttons, true);
-			if(buttons === 1) {
-				ActivateKey(DPADOfExile, InputDPAD, BehaviorOfExile, 2, false);
-			} else {
-				ActivateKey(DPADOfExile, InputDPAD, BehaviorOfExile, 1, false);
+		var pressed = buttons - KEYS.KEY_START >= 0;
+		ActivateKey(KeysOfExile, InputKeys, BehaviorOfExile, KEYS.KEY_START, pressed);
+		
+		if(pressed) {
+		
+			// unpress other buttons
+			for(var i = 64; i >= 1; i = i / 2) {
+				ActivateKey(KeysOfExile, InputKeys, BehaviorOfExile, i, false);
 			}
-		} else {
+			
+			// clear l3 and r3
 			ActivateKey(DPADOfExile, InputDPAD, BehaviorOfExile, 2, false);
 			ActivateKey(DPADOfExile, InputDPAD, BehaviorOfExile, 1, false);
-		}
+			
+			// clear dpad
+			ResolveDpadInput(0, DPADOfExile, InputDPAD, BehaviorOfExile);
+			
+		} else {
+			for(var i = 64; i >= 1; i = i / 2) {
+				var pressed = buttons - i >= 0;
+				ActivateKey(KeysOfExile, InputKeys, BehaviorOfExile, i, pressed);
+				buttons = buttons >= i ? buttons - i : buttons;
+			}
 		
-		// resolve dpad
-		
-		ResolveDpadInput(data[11], DPADOfExile, InputDPAD, BehaviorOfExile);
-		
-		var timestamp = new Date().getTime();
-		
-		if(data[9] < 128 && timestamp - lastTimeClick > 500) {
+			
+			// resolve left thumb axis
+			
+			MoveThumbstick(data[1], data[3], 
+				MAX_INPUT_THUMBSTICK, 
+				LEFT_THUMBSTICK_THRESHOLD, 
+				LeftThumbIfCallback,
+				LeftThumbElseCallback);
+			
+			// resolve r3 and l3
 
-			robot.keyToggle("alt", "down");
+			buttons = data[11] % 4;
 
-			setTimeout(function() {
-		
-				robot.mouseClick("left");
-				
+			if(DPADOfExile[buttons]) /* Cases 1 or 2 */ {
+				var key = DPADOfExile[buttons];
+				ActivateKey(DPADOfExile, InputDPAD, BehaviorOfExile, buttons, true);
+				if(buttons === 1) {
+					ActivateKey(DPADOfExile, InputDPAD, BehaviorOfExile, 2, false);
+				} else {
+					ActivateKey(DPADOfExile, InputDPAD, BehaviorOfExile, 1, false);
+				}
+			} else {
+				ActivateKey(DPADOfExile, InputDPAD, BehaviorOfExile, 2, false);
+				ActivateKey(DPADOfExile, InputDPAD, BehaviorOfExile, 1, false);
+			}
+			
+			// resolve dpad
+			
+			ResolveDpadInput(data[11], DPADOfExile, InputDPAD, BehaviorOfExile);
+			
+			var timestamp = new Date().getTime();
+			
+			if(data[9] < 128 && timestamp - lastTimeClick > 500) {
+
+				robot.keyToggle("alt", "down");
+
 				setTimeout(function() {
-					robot.keyToggle("alt", "up");
-				}, 22);
-				
-			}, 50);
+			
+					robot.mouseClick("left");
+					
+					setTimeout(function() {
+						robot.keyToggle("alt", "up");
+					}, 22);
+					
+				}, 50);
 
-			lastTimeClick = timestamp;
-		} else if(data[9] > 128 && timestamp - lastTimeClick > 500) {
-			robot.keyTap("escape");
-			lastTimeClick = timestamp;
+				lastTimeClick = timestamp;
+			} else if(data[9] > 128 && timestamp - lastTimeClick > 500) {
+				robot.keyTap("escape");
+				lastTimeClick = timestamp;
+			}
+		
 		}
 	}
 
@@ -1874,6 +1914,7 @@ var GAME_MODE_ARPG = (function() {
 	}
 	
 	function LeaveArea() {
+		console.log('leaving arpg');
 		ClearHeldInput(KeysOfExile, InputKeys, DPADOfExile, InputDPAD, BehaviorOfExile);
 	}
 	
