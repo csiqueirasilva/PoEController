@@ -83,7 +83,7 @@ function IsMouseInput(Key) {
 function ActionKey(Key, Action) {
 	if(IsMouseInput(Key)) {
 		robot.mouseToggle(Action, Key);
-	} else if(Key.match(/\w+\.\w+/) === null) {
+	} else if(Key.match(/\w+/) !== null) {
 		robot.keyToggle(Key, Action);
 	}
 }
@@ -229,7 +229,7 @@ function ActivateKey(keys, reference, behaviorReference, index, pressed, skipKey
 		if(behavior instanceof Array && behavior.length > 0 && DefaultBehaviours[behavior[0]] instanceof Function) {
 			behaviorIndex = behavior[0];
 		} else if(!(behavior instanceof Array) || !DefaultBehaviours[behavior[0]]) {
-			behaviorIndex = "nothing";
+			behaviorIndex = "arpg.nothing";
 		}
 	
 		if(reference[index] && !pressed) {
@@ -348,11 +348,11 @@ DefaultBehaviours['ARPG.FetchLootRelease'] = function () {
 	robot.keyToggle('alt', 'up');
 };
 
-DefaultBehaviours.nothing = function (args, key) {
+DefaultBehaviours['arpg.nothing'] = function (args, key) {
 	ActionKey(key, "down");
 }
 
-DefaultBehaviours.MouseNeutral = function (args, key) {
+DefaultBehaviours['ARPG.MouseNeutral'] = function (args, key) {
 	robot.moveMouse(BasePosition.x, BasePosition.y);
 	ActionKey(key, "down");
 }
@@ -1679,14 +1679,12 @@ var GAME_MODE_ARPG = (function() {
 	var BehaviorOfExile = {
 		'q': [],
 		'w': [],
-		'e': ["MouseNeutral"],
+		'e': [],
 		'r': [],
 		'right': [],
 		'middle': [],
 		'ARPG.OptionsMenu': [null, 'ARPG.OptionsMenu'],
 		'ARPG.FetchLoot': ["ARPG.FetchLootHold", "ARPG.FetchLootRelease"],
-		'1': [],
-		'2': []
 	};
 
 	var KeysOfExile = {
@@ -2036,12 +2034,12 @@ var EXPORTED_INPUT_MODES = {
 	"Simple": [
 		{
 			name: "Just press",
-			key: "nothing",
+			key: "arpg.nothing",
 			help: "Just press the key. Use the last mouse cursor position for some abilities. Good for generic ranged attacks."
 		},
 		{
 			name: "Center mouse and press",
-			key: "MouseNeutral",
+			key: "ARPG.MouseNeutral",
 			help: "Move the mouse to the center position and press the key. Good for melee attacks (use game client's aim bot)."
 		}
 	],
