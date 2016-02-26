@@ -110,7 +110,10 @@
 			
 			<div id="start-area">
 				<div>
-					<span id="flash-msg"></span>
+					<label><span id="warning-msg">*** DO NOT MINIMIZE THIS SCREEN ***</span></label>
+				</div>
+				<div>
+					<label><span id="flash-msg"></span></label>
 				</div>
 				<div>
 					<label><a target="_blank" href="https://github.com/csiqueirasilva/PoEController/blob/master/README.md">Click here to check the README file for more information</a></label>
@@ -142,7 +145,7 @@
 	
 			$('#btn-start').click(function() {
 			
-			UserSettings.Save();
+				UserSettings.Save();
 			
 				var otherInputs = $('select, button').not(this);
 			
@@ -152,8 +155,8 @@
 					$(this).html("Start gamepad");
 					otherInputs.prop('disabled', false);
 				} else {
-					otherInputs.prop('disabled', true);
-
+					$('select, button').prop('disabled', true);
+					
 					var qBehavior = $('#button-key-up select').val();
 					var wBehavior = $('#button-shoulder-left select').val();
 					var eBehavior = $('#button-key-left select').val();
@@ -163,11 +166,20 @@
 					
 					GAME_MODE_ARPG.SetBehavior(qBehavior, wBehavior, eBehavior, rBehavior, rightBehavior, middleBehavior)
 
-					StartControllerListener(false, function() {
-						global.showGameOverlay($('#select-input-method').val());
-						global.gameOverlay.focus();
-					});
+					var btn = $(this);
 					
+					StartControllerListener(false, function() {
+						global.gameOverlay.focus();
+						setTimeout(function() {
+							global.showGameOverlay($('#select-input-method').val());
+							$('#flash-msg').hide();
+							btn.prop('disabled', false);
+						}, 8000);
+					});
+
+					$('#flash-msg').html("If you have Path of Exile Steam Version it will open (or focus the window, if already open).<br />If not, please open Path of Exile's game client.");
+					$('#flash-msg').show();
+
 					$(this).html("Stop gamepad");
 				}
 			});
