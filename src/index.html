@@ -48,7 +48,7 @@
 			</div>
 			
 			<div id="button-key-up" class="button-input">
-				<label>KEY UP (Q)</label>
+				<label>KEY UP (R)</label>
 				<div>
 					<select class="button-input-type">
 					</select>
@@ -56,7 +56,7 @@
 			</div>
 
 			<div id="button-key-down" class="button-input">
-				<label>KEY DOWN (MOUSE MIDDLE)</label>
+				<label>KEY DOWN (W)</label>
 				<div>
 					<select class="button-input-type">
 					</select>
@@ -64,7 +64,7 @@
 			</div>			
 			
 			<div id="button-key-left" class="button-input">
-				<label>KEY LEFT (E)</label>
+				<label>KEY LEFT (Q)</label>
 				<div>
 					<select class="button-input-type">
 					</select>
@@ -72,7 +72,7 @@
 			</div>
 			
 			<div id="button-key-right" class="button-input">
-				<label>KEY RIGHT (MOUSE RIGHT)</label>
+				<label>KEY RIGHT (E)</label>
 				<div>
 					<select class="button-input-type">
 					</select>
@@ -80,7 +80,7 @@
 			</div>
 			
 			<div id="button-shoulder-right" class="button-input">
-				<label>KEY SHOULDER RIGHT (R)</label>
+				<label>KEY SHOULDER RIGHT (MOUSE RIGHT)</label>
 				<div>
 					<select class="button-input-type">
 					</select>
@@ -88,7 +88,7 @@
 			</div>
 			
 			<div id="button-shoulder-left" class="button-input">
-				<label>KEY SHOULDER LEFT (W)</label>
+				<label>KEY SHOULDER LEFT (MOUSE MIDDLE)</label>
 				<div>
 					<select class="button-input-type">
 					</select>
@@ -157,14 +157,16 @@
 				} else {
 					$('select, button').prop('disabled', true);
 					
-					var qBehavior = $('#button-key-up select').val();
-					var wBehavior = $('#button-shoulder-left select').val();
-					var eBehavior = $('#button-key-left select').val();
-					var rBehavior = $('#button-shoulder-right select').val();
-					var rightBehavior = $('#button-key-right select').val();
-					var middleBehavior = $('#button-key-down select').val();
+					var inputArgs = {};
 					
-					GAME_MODE_ARPG.SetBehavior(qBehavior, wBehavior, eBehavior, rBehavior, rightBehavior, middleBehavior)
+					inputArgs[KEYS.KEY_UP] = $('#button-key-up select').val();
+					inputArgs[KEYS.KEY_SHOULDER_LEFT] = $('#button-shoulder-left select').val();
+					inputArgs[KEYS.KEY_LEFT] = $('#button-key-left select').val();
+					inputArgs[KEYS.KEY_SHOULDER_RIGHT] = $('#button-shoulder-right select').val();
+					inputArgs[KEYS.KEY_RIGHT] = $('#button-key-right select').val();
+					inputArgs[KEYS.KEY_DOWN] = $('#button-key-down select').val();
+					
+					GAME_MODE_ARPG.SetBehavior(inputArgs);
 
 					var btn = $(this);
 					

@@ -1706,14 +1706,14 @@ var GAME_MODE_ARPG = (function() {
 		'ARPG.OptionsMenu': [null, 'ARPG.OptionsMenu'],
 		'ARPG.FetchLoot': ["ARPG.FetchLootHold", "ARPG.FetchLootRelease"],
 	};
-
+	
 	var KeysOfExile = {
-		1: 'middle',
-		2: 'right',
-		4: 'e',
-		8: 'q',
-		16: 'w',
-		32: 'r',
+		1: 'w',
+		2: 'e',
+		4: 'q',
+		8: 'r',
+		16: 'middle',
+		32: 'right',
 		64: 'ARPG.FetchLoot',
 		128: 'ARPG.OptionsMenu'
 	};
@@ -1968,14 +1968,11 @@ var GAME_MODE_ARPG = (function() {
 		}
 	}
 	
-	function SetBehavior(qBehavior, wBehavior, eBehavior, rBehavior, rightBehavior, middleBehavior) {
-		SetBehaviorFunction('q', qBehavior);
-		SetBehaviorFunction('w', wBehavior);
-		SetBehaviorFunction('e', eBehavior);
-		SetBehaviorFunction('r', rBehavior);
-		SetBehaviorFunction('right', rightBehavior);
-		SetBehaviorFunction('middle', middleBehavior);
-	};
+	function SetBehavior(inputArgs) {
+		for(var key in inputArgs) {
+			SetBehaviorFunction(KeysOfExile[key], inputArgs[key]);
+		}
+	}
 	
 	return {
 		EnterArea: EnterArea,
