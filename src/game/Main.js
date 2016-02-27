@@ -1770,6 +1770,36 @@ var GAME_MODE_ARPG = (function() {
 	function MouseWithIncrementKeyUp() {
 		GLOBAL_MOVE_RADIUS = null;	
 	}
+
+	DefaultBehaviours['arpg.ShiftMouseLastAngleLow.KeyDown'] = function (args, key) {
+		robot.keyToggle('shift', 'down');
+		DefaultBehaviours['arpg.MouseLastAngleLow.KeyDown'](args, key);
+	}
+
+	DefaultBehaviours['arpg.ShiftMouseLastAngleLow.KeyUp'] = function (args, key) {
+		robot.keyToggle('shift', 'up');
+		DefaultBehaviours['arpg.MouseLastAngleLow.KeyUp'](args, key);
+	}
+	
+	DefaultBehaviours['arpg.ShiftMouseLastAngleMid.KeyDown'] = function (args, key) {
+		robot.keyToggle('shift', 'down');
+		DefaultBehaviours['arpg.MouseLastAngleMid.KeyDown'](args, key);
+	}
+
+	DefaultBehaviours['arpg.ShiftMouseLastAngleMid.KeyUp'] = function (args, key) {
+		robot.keyToggle('shift', 'up');
+		DefaultBehaviours['arpg.MouseLastAngleMid.KeyUp'](args, key);
+	}
+	
+	DefaultBehaviours['arpg.ShiftMouseLastAngleHigh.KeyDown'] = function (args, key) {
+		robot.keyToggle('shift', 'down');
+		DefaultBehaviours['arpg.MouseLastAngleHigh.KeyDown'](args, key);
+	}
+	
+	DefaultBehaviours['arpg.ShiftMouseLastAngleHigh.KeyUp'] = function (args, key) {
+		robot.keyToggle('shift', 'up');
+		DefaultBehaviours['arpg.MouseLastAngleHigh.KeyUp'](args, key);
+	}
 	
 	DefaultBehaviours['arpg.MouseLastAngleLow.KeyDown'] = function (args, key) {
 		MouseWithIncrementKeyDown(h * 0.1, key);
@@ -2106,6 +2136,23 @@ var EXPORTED_INPUT_MODES = {
 			name: "High increment to cursor position",
 			key: "arpg.MouseLastAngleHigh.KeyDown",
 			help: "Use a high increment to the cursor position last angle before pressing the button. Good for totems, traps and skills like leap slam"		
+		}
+	],
+	"Holding position": [
+		{
+			name: "(H. Position) Small increment to cursor position",
+			key: "arpg.ShiftMouseLastAngleLow.KeyDown",
+			help: "Use a small increment to the cursor position last angle before pressing the button and while holding attack in place. Good for ranged attacks and spells"
+		},
+		{
+			name: "(H. Position) Medium increment to cursor position",
+			key: "arpg.ShiftMouseLastAngleMid.KeyDown",
+			help: "Use a medium increment to the cursor position last angle before pressing the button and while holding attack in place. Good for ranged attacks and spells"		
+		},
+		{
+			name: "(H. Position) High increment to cursor position",
+			key: "arpg.ShiftMouseLastAngleHigh.KeyDown",
+			help: "Use a high increment to the cursor position last angle before pressing the button and while holding attack in place. Good for ranged attacks and spells"		
 		}
 	]
 };
