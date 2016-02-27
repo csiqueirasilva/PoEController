@@ -582,7 +582,7 @@ var GAME_MODE_INVENTORY = (function() {
 			case GAME_MODE.CRAFT_SCREEN:
 				EnterCraftArea();
 				break;
-			case GAME_MODE.DIVINATION_CARD_SCREEN:
+			case GAME_MODE.DIVINATION_CARD_SCREEN: /* NOT YET IMPLEMENTED */
 				EnterDivinationCardArea();
 				break;
 			case GAME_MODE.STASH:
@@ -595,6 +595,9 @@ var GAME_MODE_INVENTORY = (function() {
 	
 	function ChangeIntoSubSection(mode) {
 		CurrentSubSection = mode;
+		if(ChangeGameModeUpdateUICallback instanceof Function && CurrentSubSection !== null) {
+			ChangeGameModeUpdateUICallback(CurrentSubSection);
+		}
 	}
 
 	DefaultBehaviours["RewardsArea.Up"] = function () {
