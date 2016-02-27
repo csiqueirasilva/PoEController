@@ -441,16 +441,15 @@ var GAME_MODE_OPTIONS_MENU = (function() {
 		}
 	}
 	
-	var blockInputs;
+	var blockInputs = true;
 	
 	function EnterArea() {
-		blockInputs = true;
-		
 		robot.moveMouse(CURSOR_X_INITIAL, CURSOR_Y_INITIAL);
 	
 		setTimeout(function() {
 			
 			robot.mouseClick("left");
+			
 			setTimeout(function() {
 			
 				CURSOR_INDEX = 0;
@@ -458,16 +457,20 @@ var GAME_MODE_OPTIONS_MENU = (function() {
 				
 				SetOptionKeys();
 				
-				blockInputs = false;
-			}, 30);
+				setTimeout(function() {
+					blockInputs = false;
+				}, 50);
+				
+			}, 50);
 			
-		}, 30);
+		}, 50);
 	}
 	
 	function LeaveArea() {
 		BehaviorOfExile = {};
 		KeysOfExile = {};
 		DPADOfExile = {};
+		blockInputs = true;
 	}
 	
 	return {
@@ -1856,6 +1859,8 @@ var GAME_MODE_ARPG = (function() {
 
 	var LastTimestampStart = 0;
 	
+	var StartBlockInterval = 750;
+	
 	function ResolveDataInput(data) {
 
 		var CurrentTimestampStart = new Date().getTime();
@@ -1883,7 +1888,7 @@ var GAME_MODE_ARPG = (function() {
 
 			LastTimestampStart = CurrentTimestampStart;
 			
-		} else if (CurrentTimestampStart - LastTimestampStart > 300) {
+		} else if (CurrentTimestampStart - LastTimestampStart > StartBlockInterval) {
 		
 			for(var i = 64; i >= 1; i = i / 2) {
 				var pressed = buttons - i >= 0;
