@@ -1772,32 +1772,32 @@ var GAME_MODE_ARPG = (function() {
 	}
 
 	DefaultBehaviours['arpg.ShiftMouseLastAngleLow.KeyDown'] = function (args, key) {
-		robot.keyToggle('shift', 'down');
+		setAttackInPlace();
 		DefaultBehaviours['arpg.MouseLastAngleLow.KeyDown'](args, key);
 	}
 
 	DefaultBehaviours['arpg.ShiftMouseLastAngleLow.KeyUp'] = function (args, key) {
-		robot.keyToggle('shift', 'up');
+		clearAttackInPlace();
 		DefaultBehaviours['arpg.MouseLastAngleLow.KeyUp'](args, key);
 	}
 	
 	DefaultBehaviours['arpg.ShiftMouseLastAngleMid.KeyDown'] = function (args, key) {
-		robot.keyToggle('shift', 'down');
+		setAttackInPlace();
 		DefaultBehaviours['arpg.MouseLastAngleMid.KeyDown'](args, key);
 	}
 
 	DefaultBehaviours['arpg.ShiftMouseLastAngleMid.KeyUp'] = function (args, key) {
-		robot.keyToggle('shift', 'up');
+		clearAttackInPlace();
 		DefaultBehaviours['arpg.MouseLastAngleMid.KeyUp'](args, key);
 	}
 	
 	DefaultBehaviours['arpg.ShiftMouseLastAngleHigh.KeyDown'] = function (args, key) {
-		robot.keyToggle('shift', 'down');
+		setAttackInPlace();
 		DefaultBehaviours['arpg.MouseLastAngleHigh.KeyDown'](args, key);
 	}
 	
 	DefaultBehaviours['arpg.ShiftMouseLastAngleHigh.KeyUp'] = function (args, key) {
-		robot.keyToggle('shift', 'up');
+		clearAttackInPlace();
 		DefaultBehaviours['arpg.MouseLastAngleHigh.KeyUp'](args, key);
 	}
 	
@@ -1828,7 +1828,7 @@ var GAME_MODE_ARPG = (function() {
 	function move(angle, extMoving) {
 		var R = GLOBAL_MOVE_RADIUS || (h * 0.0908);
 		robot.moveMouse(BasePosition.x + R * Math.cos(angle), BasePosition.y + R * Math.sin(angle));
-		if(!extMoving) {
+		if(!extMoving && !ATTACK_IN_PLACE) {
 			moving = true;
 			setTimeout(function() {
 				robot.mouseToggle("down");
@@ -2075,6 +2075,18 @@ var LastInputData = null;
 
 function ControllerListener (data) {
 	LastInputData = data;
+}
+
+var ATTACK_IN_PLACE = false;
+
+function setAttackInPlace() {
+	ATTACK_IN_PLACE = true;
+	robot.keyToggle('shift', 'down');
+}
+
+function clearAttackInPlace() {
+	ATTACK_IN_PLACE = false;
+	robot.keyToggle('shift', 'up');
 }
 
 var cbInitGame = null;
