@@ -21,6 +21,8 @@ var h = robot.getScreenSize().height;
 
 var fileResolutionPrefix = w + 'x' + h;
 
+var SCREEN_ASPECT_RATIO = w / h;
+
 console.log('using screen resolution: ' + fileResolutionPrefix);
 
 var halfScreenDiagonal = Math.sqrt(w * w + h * h) / 2;
@@ -1801,8 +1803,18 @@ var GAME_MODE_ARPG = (function() {
 	}
 	
 	function move(angle, extMoving) {
-		var R = GLOBAL_MOVE_RADIUS || (h * 0.0908);
-		robot.moveMouse(BasePosition.x + R * Math.cos(angle), BasePosition.y + R * Math.sin(angle));
+		var R;
+		var aspectFix;
+		
+		if(GLOBAL_MOVE_RADIUS === null) {
+			R = h * 0.0908;
+			aspectFix = 1;
+		} else {
+			R = GLOBAL_MOVE_RADIUS;
+			aspectFix = SCREEN_ASPECT_RATIO;
+		}
+		
+		robot.moveMouse(BasePosition.x + R * Math.cos(angle) * aspectFix, BasePosition.y + R * Math.sin(angle));
 		if(!extMoving && !ATTACK_IN_PLACE) {
 			moving = true;
 			setTimeout(function() {
