@@ -3,43 +3,8 @@ var RepeatActionInterval = 90;
 var InputInterval = 15;
 var DEBUG_MODE = false;
 
-var GAME_MODE = {
-	DEBUG: 0,
-	OPTIONS_MENU: 3,
-	
-	ARPG: 1001,
-	INVENTORY: 1002,
-	WORLD_MAP: 1003,
-	PASSIVE_SKILL_TREE: 1004,
-	CHARACTER_SCREEN: 1005,
-	STASH: 1006,
-	SELL: 1007,
-	NPC_DIALOG: 1008,
-	LOGIN_SCREEN: 1009,
-	CHARACTER_SELECTION: 1010,
-	CHARACTER_CREATION: 1011,
-	CHARACTER_CREATION_CLASS: 1012,
-	REWARD_SCREEN: 1013,
-	CRAFT_SCREEN: 1014,
-	DIVINATION_CARD_SCREEN: 1015
-};
-
-var KEYS = {
-	L3: 1,
-	R3: 2,
-	DPAD_UP: 4,
-	DPAD_RIGHT: 12,
-	DPAD_DOWN: 20,
-	DPAD_LEFT: 28,
-	KEY_UP: 8,
-	KEY_DOWN: 1,
-	KEY_LEFT: 4,
-	KEY_RIGHT: 2,
-	KEY_SHOULDER_LEFT: 16,
-	KEY_SHOULDER_RIGHT: 32,
-	KEY_SELECT: 64,
-	KEY_START: 128
-};
+var GAME_MODE = require('./game/Enums.js').GAME_MODE;
+var KEYS = require('./game/Enums.js').KEYS;
 
 var fs = require('fs');
 var robot = require("robotjs");
@@ -96,6 +61,8 @@ function IsInsideScreen(x, y) {
 	return x >= 0 && x <= w && y >= 0 && y <= h;
 }
 
+var ChangeGameModeUpdateUICallback = null;
+
 function ChangeGameMode(NewGameMode) {
 
 	var oldGameMode = CURRENT_GAME_MODE;
@@ -138,8 +105,10 @@ function ChangeGameMode(NewGameMode) {
 			mode.EnterArea();
 		}
 	
+		if(ChangeGameModeUpdateUICallback instanceof Function) {
+			ChangeGameModeUpdateUICallback(CURRENT_GAME_MODE);
+		}
 	}
-	
 }
 
 function ResolveDpadInput (data, DpadMapping, InputMapping, BehaviorMapping, skipKeyUp) {

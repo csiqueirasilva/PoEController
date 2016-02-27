@@ -133,6 +133,12 @@
 
 		<script>
 	
+			function updateGameOverlay (mode) {
+				global.showGameOverlay($('#select-input-method').val(), mode);
+			}
+	
+			ChangeGameModeUpdateUICallback = updateGameOverlay;
+	
 			// src: https://github.com/nwjs/nw.js/issues/1162
 			$('a[target=_blank]').on('click', function(){
 				require('nw.gui').Shell.openExternal( this.href );
@@ -173,7 +179,7 @@
 					StartControllerListener(false, function() {
 						global.gameOverlay.focus();
 						setTimeout(function() {
-							global.showGameOverlay($('#select-input-method').val());
+							updateGameOverlay(GAME_MODE.ARPG);
 							$('#flash-msg').hide();
 							btn.prop('disabled', false);
 						}, 8000);

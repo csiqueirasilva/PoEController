@@ -16,6 +16,8 @@
 		
 		<script>
 		
+			var GAME_MODE = require('./game/Enums.js').GAME_MODE;
+		
 			var gui = require('nw.gui');
 		
 			var context = null;
@@ -59,10 +61,10 @@
 				canvas.style.display = 'none';
 			}
 
-			function showGameOverlay(input) {
+			function showGameOverlay(input, mode) {
 				YIndex = input === "ps3" ? 0 : imageXSize; // select buttons in texture
 				var canvas = document.getElementById('main-canvas');
-				updateOverlayCanvas();
+				updateOverlayCanvas(mode);
 				canvas.style.display = 'block';
 			}
 			
@@ -113,19 +115,8 @@
 					buttonSize,
 					buttonSize);
 			}
-			
-			function updateOverlayCanvas () {
-				buttonSize = window.innerWidth * 0.015;
-				
-				canvas = document.getElementById('main-canvas');
-				
-				canvas.width = window.innerWidth;
-				canvas.height = window.innerHeight;
-				
-				context = canvas.getContext('2d');
 
-				context.clearRect(0, 0, canvas.width, canvas.height);
-
+			function drawARPGCanvas() {
 				drawOverlayCanvas();
 				
 				drawButton(XIndex.DPAD_LEFT, 0.1575, 0.97);
@@ -141,7 +132,25 @@
 				drawButton(XIndex.KEY_DOWN, 0.8215 - 0.02875 * 2, 0.97);
 				drawButton(XIndex.KEY_RIGHT, 0.8215 - 0.02875, 0.97);
 				drawButton(XIndex.KEY_UP, 0.8215, 0.97);
+			}
+			
+			function updateOverlayCanvas (mode) {
+				buttonSize = window.innerWidth * 0.015;
+				
+				canvas = document.getElementById('main-canvas');
+				
+				canvas.width = window.innerWidth;
+				canvas.height = window.innerHeight;
+				
+				context = canvas.getContext('2d');
 
+				context.clearRect(0, 0, canvas.width, canvas.height);
+
+				switch(mode) {
+					case GAME_MODE.ARPG:
+						drawARPGCanvas();
+						break;
+				}
 			}
 			
 		</script>
