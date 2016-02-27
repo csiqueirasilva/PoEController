@@ -1997,15 +1997,6 @@ var MoveThumbstick = (function() {
 		var y = (DataY - Max) / Max;
 
 		if(Math.abs(x) > Threshold || Math.abs(y) > Threshold) {
-			
-			if(Math.abs(x) > Threshold) {
-				x = Math.sign(x) * (Math.abs(x) - Threshold)/(1 - Threshold);
-			}
-			
-			if(Math.abs(y) > Threshold) {
-				y = Math.sign(y) * (Math.abs(y) - Threshold)/(1 - Threshold);
-			}
-			
 			IfCallback(x, y);
 		} else {
 			ElseCallback();
