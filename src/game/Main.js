@@ -46,6 +46,12 @@ var BasePosition = {
 	y: h * 0.44
 };
 
+var globalDiffY = (-(h / 1080) + 1) * 100;
+
+function proxyMoveMouse(x, y) {
+	robot.moveMouse(x, y - globalDiffY);
+}
+
 function IndexOf(o, value) {
 	
 	for(var key in o) {
@@ -865,7 +871,7 @@ var GAME_MODE_INVENTORY = (function() {
 		var posX = w * 0.440;
 		var posY = h * 0.171;
 
-		robot.moveMouse(posX, posY);
+		proxyMoveMouse(posX, posY);
 		
 		setTimeout(function() {
 			robot.mouseClick("left");
@@ -879,7 +885,7 @@ var GAME_MODE_INVENTORY = (function() {
 		var posX = w * 0.440;
 		var posY = h * 0.547;
 
-		robot.moveMouse(posX, posY);
+		proxyMoveMouse(posX, posY);
 		
 		setTimeout(function() {
 			robot.mouseClick("left");
@@ -1735,7 +1741,10 @@ var GAME_MODE_ARPG = (function() {
 	
 	DefaultBehaviours['ARPG.OptionsMenu'] = function() {
 		// check if possible to open menu (eg: if esc menu is not open)
-		if(robot.getPixelColor(parseInt(w * 0.1421875), parseInt(h * 0.89351851852)) === '98a1a6') {
+		console.log(robot.getPixelColor(parseInt(w * 0.1421875), parseInt(h * 0.89351851852)));
+		var color = robot.getPixelColor(parseInt(w * 0.1421875), parseInt(h * 0.89351851852));
+		if(color === '98a1a6' ||
+			color === 'a3abb1') {
 			ChangeGameMode(GAME_MODE.OPTIONS_MENU);
 		}
 	};
