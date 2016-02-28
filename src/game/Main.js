@@ -1176,7 +1176,7 @@ var GAME_MODE_INVENTORY = (function() {
 			posY += h * 0.083 * INVENTORY_INDEX;
 		}
 	
-		robot.moveMouse(posX, posY);
+		proxyMoveMouse(posX, posY);
 	}
 	
 	function EnterCraftArea() {
@@ -1386,14 +1386,17 @@ var GAME_MODE_DEBUG = (function() {
 	
 	function GetCaptureCoordinates(mode) {
 		var aspectRatioIndex = FindAspectRatio(w / h);
-		var coords = null;
-		if(aspectRatioIndex !== -1) /* supported */ {
-			coords = supportedAspects[aspectRatioIndex].coords[mode];
-			coords.x *= Math.round(w);
-			coords.y *= Math.round(h);
-		} else {
-			console.error('unsupported aspect ratio for capture');
+		
+		if(aspectRatioIndex === -1) {
+			console.warn('aspect ratio ' + (w/h) + ' not mapped. using ' + supportedAspects[0].aspect + ' as default');
+			aspectRatioIndex = 0;
 		}
+		
+		var coords = supportedAspects[aspectRatioIndex].coords[mode];
+
+		coords.x *= Math.round(w);
+		coords.y *= Math.round(h);
+
 		return coords;
 	}
 	
@@ -1741,10 +1744,8 @@ var GAME_MODE_ARPG = (function() {
 	
 	DefaultBehaviours['ARPG.OptionsMenu'] = function() {
 		// check if possible to open menu (eg: if esc menu is not open)
-		console.log(robot.getPixelColor(parseInt(w * 0.1421875), parseInt(h * 0.89351851852)));
 		var color = robot.getPixelColor(parseInt(w * 0.1421875), parseInt(h * 0.89351851852));
-		if(color === '98a1a6' ||
-			color === 'a3abb1') {
+		if(color > "777777") {
 			ChangeGameMode(GAME_MODE.OPTIONS_MENU);
 		}
 	};

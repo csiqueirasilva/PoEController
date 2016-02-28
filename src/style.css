@@ -231,11 +231,11 @@ label {
 #msg-overlay {
 	text-shadow: 1px 0 0 #000, -1px 0 0 #000, 0 1px 0 #000, 0 -1px 0 #000, 1px 1px #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000;
 	font-family: 'Fontin';
-	font-size: 1.2em;
+	font-size: 2vh;
 	position: absolute;
 	bottom: 5vh;
-	left: 40vw;
-	width: 20vw;
+	left: 38vw;
+	width: 24vw;
 	color: #ffffff;
 	-moz-user-select: none; 
 	-webkit-user-select: none; 
