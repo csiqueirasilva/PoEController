@@ -11,14 +11,30 @@ var robot = require("robotjs");
 
 var dialog = require('dialog');
 
+var ABORTING_APPLICATION = false;
+
+function hideAllGUIWindows() {
+	for(var i in global.__nwWindowsStore) {
+		global.__nwWindowsStore[i].hide();
+	}
+}
+
 var xbox;
 
 try {
 	xbox = require('xbox-controller-node');
 } catch (e) {
+	hideAllGUIWindows();
 	dialog.warn('Error while connecting to xbox controller driver. Please ensure it is correctly connected and configured.', function(err) {
 		var App = require('nw.gui').App;
-		App.closeAllWindows();
+		App.quit();
+	});
+}
+
+if(xbox.HIDController === null) {
+	hideAllGUIWindows();
+	dialog.warn('No xbox controller detected. Please ensure it is correctly connected and configured.', function(err) {
+		var App = require('nw.gui').App;
 		App.quit();
 	});
 }
@@ -49,8 +65,6 @@ var SUPPORTED_RESOLUTIONS = [
 	new SupportedResolution(1360, 768),
 ];
 
-var ABORTING_APPLICATION = false;
-
 if(!DEBUG_MODE) {
 
 	ABORTING_APPLICATION = (function() {
@@ -67,9 +81,7 @@ if(!DEBUG_MODE) {
 		if(quitGame) {
 			var gui = require('nw.gui');
 			
-			for(var i in global.__nwWindowsStore) {
-				global.__nwWindowsStore[i].hide();
-			}
+			hideAllGUIWindows();
 			
 			dialog.warn('Unsupported screen resolution. Supported screen resolutions are ' + SUPPORTED_RESOLUTIONS.toString(), function(err) {
 				gui.App.quit();
@@ -100,9 +112,7 @@ function SignatureNotFound (filename) {
 	if(!DEBUG_MODE && !ABORTING_APPLICATION) {
 		var gui = require('nw.gui');
 		
-		for(var i in global.__nwWindowsStore) {
-			global.__nwWindowsStore[i].hide();
-		}
+		hideAllGUIWindows();
 		
 		dialog.warn('Signature file ' + filename + ' not found. Could not start the application.', function(err) {
 			gui.App.quit();
