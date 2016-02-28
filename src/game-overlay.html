@@ -12,7 +12,32 @@
 		<canvas id="main-canvas"></canvas>
 		
 		<div id="msg-overlay" style="display: none;">
-		
+
+			<div id="navigate-move-thumbstick">
+				<div class="game-button-text">Move with</div>
+				<div class="game-button-icon"></div>
+			</div>
+
+			<div id="navigate-right-thumbstick">
+				<div class="game-button-text">Use mouse with</div>
+				<div class="game-button-icon"></div>
+			</div>
+
+			<div id="navigate-escape-key">
+				<div class="game-button-text">Escape key is</div>
+				<div class="game-button-icon"></div>
+			</div>
+
+			<div id="navigate-alt-click">
+				<div class="game-button-text">Click is</div>
+				<div class="game-button-icon"></div>
+			</div>
+			
+			<div id="navigate-loot-position">
+				<div class="game-button-text">Loot position (red circle) is</div>
+				<div class="game-button-icon"></div>
+			</div>
+			
 			<div id="navigate-left-thumbstick">
 				<div class="game-button-text">Navigate using</div>
 				<div class="game-button-icon"></div>
@@ -92,6 +117,11 @@
 				<div class="game-button-text">to close</div>
 			</div>
 			
+			<div id="navigate-open-menu">
+				<div class="game-button-text">More options with</div>
+				<div class="game-button-icon"></div>
+			</div>
+			
 		</div>
 		
 		<img id="buttons-image" src="imgs/buttons.png" style="display: none;" />
@@ -101,6 +131,10 @@
 			$('#msg-overlay').children().hide();
 			$('#msg-overlay').show();
 		
+			global.hideAllHelp = function () {
+				$('#msg-overlay').children().hide();
+			};
+		
 			var GAME_MODE = require('./game/Enums.js').GAME_MODE;
 		
 			var gui = require('nw.gui');
@@ -108,6 +142,17 @@
 			var	canvas = document.getElementById('main-canvas');
 			var context = canvas.getContext('2d');
 
+			var ARPGHelp = true;
+			var MenuHelp = true;
+			
+			global.setARPGHelp = function(b) {
+				ARPGHelp = b;
+			};
+
+			global.setMenuHelp = function(b) {
+				MenuHelp = b;
+			};
+			
 			canvas.width = window.innerWidth;
 			canvas.height = window.innerHeight;
 			
@@ -240,6 +285,10 @@
 				drawButton(XIndex.KEY_DOWN, 0.8215 - 0.02875 * 2, 0.97);
 				drawButton(XIndex.KEY_RIGHT, 0.8215 - 0.02875, 0.97);
 				drawButton(XIndex.KEY_UP, 0.8215, 0.97);
+				
+				if(ARPGHelp) {
+					showARPGHelp();
+				}
 			}
 
 			function strokedText(txt, x, y, fontSize) {
@@ -292,6 +341,15 @@
 				$('#start-to-close').show();
 			}
 			
+			function showARPGHelp() {
+				$('#navigate-move-thumbstick').show();
+				$('#navigate-right-thumbstick').show();
+				$('#navigate-escape-key').show();
+				$('#navigate-alt-click').show();
+				$('#navigate-loot-position').show();
+				$('#navigate-open-menu').show();
+			}
+			
 			function updateOverlayCanvas (mode) {
 				canvas.width = window.innerWidth;
 				canvas.height = window.innerHeight;
@@ -300,26 +358,28 @@
 
 				$('#msg-overlay').children().hide();
 				
-				switch(mode) {
-					case GAME_MODE.ARPG:
-						drawARPGCanvas();
-						break;
-					case GAME_MODE.WORLD_MAP:
-						showWorldMapHelp();
-						break;
-					case GAME_MODE.INVENTORY:
-					case GAME_MODE.STASH:
-					case GAME_MODE.SELL:
-					case GAME_MODE.REWARD_SCREEN:
-					case GAME_MODE.CRAFT_SCREEN:
-						showInventoryHelp(mode);
-						break;
-					case GAME_MODE.OPTIONS_MENU:
-						showOptionsHelp();
-						break;
-					case GAME_MODE.PASSIVE_SKILL_TREE:
-						showPassiveTreeHelp();
-						break;
+				if(mode === GAME_MODE.ARPG) {
+					drawARPGCanvas();
+				} else if (MenuHelp) {
+				
+					switch(mode) {
+						case GAME_MODE.WORLD_MAP:
+							showWorldMapHelp();
+							break;
+						case GAME_MODE.INVENTORY:
+						case GAME_MODE.STASH:
+						case GAME_MODE.SELL:
+						case GAME_MODE.REWARD_SCREEN:
+						case GAME_MODE.CRAFT_SCREEN:
+							showInventoryHelp(mode);
+							break;
+						case GAME_MODE.OPTIONS_MENU:
+							showOptionsHelp();
+							break;
+						case GAME_MODE.PASSIVE_SKILL_TREE:
+							showPassiveTreeHelp();
+					}
+					
 				}
 			}
 

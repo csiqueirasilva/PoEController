@@ -221,6 +221,11 @@ label {
   width: 200px !important;
 }
 
+.menu-choice-checkbox {
+	display: inline-block;
+	margin-right: 1em;
+}
+
 /* game-overlay.html */
 
 #msg-overlay {
@@ -266,6 +271,10 @@ label {
 	background-position-x: 77.94%;
 }
 
+#navigate-open-menu .game-button-icon {
+	background-position-x: 77.94%;
+}
+
 #navigate-up-down .game-button-icon {
 	background-position-x: 27.84%;
 }
@@ -280,6 +289,26 @@ label {
 
 #navigate-left-thumbstick .game-button-icon {
 	background-position-x: 39%;
+}
+
+#navigate-move-thumbstick .game-button-icon {
+	background-position-x: 39%;
+}
+
+#navigate-right-thumbstick .game-button-icon {
+	background-position-x: 44.5%;
+}
+
+#navigate-escape-key .game-button-icon {
+	background-position-x: -11.1%;
+}
+
+#navigate-loot-position .game-button-icon {
+	background-position-x: 72.185%;
+}
+
+#navigate-alt-click .game-button-icon {
+	background-position-x: -5.6%;
 }
 
 #navigate-pick-with .game-button-icon {

@@ -118,7 +118,19 @@
 				<div>
 					<label><a target="_blank" href="https://github.com/csiqueirasilva/PoEController/blob/master/README.md">Click here to check the README file for more information</a></label>
 				</div>
-				<button id="btn-start" class="btn">Start gamepad</button>
+				<div>
+				
+					<div id="arpg-help-checkbox" class="menu-choice-checkbox checkbox">
+						<label><input type="checkbox" checked="checked">Use ARPG mode on-screen help</label>
+					</div>
+					
+					<div id="menu-help-checkbox" class="menu-choice-checkbox checkbox">
+						<label><input type="checkbox" checked="checked">Use menus on-screen help</label>
+					</div>
+
+					<button id="btn-start" class="btn">Start gamepad</button>
+
+				</div>
 			</div>
 		</div>
 
@@ -133,6 +145,18 @@
 
 		<script>
 	
+			global.menuWindow.on('focus', function() {
+				global.hideAllHelp();
+			});
+	
+			$('#arpg-help-checkbox').click(function() {
+				global.setARPGHelp($(this).is(':checked'));
+			});
+
+			$('#menu-help-checkbox').click(function() {
+				global.setMenuHelp($(this).is(':checked'));
+			});
+			
 			function updateGameOverlay (mode) {
 				global.showGameOverlay($('#select-input-method').val(), mode);
 			}
@@ -153,7 +177,7 @@
 			
 				UserSettings.Save();
 			
-				var otherInputs = $('select, button').not(this);
+				var otherInputs = $('select, button, input').not(this);
 			
 				if($(this).html() === "Stop gamepad") {
 					global.hideGameOverlay();
@@ -161,7 +185,7 @@
 					$(this).html("Start gamepad");
 					otherInputs.prop('disabled', false);
 				} else {
-					$('select, button').prop('disabled', true);
+					$('select, button, input').prop('disabled', true);
 					
 					var inputArgs = {};
 					
