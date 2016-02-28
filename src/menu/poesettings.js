@@ -45,6 +45,14 @@ key_pickup=1`;
 	var defaultCorpseTargeting = `
 corpse_targeting=key`;
 	
+	
+	var videoSettings = `borderless_windowed_fullscreen=true
+fullscreen=false
+post_processing=true
+resolution_height=%h
+resolution_width=%w
+screen_shake=false`;
+
 	function configFilePath(docFolder) {
 		return process.env['USERPROFILE'] + '\\' + docFolder + '\\My Games\\Path of Exile\\production_Config.ini';
 	}
@@ -58,6 +66,7 @@ corpse_targeting=key`;
 	var originalActionKeys = null;
 	var originalKeyPickup = null;
 	var originalCorpseTargeting = null;
+	var originalVideoSettings = null;
 	
 	function getFilePath() {
 		var path;
@@ -122,6 +131,16 @@ corpse_targeting=key`;
 		}
 		
 		finalContent = finalContent.replace(originalCorpseTargeting, defaultCorpseTargeting);
+		
+		match = finalContent.match(/borderless_windowed_fullscreen[\na-z=_0-9]*screen_shake=.*/);
+		
+		if(match!= null) {
+			originalVideoSettings = match[0];
+		}
+		
+		videoSettings = videoSettings.replace("%w", w).replace("%h", h);
+		
+		finalContent = finalContent.replace(originalVideoSettings, videoSettings);
 		
 		fs.writeFileSync(lastFilePath, finalContent);
 	}
