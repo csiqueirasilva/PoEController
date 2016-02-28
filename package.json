@@ -23,6 +23,8 @@
 	"show_in_taskbar": false,
 	"position": "center",
 	"width": 1173,
-	"height": 660
+	"height": 660,
+	"title": "PoEController - Game Overlay - DONT CLOSE",
+	"icon": "src/imgs/app-icon.png"
   }
 }

@@ -1,0 +1,5 @@
+Got the app icon from:
+
+https://icons8.com/
+
+The only thing I did was resize it to 128x128 from 512x512.

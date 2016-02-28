@@ -215,13 +215,26 @@
 					$(this).html("Stop gamepad");
 				}
 			});
-	
-			$('#close-btn').click(function() {
+
+			var gui = require ('nw.gui');
+			
+			function QuitApplication() {
 				UserSettings.Save(function() {
 					PoESettings.restoreConfigFile();
-					global.menuWindow.close();
-					global.gameOverlay.close();
+					gui.App.quit();
 				});
+			}
+				
+			global.menuWindow.on('close', function () {
+				QuitApplication();
+			});
+			
+			global.gameOverlay.on('close', function () {
+				QuitApplication();
+			});
+	
+			$('#close-btn').click(function () {
+				QuitApplication();
 			});
 	
 			$(window).load(function() {
