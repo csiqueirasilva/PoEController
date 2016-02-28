@@ -12,14 +12,17 @@ function PersistSignatureToFile(filename, data) {
 }
 
 function ReadSignatureFile(filename) {
-	fs.readFile("signatures/" + (filename || "signatures.json"), 'utf8', function(err, data) {
-		if(err) {
-			return console.log(err);
-		} else {
-			PIXEL_SIGNATURES = JSON.parse(data);
-			console.log("Read signature file from disk.");
-		}
-	});
+	
+	var ret = true;
+		try {
+		data = fs.readFileSync("signatures/" + (filename || "signatures.json"), 'utf8');
+		PIXEL_SIGNATURES = JSON.parse(data);
+		console.log("Read signature file from disk.");
+	} catch (e) {
+		ret = false;
+	}
+	
+	return ret;
 }
 
 function DetectPixelSignature (SigCollection) {
@@ -114,11 +117,15 @@ self.onmessage = function(event) {
 		case 'persist':
 			PersistSignatureToFile(data.filename, data.sigs);
 			break;
+			
 		case 'init':
 			DEFAULT_GAME_MODE = data.defaultGameMode;
 			resolutionPrefix = data.resolutionPrefix;
-			ReadSignatureFile(resolutionPrefix + "signatures.json");
-			self.postMessage({cmd: 'init'});
+			if(ReadSignatureFile(resolutionPrefix + "signatures.json")) {
+				self.postMessage({cmd: 'init'});
+			} else {
+				self.postMessage({cmd: 'signature-not-found', data: "signatures/" + resolutionPrefix + "signatures.json"});
+			}
 	}
 
 };

@@ -46,6 +46,22 @@ var BasePosition = {
 	y: h * 0.44
 };
 
+function SignatureNotFound (filename) {
+
+	if(!DEBUG_MODE) {
+		var gui = require('nw.gui');
+		
+		for(var i in global.__nwWindowsStore) {
+			global.__nwWindowsStore[i].hide();
+		}
+		
+		dialog.warn('Signature file ' + filename + ' not found. Could not start the application.', function(err) {
+			gui.App.quit();
+		});
+	}	
+	
+}
+
 var globalDiffY = (-(h / 1080) + 1) * 100;
 
 function proxyMoveMouse(x, y) {
@@ -280,6 +296,9 @@ SignatureDetectionWorker.onmessage = function(event) {
 			break;
 		case 'init':
 			InitGame();
+			break;
+		case 'signature-not-found':
+			SignatureNotFound(data);
 	}
 };
 
@@ -476,15 +495,16 @@ var GAME_MODE_INVENTORY = (function() {
 	var SubSectionSignatures = null;
 	var CurrentSubSection = null;
 	var CURRENT_AREA = null;
-		
-	fs.readFile("signatures/" + fileResolutionPrefix + "inventory-signatures.json", 'utf8', function(err, data) {
-		if(err) {
-			return console.log(err);
-		} else {
-			SubSectionSignatures = JSON.parse(data);
-			console.log("Read inventory signature file from disk.");
-		}
-	});
+	
+	var signatureFileName = "signatures/" + fileResolutionPrefix + "inventory-signatures.json";
+	
+	try {
+		var data = fs.readFileSync(signatureFileName, 'utf8');
+		SubSectionSignatures = JSON.parse(data);
+		console.log("Read inventory signature file from disk.");
+	} catch (e) {
+		SignatureNotFound(signatureFileName);
+	}
 	
 	var INVENTORY_AREA = {
 		FLASKS_AREA: 0,
