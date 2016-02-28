@@ -8,7 +8,21 @@ var KEYS = require('./game/Enums.js').KEYS;
 
 var fs = require('fs');
 var robot = require("robotjs");
-var xbox = require('xbox-controller-node');
+
+var dialog = require('dialog');
+
+var xbox;
+
+try {
+	xbox = require('xbox-controller-node');
+} catch (e) {
+	dialog.warn('Error while connecting to xbox controller driver. Please ensure it is correctly connected and configured.', function(err) {
+		var App = require('nw.gui').App;
+		App.closeAllWindows();
+		App.quit();
+	});
+}
+
 var Worker = require('workerjs');
 var exec = require('child_process').exec;
 var fork = require('child_process').fork;
