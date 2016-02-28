@@ -33,6 +33,54 @@ robot.setKeyboardDelay(0);
 var w = robot.getScreenSize().width;
 var h = robot.getScreenSize().height;
 
+function SupportedResolution(width, height) {
+	this.w = width;
+	this.h = height;
+}
+
+SupportedResolution.prototype.toString = function() {
+	return this.w + "x" + this.h;
+};
+
+var SUPPORTED_RESOLUTIONS = [
+	new SupportedResolution(1920, 1080),
+	new SupportedResolution(1600, 900),
+	new SupportedResolution(1366, 768),
+];
+
+var ABORTING_APPLICATION = false;
+
+if(!DEBUG_MODE) {
+
+	ABORTING_APPLICATION = (function() {
+
+		var quitGame = true;
+
+		for(var i = 0; i < SUPPORTED_RESOLUTIONS.length && quitGame; i++) {
+			var res = SUPPORTED_RESOLUTIONS[i];
+			if(w === res.w && h === res.h) {
+				quitGame = false;
+			}
+		}
+
+		if(quitGame) {
+			var gui = require('nw.gui');
+			
+			for(var i in global.__nwWindowsStore) {
+				global.__nwWindowsStore[i].hide();
+			}
+			
+			dialog.warn('Unsupported screen resolution. Supported screen resolutions are ' + SUPPORTED_RESOLUTIONS.toString(), function(err) {
+				gui.App.quit();
+			});
+		}
+		
+		return quitGame;
+		
+	})();
+	
+}
+
 var fileResolutionPrefix = w + 'x' + h;
 
 var SCREEN_ASPECT_RATIO = w / h;
@@ -48,7 +96,7 @@ var BasePosition = {
 
 function SignatureNotFound (filename) {
 
-	if(!DEBUG_MODE) {
+	if(!DEBUG_MODE && !ABORTING_APPLICATION) {
 		var gui = require('nw.gui');
 		
 		for(var i in global.__nwWindowsStore) {
