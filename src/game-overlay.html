@@ -1,28 +1,131 @@
 <html>
 	<head>
-		<style>
-			body {
-				margin: 0;
-				padding: 0;
-			}
-		</style>
+		
+		<link rel="stylesheet" type="text/css" href="style.css" />
+		
+		<script src="lib/jquery/jquery.min.js"></script>
+
 	</head>
 	
 	<body style="background: transparent;">
 		
 		<canvas id="main-canvas"></canvas>
 		
+		<div id="msg-overlay" style="display: none;">
+		
+			<div id="navigate-left-thumbstick">
+				<div class="game-button-text">Navigate using</div>
+				<div class="game-button-icon"></div>
+			</div>
+		
+			<div id="navigate-up-down">
+				<div class="game-button-text">Navigate using</div>
+				<div class="game-button-icon"></div>
+			</div>
+
+			<div id="navigate-dpad">
+				<div class="game-button-text">Navigate using</div>
+				<div class="game-button-icon"></div>
+			</div>
+
+			<div id="navigate-confirm-key-down">
+				<div class="game-button-text">Confirm with</div>
+				<div class="game-button-icon"></div>
+			</div>
+
+			<div id="navigate-pick-with">
+				<div class="game-button-text">Pick item with</div>
+				<div class="game-button-icon"></div>
+			</div>
+			
+			<div id="navigate-use-with">
+				<div class="game-button-text">Use item with</div>
+				<div class="game-button-icon"></div>
+			</div>
+			
+			<div id="navigate-hold-ctrl-inv">
+				<div class="game-button-text">Hold</div>
+				<div class="game-button-icon"></div>
+				<div class="game-button-text">for quick transfer</div>
+			</div>
+
+			<div id="navigate-hold-shift-inv">
+				<div class="game-button-text">Hold</div>
+				<div class="game-button-icon"></div>
+				<div class="game-button-text">for mass use</div>
+			</div>
+
+			<div id="navigate-center-cursor">
+				<div class="game-button-text">Center cursor with</div>
+				<div class="game-button-icon"></div>
+			</div>
+
+			<div id="navigate-confirm-sale">
+				<div class="game-button-text">Navigate to confirm with</div>
+				<div class="game-button-icon first-icon"></div>
+				<div class="game-button-text">or to cancel with</div>
+				<div class="game-button-icon second-icon"></div>
+			</div>
+
+			<div id="navigate-scroll-craft">
+				<div class="game-button-text">Scroll down with</div>
+				<div class="game-button-icon first-icon"></div>
+				<div class="game-button-text">or scroll up with</div>
+				<div class="game-button-icon second-icon"></div>
+			</div>
+			
+			<div id="navigate-stash-tabs">
+				<div class="game-button-text">Browse left tabs with</div>
+				<div class="game-button-icon first-icon"></div>
+				<div class="game-button-text">or right tabs with</div>
+				<div class="game-button-icon second-icon"></div>
+			</div>
+
+			<div id="navigate-select-tab">
+				<div class="game-button-text">Select first tab with</div>
+				<div class="game-button-icon"></div>
+			</div>
+			
+			<div id="start-to-close">
+				<div class="game-button-text">Press</div>
+				<div class="game-button-icon"></div>
+				<div class="game-button-text">to close</div>
+			</div>
+			
+		</div>
+		
 		<img id="buttons-image" src="imgs/buttons.png" style="display: none;" />
 		
 		<script>
+		
+			$('#msg-overlay').children().hide();
+			$('#msg-overlay').show();
 		
 			var GAME_MODE = require('./game/Enums.js').GAME_MODE;
 		
 			var gui = require('nw.gui');
 		
-			var context = null;
-			var canvas = null;
-		
+			var	canvas = document.getElementById('main-canvas');
+			var context = canvas.getContext('2d');
+
+			canvas.width = window.innerWidth;
+			canvas.height = window.innerHeight;
+			
+			function setButtonsCSSSprite(mode) {
+				var n = mode === "ps3" ? 0 : 100;
+				
+				var rules = document.styleSheets[0].rules;
+				
+				var found = false;
+				
+				for(var i = rules.length - 1; i >= 0 && !found; i--) {
+					if(rules[i].selectorText === ".game-button-icon") {
+						found = true;
+						rules[i].style["background-position-y"] = n + "%";
+					}
+				}
+			}
+			
 			function drawOverlayCanvas () {
 				var posX = canvas.width * 0.5;
 				var posY = canvas.height * 0.44;
@@ -53,9 +156,9 @@
 					width: 1173,
 					height: 660
 				});
-			
+				
 			};
-			
+
 			function hideGameOverlay() {
 				var canvas = document.getElementById('main-canvas');
 				canvas.style.display = 'none';
@@ -63,6 +166,7 @@
 
 			function showGameOverlay(input, mode) {
 				YIndex = input === "ps3" ? 0 : imageXSize; // select buttons in texture
+				setButtonsCSSSprite(input);
 				var canvas = document.getElementById('main-canvas');
 				updateOverlayCanvas(mode);
 				canvas.style.display = 'block';
@@ -98,16 +202,18 @@
 			
 			var buttonImage = document.getElementById('buttons-image');
 			
-			function drawButton(btn, x, y) {
+			function drawButton(btn, x, y, notBG) {
 
 				var posX = window.innerWidth * x;
 				var posY = window.innerHeight * y;
 				
-				context.fillStyle = "#FFFFFF";
-				context.beginPath();
-				context.arc(posX + buttonSize * 0.5, posY + buttonSize * 0.5, buttonSize * 0.4, 0, 2 * Math.PI);
-				context.fill();
-			
+				if(!notBG) {
+					context.fillStyle = "#FFFFFF";
+					context.beginPath();
+					context.arc(posX + buttonSize * 0.5, posY + buttonSize * 0.5, buttonSize * 0.4, 0, 2 * Math.PI);
+					context.fill();
+				}
+				
 				context.drawImage(buttonImage,
 					imageXSize * btn, YIndex,
 					imageXSize, imageXSize,
@@ -118,6 +224,8 @@
 
 			function drawARPGCanvas() {
 				drawOverlayCanvas();
+				
+				buttonSize = window.innerWidth * 0.015;
 				
 				drawButton(XIndex.DPAD_LEFT, 0.1575, 0.97);
 				drawButton(XIndex.DPAD_DOWN, 0.18, 0.97);
@@ -133,26 +241,88 @@
 				drawButton(XIndex.KEY_RIGHT, 0.8215 - 0.02875, 0.97);
 				drawButton(XIndex.KEY_UP, 0.8215, 0.97);
 			}
+
+			function strokedText(txt, x, y, fontSize) {
+				context.fillStyle = "#FFFFFF";
+				context.strokeStyle = "#000000";
+				context.textBaseline = "top";
+				context.lineWidth = 1;
+				context.font = parseInt(window.innerHeight * fontSize) + "px FontinSmallCaps";
+				context.fillText(txt, x * window.innerWidth, y * window.innerHeight);
+				context.strokeText(txt, x * window.innerWidth, y * window.innerHeight);
+			}
+			
+			function showWorldMapHelp() {
+				$('#navigate-left-thumbstick').show();
+				$('#navigate-confirm-key-down').show();
+				$('#start-to-close').show();
+			}
+			
+			function showOptionsHelp() {
+				$('#navigate-up-down').show();
+				$('#navigate-confirm-key-down').show();
+				$('#start-to-close').show();
+			}
+			
+			function showInventoryHelp(mode) {
+				$('#navigate-dpad').show();
+				$('#navigate-pick-with').show();
+				$('#navigate-use-with').show();
+				$('#navigate-hold-ctrl-inv').show();
+				$('#navigate-hold-shift-inv').show();
+				$('#start-to-close').show();
+				
+				switch(mode) {
+					case GAME_MODE.SELL:
+						$('#navigate-confirm-sale').show();
+						break;
+					case GAME_MODE.STASH:
+						$('#navigate-select-tab').show();
+						$('#navigate-stash-tabs').show();
+						break;
+					case GAME_MODE.CRAFT_SCREEN:
+						$('#navigate-scroll-craft').show();
+				}
+			}
+			
+			function showPassiveTreeHelp() {
+				$('#navigate-center-cursor').show();
+				$('#navigate-left-thumbstick').show();
+				$('#navigate-confirm-key-down').show();
+				$('#start-to-close').show();
+			}
 			
 			function updateOverlayCanvas (mode) {
-				buttonSize = window.innerWidth * 0.015;
-				
-				canvas = document.getElementById('main-canvas');
-				
 				canvas.width = window.innerWidth;
 				canvas.height = window.innerHeight;
-				
-				context = canvas.getContext('2d');
 
 				context.clearRect(0, 0, canvas.width, canvas.height);
 
+				$('#msg-overlay').children().hide();
+				
 				switch(mode) {
 					case GAME_MODE.ARPG:
 						drawARPGCanvas();
 						break;
+					case GAME_MODE.WORLD_MAP:
+						showWorldMapHelp();
+						break;
+					case GAME_MODE.INVENTORY:
+					case GAME_MODE.STASH:
+					case GAME_MODE.SELL:
+					case GAME_MODE.REWARD_SCREEN:
+					case GAME_MODE.CRAFT_SCREEN:
+						showInventoryHelp(mode);
+						break;
+					case GAME_MODE.OPTIONS_MENU:
+						showOptionsHelp();
+						break;
+					case GAME_MODE.PASSIVE_SKILL_TREE:
+						showPassiveTreeHelp();
+						break;
 				}
 			}
-			
+
 		</script>
 	
 	</body>

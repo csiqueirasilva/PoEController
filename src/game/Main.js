@@ -1273,6 +1273,7 @@ var GAME_MODE_INVENTORY = (function() {
 		//console.log('enter area');
 		//robot.mouseToggle("up");
 		//console.log('set subsigs');
+		robot.keyToggle('alt', 'up');
 		SignatureDetectionWorker.postMessage({cmd: 'set-subsigs', data: SubSectionSignatures});
 		SubSectionDetectionInterval = setInterval(function () {
 			SignatureDetectionWorker.postMessage({cmd: 'detect-sub'});

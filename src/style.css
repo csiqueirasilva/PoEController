@@ -8,6 +8,13 @@
 	src: url("font/Fontin-Bold.ttf")
 }
 
+body {
+	margin: 0;
+	padding: 0;
+}
+
+/* index.html */
+
 * {
 	font-family: "Fontin";
 	color: #ffc;
@@ -212,4 +219,158 @@ label {
 
 .select2-container {
   width: 200px !important;
+}
+
+/* game-overlay.html */
+
+#msg-overlay {
+	text-shadow: 1px 0 0 #000, -1px 0 0 #000, 0 1px 0 #000, 0 -1px 0 #000, 1px 1px #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000;
+	font-family: 'Fontin';
+	font-size: 1.2em;
+	position: absolute;
+	bottom: 5vh;
+	left: 40vw;
+	width: 20vw;
+	color: #ffffff;
+	-moz-user-select: none; 
+	-webkit-user-select: none; 
+	-ms-user-select:none; 
+	user-select:none;
+	-o-user-select:none;
+	cursor: default;
+	text-align: right;
+}
+
+#msg-overlay > div {
+	height: 2.7vw;
+}
+
+.game-button-icon {
+	width: 2.7vw;
+	height: 2.7vw;
+	background-image: url('imgs/buttons.png');
+	background-position-x: 0%;
+	background-position-y: 0%;
+	display: inline-block;
+	background-size: 1900% 200%;
+}
+
+.game-button-text {
+	display: inline-block;
+	height: 2.7vw;
+	vertical-align: top;
+	padding-top: 0.9vw;
+}
+
+#start-to-close .game-button-icon {
+	background-position-x: 77.94%;
+}
+
+#navigate-up-down .game-button-icon {
+	background-position-x: 27.84%;
+}
+
+#navigate-dpad .game-button-icon {
+	background-position-x: 0%;
+}
+
+#navigate-confirm-key-down .game-button-icon {
+	background-position-x: 50%;
+}
+
+#navigate-left-thumbstick .game-button-icon {
+	background-position-x: 39%;
+}
+
+#navigate-pick-with .game-button-icon {
+	background-position-x: 50%;
+}
+
+#navigate-use-with .game-button-icon {
+	background-position-x: 55.55%;
+}
+
+#navigate-hold-ctrl-inv .game-button-icon {
+	background-position-x: 83.385%;
+}
+
+#navigate-center-cursor .game-button-icon {
+	background-position-x: 72.185%;
+}
+
+#navigate-select-tab .game-button-icon {
+	background-position-x: 72.185%;
+}
+
+#navigate-hold-shift-inv .game-button-icon {
+	background-position-x: 88.84%;
+}
+
+#navigate-confirm-sale {
+	font-size: 0.75em;
+	height: 1.8vw !important;
+}
+
+#navigate-confirm-sale .game-button-text {
+	height: 1.8vw;
+	padding-top: 0.4vw;
+}
+
+#navigate-confirm-sale .game-button-icon {
+	width: 1.8vw;
+	height: 1.8vw;
+}
+
+#navigate-confirm-sale .first-icon {
+	background-position-x: 66.84%;
+}
+
+#navigate-confirm-sale .second-icon {
+	background-position-x: 61.05%;
+}
+
+#navigate-stash-tabs {
+	font-size: 0.75em;
+	height: 1.8vw !important;
+}
+
+#navigate-stash-tabs .game-button-text {
+	height: 1.8vw;
+	padding-top: 0.4vw;
+}
+
+#navigate-stash-tabs .game-button-icon {
+	width: 1.8vw;
+	height: 1.8vw;
+}
+
+#navigate-stash-tabs .first-icon {
+	background-position-x: 66.84%;
+}
+
+#navigate-stash-tabs .second-icon {
+	background-position-x: 61.05%;
+}
+
+#navigate-scroll-craft {
+	font-size: 0.75em;
+	height: 1.8vw !important;
+}
+
+#navigate-scroll-craft .game-button-text {
+	height: 1.8vw;
+	padding-top: 0.4vw;
+}
+
+#navigate-scroll-craft .game-button-icon {
+	width: 1.8vw;
+	height: 1.8vw;
+}
+
+#navigate-scroll-craft .first-icon {
+	background-position-x: 66.84%;
+}
+
+#navigate-scroll-craft .second-icon {
+	background-position-x: 61.05%;
 }
