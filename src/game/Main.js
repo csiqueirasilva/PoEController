@@ -46,6 +46,7 @@ var SUPPORTED_RESOLUTIONS = [
 	new SupportedResolution(1920, 1080),
 	new SupportedResolution(1600, 900),
 	new SupportedResolution(1366, 768),
+	new SupportedResolution(1360, 768),
 ];
 
 var ABORTING_APPLICATION = false;

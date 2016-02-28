@@ -190,7 +190,7 @@
 			window.onload = function() {
 			
 				global.menuWindow = gui.Window.open('index.html', {
-					toolbar: true,
+					toolbar: false,
 					frame: false,
 					position: 'center',
 					fullscreen: false,
@@ -356,31 +356,31 @@
 
 				context.clearRect(0, 0, canvas.width, canvas.height);
 
-				$('#msg-overlay').children().hide();
+				$('#msg-overlay').children().hide(0, function() {
 				
-				if(mode === GAME_MODE.ARPG) {
-					drawARPGCanvas();
-				} else if (MenuHelp) {
-				
-					switch(mode) {
-						case GAME_MODE.WORLD_MAP:
-							showWorldMapHelp();
-							break;
-						case GAME_MODE.INVENTORY:
-						case GAME_MODE.STASH:
-						case GAME_MODE.SELL:
-						case GAME_MODE.REWARD_SCREEN:
-						case GAME_MODE.CRAFT_SCREEN:
-							showInventoryHelp(mode);
-							break;
-						case GAME_MODE.OPTIONS_MENU:
-							showOptionsHelp();
-							break;
-						case GAME_MODE.PASSIVE_SKILL_TREE:
-							showPassiveTreeHelp();
+					if(mode === GAME_MODE.ARPG) {
+						drawARPGCanvas();
+					} else if (MenuHelp) {
+						switch(mode) {
+							case GAME_MODE.WORLD_MAP:
+								showWorldMapHelp();
+								break;
+							case GAME_MODE.INVENTORY:
+							case GAME_MODE.STASH:
+							case GAME_MODE.SELL:
+							case GAME_MODE.REWARD_SCREEN:
+							case GAME_MODE.CRAFT_SCREEN:
+								showInventoryHelp(mode);
+								break;
+							case GAME_MODE.OPTIONS_MENU:
+								showOptionsHelp();
+								break;
+							case GAME_MODE.PASSIVE_SKILL_TREE:
+								showPassiveTreeHelp();
+						}
 					}
-					
-				}
+				
+				});
 			}
 
 		</script>
