@@ -54,16 +54,13 @@ var VID = 0x45E; // Microsoft
 var PID = [0x28E, 0x28F, 0x2D1]; // Searches for Xbox 360 Controller, Xbox 360 Wifi Controller and Xbox One Controller
 								 // http://www.linux-usb.org/usb.ids
 
-var deviceList = HID.devices();
-var detectedDevice = null;
 var HIDController = null;
 
-for(var j = 0; j < deviceList.length && detectedDevice === null; j++) {
-	var device = deviceList[j];
-	if(device.vendorId === VID) {
-		if(PID.indexOf(device.productId) !== -1) {
-			detectedDevice = device;
-		}
+for(var i = 0; i < PID.length && HIDController === null; i++) {
+	try {
+		HIDController = new HID.HID(VID, PID[i]);
+	} catch (e) {
+		console.log(e);
 	}
 }
 
@@ -91,12 +88,8 @@ function removeErrorListener(cb) {
 	}
 }
 
-if(detectedDevice) {
-	HIDController = new HID.HID(detectedDevice.path);
-}
-
 module.exports = {
-	found: detectedDevice !== null,
+	found: HIDController !== null,
 	addDataListener: addDataListener,
 	removeDataListener: removeDataListener,
 	addErrorListener: addErrorListener,

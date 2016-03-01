@@ -1,51 +1,60 @@
 var DETECTION_INTERVAL_MS = 750;
 var RepeatActionInterval = 90;
 var InputInterval = 15;
-var DEBUG_MODE = true;
-
-var ENUMS = require('./game/Enums.js');
-
-var GAME_MODE = ENUMS.GAME_MODE;
-var KEYS = ENUMS.KEYS;
+var DEBUG_MODE = false;
 
 var fs = require('fs');
 var robot = require("robotjs");
 var dialog = require('dialog');
 var gui = require('nw.gui');
+var Worker = require('workerjs');
+var exec = require('child_process').exec;
+var ENUMS = require('./game/Enums.js');
+var Logger = require('./game/Logger.js');
+
+var GAME_MODE = ENUMS.GAME_MODE;
+var KEYS = ENUMS.KEYS;
 
 var ABORTING_APPLICATION = false;
 
 function showAllDevTools() {
-	for(var i in global.__nwWindowsStore) {
+	for (var i in global.__nwWindowsStore) {
 		global.__nwWindowsStore[i].showDevTools();
 	}
 }
 
 function hideAllGUIWindows() {
-	for(var i in global.__nwWindowsStore) {
+	for (var i in global.__nwWindowsStore) {
 		global.__nwWindowsStore[i].hide();
 	}
 }
 
+function quitIf(test, msg) {
+	if (test) {
+		hideAllGUIWindows();
+		dialog.warn(msg, function (err) {
+			gui.App.quit();
+		});
+	}
+}
+
+quitIf(!Logger, "Could not create log file.");
+
 var Controller = require('./game/Controller');
 
-if(!Controller.found) {
+if (!Controller.found) {
 	hideAllGUIWindows();
-	dialog.warn('Error while connecting to xbox 360/one controller driver. Please ensure it is correctly connected and configured.', function(err) {
+	dialog.warn('Error while connecting to xbox 360/one controller driver. Please ensure it is correctly connected and configured.', function (err) {
 		gui.App.quit();
 	});
 } else {
-	Controller.addErrorListener(function() {
+	Controller.addErrorListener(function () {
 		hideAllGUIWindows();
-		dialog.warn('Error while reading information from the controller. Please ensure it is correctly connected and run PoEController again.', function(err) {
+		dialog.warn('Error while reading information from the controller. Please ensure it is correctly connected and run PoEController again.', function (err) {
 			gui.App.quit();
 		});
 	});
 }
-
-var Worker = require('workerjs');
-var exec = require('child_process').exec;
-var fork = require('child_process').fork;
 
 robot.setMouseDelay(0);
 robot.setKeyboardDelay(0);
@@ -58,7 +67,7 @@ function SupportedResolution(width, height) {
 	this.h = height;
 }
 
-SupportedResolution.prototype.toString = function() {
+SupportedResolution.prototype.toString = function () {
 	return this.w + "x" + this.h;
 };
 
@@ -69,31 +78,31 @@ var SUPPORTED_RESOLUTIONS = [
 	new SupportedResolution(1360, 768),
 ];
 
-if(!DEBUG_MODE) {
+if (!DEBUG_MODE) {
 
-	ABORTING_APPLICATION = (function() {
+	ABORTING_APPLICATION = (function () {
 
 		var quitGame = true;
 
-		for(var i = 0; i < SUPPORTED_RESOLUTIONS.length && quitGame; i++) {
+		for (var i = 0; i < SUPPORTED_RESOLUTIONS.length && quitGame; i++) {
 			var res = SUPPORTED_RESOLUTIONS[i];
-			if(w === res.w && h === res.h) {
+			if (w === res.w && h === res.h) {
 				quitGame = false;
 			}
 		}
 
-		if(quitGame) {
+		if (quitGame) {
 			hideAllGUIWindows();
-			
-			dialog.warn('Unsupported screen resolution. Supported screen resolutions are ' + SUPPORTED_RESOLUTIONS.toString(), function(err) {
+
+			dialog.warn('Unsupported screen resolution. Supported screen resolutions are ' + SUPPORTED_RESOLUTIONS.toString(), function (err) {
 				gui.App.quit();
 			});
 		}
-		
+
 		return quitGame;
-		
+
 	})();
-	
+
 }
 
 var fileResolutionPrefix = w + 'x' + h;
@@ -109,16 +118,16 @@ var BasePosition = {
 	y: h * 0.44
 };
 
-function SignatureNotFound (filename) {
+function SignatureNotFound(filename) {
 
-	if(!DEBUG_MODE && !ABORTING_APPLICATION) {
+	if (!DEBUG_MODE && !ABORTING_APPLICATION) {
 		hideAllGUIWindows();
-		
-		dialog.warn('Signature file ' + filename + ' not found. Could not start the application.', function(err) {
+
+		dialog.warn('Signature file ' + filename + ' not found. Could not start the application.', function (err) {
 			gui.App.quit();
 		});
-	}	
-	
+	}
+
 }
 
 var globalDiffY = (-(h / 1080) + 1) * 100;
@@ -128,13 +137,13 @@ function proxyMoveMouse(x, y) {
 }
 
 function IndexOf(o, value) {
-	
-	for(var key in o) {
-		if(o[key] === value) {
+
+	for (var key in o) {
+		if (o[key] === value) {
 			return key;
 		}
 	}
-	
+
 	return -1;
 }
 
@@ -143,9 +152,9 @@ function IsMouseInput(Key) {
 }
 
 function ActionKey(Key, Action) {
-	if(IsMouseInput(Key)) {
+	if (IsMouseInput(Key)) {
 		robot.mouseToggle(Action, Key);
-	} else if(Key.match(/\./) === null) {
+	} else if (Key.match(/\./) === null) {
 		robot.keyToggle(Key, Action);
 	}
 }
@@ -164,17 +173,17 @@ function ChangeGameMode(NewGameMode) {
 
 	var oldGameMode = CURRENT_GAME_MODE;
 
-	if(oldGameMode !== NewGameMode) {
+	if (oldGameMode !== NewGameMode) {
 
 		//console.log(IndexOf(GAME_MODE, oldGameMode) + " to " + IndexOf(GAME_MODE, NewGameMode));
-	
-		if(GAME_MODE_OBJECT && GAME_MODE_OBJECT.LeaveArea instanceof Function) {
+
+		if (GAME_MODE_OBJECT && GAME_MODE_OBJECT.LeaveArea instanceof Function) {
 			GAME_MODE_OBJECT.LeaveArea();
 		}
-		
+
 		var mode = null;
-		
-		switch(NewGameMode) {
+
+		switch (NewGameMode) {
 			case GAME_MODE.DEBUG:
 				mode = GAME_MODE_DEBUG;
 				break;
@@ -193,92 +202,92 @@ function ChangeGameMode(NewGameMode) {
 			default:
 				mode = GAME_MODE_ARPG;
 		}
-		
+
 		CURRENT_GAME_MODE = NewGameMode;
 
 		GAME_MODE_OBJECT = mode;
-		
-		if(oldGameMode !== CURRENT_GAME_MODE && mode.EnterArea instanceof Function) {
+
+		if (oldGameMode !== CURRENT_GAME_MODE && mode.EnterArea instanceof Function) {
 			mode.EnterArea();
 		}
-	
-		if(ChangeGameModeUpdateUICallback instanceof Function) {
+
+		if (ChangeGameModeUpdateUICallback instanceof Function) {
 			ChangeGameModeUpdateUICallback(CURRENT_GAME_MODE);
 		}
 	}
 }
 
-function ResolveDpadInput (data, DpadMapping, InputMapping, BehaviorMapping, skipKeyUp) {
+function ResolveDpadInput(data, DpadMapping, InputMapping, BehaviorMapping, skipKeyUp) {
 
-	var	buttons = parseInt(data / 4) * 4;
+	var buttons = parseInt(data / 4) * 4;
 
-	switch(buttons) {
+	switch (buttons) {
 		case 4:
-			
+
 			ActivateKey(DpadMapping, InputMapping, BehaviorMapping, 4, true, skipKeyUp);
-			for(var i = 12; i <= 28; i = i + 8) {
+			for (var i = 12; i <= 28; i = i + 8) {
 				ActivateKey(DpadMapping, InputMapping, BehaviorMapping, i, false, skipKeyUp);
 			}
-			
-		break;
+
+			break;
 		case 12:
-			
+
 			ActivateKey(DpadMapping, InputMapping, BehaviorMapping, 12, true, skipKeyUp);
-			for(var i = 4; i <= 28; i = i + 8) {
-				if(i != 12) {
+			for (var i = 4; i <= 28; i = i + 8) {
+				if (i != 12) {
 					ActivateKey(DpadMapping, InputMapping, BehaviorMapping, i, false, skipKeyUp);
 				}
-			}		
-			
-		break;
+			}
+
+			break;
 		case 20:
-		
+
 			ActivateKey(DpadMapping, InputMapping, BehaviorMapping, 20, true, skipKeyUp);
-			for(var i = 4; i <= 28; i = i + 8) {
-				if(i != 20) {
+			for (var i = 4; i <= 28; i = i + 8) {
+				if (i != 20) {
 					ActivateKey(DpadMapping, InputMapping, BehaviorMapping, i, false, skipKeyUp);
 				}
 			}
-		
-		break;
+
+			break;
 		case 28:
-		
+
 			ActivateKey(DpadMapping, InputMapping, BehaviorMapping, 28, true, skipKeyUp);
-			for(var i = 4; i <= 20; i = i + 8) {
+			for (var i = 4; i <= 20; i = i + 8) {
 				ActivateKey(DpadMapping, InputMapping, BehaviorMapping, i, false, skipKeyUp);
 			}
-			
-		break;
+
+			break;
 		default:
-		
-			for(var i = 4; i <= 28; i = i + 8) {
-				ActivateKey(DpadMapping, InputMapping, BehaviorMapping, i, false, skipKeyUp);
-			}
+
+		for (var i = 4; i <= 28; i = i + 8) {
+			ActivateKey(DpadMapping, InputMapping, BehaviorMapping, i, false, skipKeyUp);
+		}
 
 	}
 }
 
-function ClearHeldInput (KeysOfExile, InputKeys, DPADOfExile, InputDPAD, BehaviorOfExile) {
+function ClearHeldInput(KeysOfExile, InputKeys, DPADOfExile, InputDPAD, BehaviorOfExile) {
 	robot.mouseToggle("up");
 
-	for(var key in BehaviorOfExile) {
+	for (var key in BehaviorOfExile) {
 		var ref = IndexOf(KeysOfExile, key);
-		if(ref === -1) {
+		if (ref === -1) {
 			ref = IndexOf(DPADOfExile, key);
-			if(InputDPAD[ref]) {
+			if (InputDPAD[ref]) {
 				ActionKeyUp(key, BehaviorOfExile);
 			}
-		} else if(InputKeys[ref]) {
+		} else if (InputKeys[ref]) {
 			ActionKeyUp(key, BehaviorOfExile);
 		}
 	}
 }
 
-function ActionKeyUp (key, behaviorReference) {
+function ActionKeyUp(key, behaviorReference) {
 	ActionKey(key, "up");
 
-	var behavior = behaviorReference[key];				
-	if(behavior instanceof Array && behavior.length > 1 && DefaultBehaviours[behavior[1]] instanceof Function) {
+	var behavior = behaviorReference[key];
+	if (behavior instanceof Array && behavior.length > 1 && DefaultBehaviours[behavior[1]] instanceof Function) {
 		DefaultBehaviours[behavior[1]](behavior, key);
 	}
 }
@@ -287,48 +296,48 @@ var ActionRepeatTimestamps = {};
 
 function ActivateKey(keys, reference, behaviorReference, index, pressed, skipKeyUp) {
 	var timestamp = new Date().getTime();
-	
-	if(keys[index]) {
+
+	if (keys[index]) {
 
 		var behavior = behaviorReference[keys[index]];
 
 		var behaviorIndex = null;
-		
-		if(behavior instanceof Array && behavior.length > 0 && DefaultBehaviours[behavior[0]] instanceof Function) {
+
+		if (behavior instanceof Array && behavior.length > 0 && DefaultBehaviours[behavior[0]] instanceof Function) {
 			behaviorIndex = behavior[0];
-		} else if(!(behavior instanceof Array) || !DefaultBehaviours[behavior[0]]) {
+		} else if (!(behavior instanceof Array) || !DefaultBehaviours[behavior[0]]) {
 			behaviorIndex = "arpg.nothing";
 		}
-	
-		if(reference[index] && !pressed) {
+
+		if (reference[index] && !pressed) {
 			reference[index] = false;
 			delete ActionRepeatTimestamps[behaviorIndex];
-			if(!skipKeyUp) {
+			if (!skipKeyUp) {
 				ActionKeyUp(keys[index], behaviorReference);
 			}
-		} else if(!reference[index] && pressed) {
+		} else if (!reference[index] && pressed) {
 			reference[index] = true;
 			ActionRepeatTimestamps[behaviorIndex] = timestamp;
 			DefaultBehaviours[behaviorIndex](behavior, keys[index]);
-		} else if(behaviorIndex.charAt(0) === behaviorIndex.charAt(0).toUpperCase()) /* Repeatable Action */ {
+		} else if (behaviorIndex.charAt(0) === behaviorIndex.charAt(0).toUpperCase()) /* Repeatable Action */ {
 			if (ActionRepeatTimestamps[behaviorIndex] && (timestamp - ActionRepeatTimestamps[behaviorIndex]) > RepeatActionInterval) {
 				ActionRepeatTimestamps[behaviorIndex] = timestamp;
 				//console.log(behaviorIndex);
 				DefaultBehaviours[behaviorIndex](behavior, keys[index]);
 			}
-		} 
+		}
 	}
 }
 
-function ResetInputArrays (Keys, Dpad) {
+function ResetInputArrays(Keys, Dpad) {
 	delete ActionRepeatTimestamps;
 	ActionRepeatTimestamps = {};
-	
-	for(var i = 1; i <= 128; i = i * 2) {
+
+	for (var i = 1; i <= 128; i = i * 2) {
 		Keys[i] = false;
 	}
-	
-	for(var i = 4; i <= 28; i = i + 8) {
+
+	for (var i = 4; i <= 28; i = i + 8) {
 		Dpad[i] = false;
 	}
 }
@@ -339,14 +348,14 @@ function IsBlockedGameMode() {
 
 var SignatureDetectionWorker = new Worker('src/game/SignatureDetectionWorker.js');
 
-SignatureDetectionWorker.onmessage = function(event) {
+SignatureDetectionWorker.onmessage = function (event) {
 	var cmd = event.data.cmd;
 	var data = event.data.data;
-	
-	switch(cmd) {
+
+	switch (cmd) {
 		case 'detect-sub':
 			console.log('detect-sub', IndexOf(GAME_MODE, data));
-			if(GAME_MODE_OBJECT.SubSection instanceof Function) {
+			if (GAME_MODE_OBJECT.SubSection instanceof Function) {
 				GAME_MODE_OBJECT.SubSection(data);
 			}
 			break;
@@ -365,38 +374,38 @@ var DetectPollingInterval = null;
 var RightThumbstickMouseInterval = null;
 
 function PollGamepadEvents() {
-	RightThumbstickMouseInterval = setInterval(function() {
-		
-		if(LastInputData !== null) {
+	RightThumbstickMouseInterval = setInterval(function () {
+
+		if (LastInputData !== null) {
 			// resolve right thumb axis
-			MoveThumbstick(LastInputData[5], LastInputData[7], 
-				MAX_INPUT_THUMBSTICK, 
+			MoveThumbstick(LastInputData[5], LastInputData[7],
+				MAX_INPUT_THUMBSTICK,
 				RIGHT_THUMBSTICK_THRESHOLD,
 				RightThumbIfCallback,
 				RightThumbElseCallback);
-			
+
 			GAME_MODE_OBJECT.ResolveInput(LastInputData);
 		}
-		
+
 	}, InputInterval);
 }
 
 function InitGame() {
-	DetectPollingInterval = setInterval(function() {
+	DetectPollingInterval = setInterval(function () {
 		SignatureDetectionWorker.postMessage({cmd: 'detect', data: {CURRENT_GAME_MODE: CURRENT_GAME_MODE, isBlockedGameMode: IsBlockedGameMode()}});
 	}, DETECTION_INTERVAL_MS);
-	
+
 	PollGamepadEvents();
-		
-	exec("start steam://rungameid/238960", function(error, stdout, stderr) {
+
+	exec("start steam://rungameid/238960", function (error, stdout, stderr) {
 		console.log(stdout);
-		
-		if(error) {
+
+		if (error) {
 			return console.error(stderr);
 		}
 	});
-	
-	if(cbInitGame instanceof Function) {
+
+	if (cbInitGame instanceof Function) {
 		cbInitGame();
 	}
 }
@@ -409,7 +418,7 @@ DefaultBehaviours["Inventory.Quit"] = function () {
 	robot.keyTap("escape");
 	ChangeGameMode(GAME_MODE.ARPG);
 };
-	
+
 DefaultBehaviours['ARPG.FetchLootHold'] = function () {
 	robot.keyToggle('alt', 'down');
 	robot.moveMouse(BasePosition.x, BasePosition.y);
@@ -432,18 +441,18 @@ DefaultBehaviours['ARPG.MouseNeutral'] = function (args, key) {
 
 /* GAME MODES */
 
-var GAME_MODE_OPTIONS_MENU = (function() {
+var GAME_MODE_OPTIONS_MENU = (function () {
 
 	DefaultBehaviours["OptionsMenu.Down"] = function () {
 		CURSOR_INDEX = (CURSOR_INDEX + 1) % CURSOR_TOTAL;
 		robot.moveMouse(CURSOR_X_POSITION, CURSOR_Y_POSITION + CURSOR_INDEX * CURSOR_Y_INCREMENT);
 	};
-	
+
 	DefaultBehaviours["OptionsMenu.Up"] = function () {
 		CURSOR_INDEX = (CURSOR_INDEX - 1 + CURSOR_TOTAL) % CURSOR_TOTAL;
 		robot.moveMouse(CURSOR_X_POSITION, CURSOR_Y_POSITION + CURSOR_INDEX * CURSOR_Y_INCREMENT);
 	};
-	
+
 	DefaultBehaviours["OptionsMenu.Cancel"] = function () {
 		robot.keyTap('escape');
 		ChangeGameMode(GAME_MODE.ARPG);
@@ -451,7 +460,7 @@ var GAME_MODE_OPTIONS_MENU = (function() {
 
 	DefaultBehaviours["OptionsMenu.Confirm"] = function () {
 		robot.mouseClick("left");
-		if(CURSOR_INDEX === 0) {
+		if (CURSOR_INDEX === 0) {
 			ChangeGameMode(GAME_MODE.INVENTORY);
 		} else if (CURSOR_INDEX === 2) {
 			ChangeGameMode(GAME_MODE.PASSIVE_SKILL_TREE);
@@ -459,19 +468,19 @@ var GAME_MODE_OPTIONS_MENU = (function() {
 			ChangeGameMode(GAME_MODE.ARPG);
 		}
 	};
-	
+
 	var KeysOfExile = {};
-		
+
 	var DPADOfExile = {};
-	
+
 	function SetOptionKeys() {
 		KeysOfExile[KEYS.KEY_DOWN] = "OptionsMenu.Confirm";
 		KeysOfExile[KEYS.KEY_RIGHT] = "OptionsMenu.Cancel";
 		KeysOfExile[KEYS.KEY_START] = "OptionsMenu.Cancel";
-		
+
 		DPADOfExile[KEYS.DPAD_UP] = "OptionsMenu.Up";
 		DPADOfExile[KEYS.DPAD_DOWN] = "OptionsMenu.Down";
-		
+
 		BehaviorOfExile = {
 			"OptionsMenu.Up": ["OptionsMenu.Up"],
 			"OptionsMenu.Down": ["OptionsMenu.Down"],
@@ -479,11 +488,11 @@ var GAME_MODE_OPTIONS_MENU = (function() {
 			"OptionsMenu.Confirm": [null, "OptionsMenu.Confirm"]
 		};
 	}
-	
+
 	var BehaviorOfExile = {};
-	
+
 	var InputDPAD = {};
-	
+
 	var InputKeys = {};
 
 	var CURSOR_INDEX = 0;
@@ -491,57 +500,57 @@ var GAME_MODE_OPTIONS_MENU = (function() {
 	var CURSOR_X_POSITION = parseInt(w * 0.14);
 	var CURSOR_Y_POSITION = parseInt(h * 0.61945);
 	var CURSOR_Y_INCREMENT = parseInt(h * 0.0346);
-	
+
 	var CURSOR_X_INITIAL = CURSOR_X_POSITION;
 	var CURSOR_Y_INITIAL = parseInt(h * 0.9287);
-	
+
 	function ResolveInput(data) {
-		if(!blockInputs) {
+		if (!blockInputs) {
 			var buttons = data[10];
-			
-			for(var i = 128; i >= 1; i = i / 2) {
+
+			for (var i = 128; i >= 1; i = i / 2) {
 				var pressed = buttons - i >= 0;
 				ActivateKey(KeysOfExile, InputKeys, BehaviorOfExile, i, pressed);
 				buttons = buttons >= i ? buttons - i : buttons;
 			}
-			
+
 			// solve dpad
 			ResolveDpadInput(data[11], DPADOfExile, InputDPAD, BehaviorOfExile, true);
 		}
 	}
-	
+
 	var blockInputs = true;
-	
+
 	function EnterArea() {
 		robot.moveMouse(CURSOR_X_INITIAL, CURSOR_Y_INITIAL);
-	
-		setTimeout(function() {
-			
+
+		setTimeout(function () {
+
 			robot.mouseClick("left");
-			
-			setTimeout(function() {
-			
+
+			setTimeout(function () {
+
 				CURSOR_INDEX = 0;
 				robot.moveMouse(CURSOR_X_POSITION, CURSOR_Y_POSITION);
-				
+
 				SetOptionKeys();
-				
-				setTimeout(function() {
+
+				setTimeout(function () {
 					blockInputs = false;
 				}, 50);
-				
+
 			}, 50);
-			
+
 		}, 50);
 	}
-	
+
 	function LeaveArea() {
 		BehaviorOfExile = {};
 		KeysOfExile = {};
 		DPADOfExile = {};
 		blockInputs = true;
 	}
-	
+
 	return {
 		ResolveInput: ResolveInput,
 		EnterArea: EnterArea,
@@ -549,14 +558,14 @@ var GAME_MODE_OPTIONS_MENU = (function() {
 	};
 })();
 
-var GAME_MODE_INVENTORY = (function() {
+var GAME_MODE_INVENTORY = (function () {
 
 	var SubSectionSignatures = null;
 	var CurrentSubSection = null;
 	var CURRENT_AREA = null;
-	
+
 	var signatureFileName = "signatures/" + fileResolutionPrefix + "inventory-signatures.json";
-	
+
 	try {
 		var data = fs.readFileSync(signatureFileName, 'utf8');
 		SubSectionSignatures = JSON.parse(data);
@@ -564,7 +573,7 @@ var GAME_MODE_INVENTORY = (function() {
 	} catch (e) {
 		SignatureNotFound(signatureFileName);
 	}
-	
+
 	var INVENTORY_AREA = {
 		FLASKS_AREA: 0,
 		EQUIPMENT_AREA: 1,
@@ -578,7 +587,7 @@ var GAME_MODE_INVENTORY = (function() {
 		DIVINATION_CARD: 9,
 		CRAFT: 10
 	};
-	
+
 	var EquipmentIndexTable = {
 		MAIN_HAND: 1,
 		RING_L: 2,
@@ -593,7 +602,7 @@ var GAME_MODE_INVENTORY = (function() {
 	};
 
 	var EquipmentGraph = [];
-	
+
 	EquipmentGraph[EquipmentIndexTable.BELT] = {
 		d: -1, /* Go to Flasks Area */
 		l: EquipmentIndexTable.GLOVES,
@@ -610,20 +619,20 @@ var GAME_MODE_INVENTORY = (function() {
 		d: EquipmentIndexTable.BOOTS,
 		l: EquipmentIndexTable.RING_R
 	};
-	
+
 	EquipmentGraph[EquipmentIndexTable.HELMET] = {
 		d: EquipmentIndexTable.CHEST,
 		r: EquipmentIndexTable.AMULET,
 		l: EquipmentIndexTable.MAIN_HAND
-	};	
+	};
 
 	EquipmentGraph[EquipmentIndexTable.CHEST] = {
 		d: EquipmentIndexTable.BELT,
 		u: EquipmentIndexTable.HELMET,
 		l: EquipmentIndexTable.RING_L,
 		r: EquipmentIndexTable.RING_R
-	};	
-	
+	};
+
 	EquipmentGraph[EquipmentIndexTable.RING_R] = {
 		d: EquipmentIndexTable.BOOTS,
 		u: EquipmentIndexTable.AMULET,
@@ -636,13 +645,13 @@ var GAME_MODE_INVENTORY = (function() {
 		l: EquipmentIndexTable.MAIN_HAND,
 		r: EquipmentIndexTable.CHEST
 	};
-	
+
 	EquipmentGraph[EquipmentIndexTable.AMULET] = {
 		d: EquipmentIndexTable.RING_R,
 		l: EquipmentIndexTable.CHEST,
 		r: EquipmentIndexTable.OFF_HAND,
 	};
-	
+
 	EquipmentGraph[EquipmentIndexTable.GLOVES] = {
 		d: -1,
 		u: EquipmentIndexTable.RING_L,
@@ -654,12 +663,12 @@ var GAME_MODE_INVENTORY = (function() {
 		u: EquipmentIndexTable.RING_R,
 		l: EquipmentIndexTable.BELT
 	};
-	
+
 	var LeaveSubSectionDelay = 100;
-	
+
 	function LeaveCurrentSubSection(TargetArea) {
-		setTimeout(function() {
-			switch(TargetArea) {
+		setTimeout(function () {
+			switch (TargetArea) {
 				case INVENTORY_AREA.BAG_AREA:
 					EnterBagArea();
 					break;
@@ -674,9 +683,9 @@ var GAME_MODE_INVENTORY = (function() {
 			}
 		}, LeaveSubSectionDelay);
 	}
-	
+
 	function EnterCurrentSubSection() {
-		switch(CurrentSubSection) {
+		switch (CurrentSubSection) {
 			case GAME_MODE.REWARD_SCREEN:
 				EnterRewardArea();
 				break;
@@ -693,37 +702,37 @@ var GAME_MODE_INVENTORY = (function() {
 				EnterSellArea();
 		}
 	}
-	
+
 	function ChangeIntoSubSection(mode) {
 		CurrentSubSection = mode;
-		if(ChangeGameModeUpdateUICallback instanceof Function && CurrentSubSection !== null) {
+		if (ChangeGameModeUpdateUICallback instanceof Function && CurrentSubSection !== null) {
 			ChangeGameModeUpdateUICallback(CurrentSubSection);
 		}
 	}
 
 	DefaultBehaviours["RewardsArea.Up"] = function () {
-		if(INVENTORY_INDEX >= 10) {
+		if (INVENTORY_INDEX >= 10) {
 			INVENTORY_INDEX -= 10;
 			SET_AREA_POSITION(INVENTORY_INDEX);
 		}
 	};
 
 	DefaultBehaviours["RewardsArea.Down"] = function () {
-		if(INVENTORY_INDEX < 50) {
+		if (INVENTORY_INDEX < 50) {
 			INVENTORY_INDEX += 10;
 			SET_AREA_POSITION(INVENTORY_INDEX);
 		}
 	};
-	
+
 	DefaultBehaviours["RewardsArea.Left"] = function () {
-		if(INVENTORY_INDEX % 10 !== 0) {
+		if (INVENTORY_INDEX % 10 !== 0) {
 			INVENTORY_INDEX--;
 			SET_AREA_POSITION(INVENTORY_INDEX);
 		}
 	};
-	
+
 	DefaultBehaviours["RewardsArea.Right"] = function () {
-		if((INVENTORY_INDEX + 1) % 10 === 0) /* Goes Back to BagArea */ {
+		if ((INVENTORY_INDEX + 1) % 10 === 0) /* Goes Back to BagArea */ {
 			LeaveCurrentSubSection(INVENTORY_AREA.BAG_AREA);
 		} else {
 			INVENTORY_INDEX++;
@@ -733,7 +742,7 @@ var GAME_MODE_INVENTORY = (function() {
 
 	DefaultBehaviours["EquipmentArea.Up"] = function () {
 		var pos = EquipmentGraph[INVENTORY_INDEX].u;
-	
+
 		if (pos !== undefined) {
 			INVENTORY_INDEX = pos;
 			SET_AREA_POSITION(INVENTORY_INDEX);
@@ -742,8 +751,8 @@ var GAME_MODE_INVENTORY = (function() {
 
 	DefaultBehaviours["EquipmentArea.Down"] = function () {
 		var pos = EquipmentGraph[INVENTORY_INDEX].d;
-	
-		if(pos === -1) /* Change Area, Flasks */ {
+
+		if (pos === -1) /* Change Area, Flasks */ {
 			LeaveCurrentSubSection(INVENTORY_AREA.FLASKS_AREA);
 		} else if (pos !== undefined) {
 			INVENTORY_INDEX = pos;
@@ -751,25 +760,25 @@ var GAME_MODE_INVENTORY = (function() {
 		}
 
 	};
-	
+
 	DefaultBehaviours["EquipmentArea.Left"] = function () {
 		var pos = EquipmentGraph[INVENTORY_INDEX].l;
-	
+
 		if (pos !== undefined) {
 			INVENTORY_INDEX = pos;
 			SET_AREA_POSITION(INVENTORY_INDEX);
 		}
 	};
-	
+
 	DefaultBehaviours["EquipmentArea.Right"] = function () {
 		var pos = EquipmentGraph[INVENTORY_INDEX].r;
-	
+
 		if (pos !== undefined) {
 			INVENTORY_INDEX = pos;
 			SET_AREA_POSITION(INVENTORY_INDEX);
 		}
 	};
-	
+
 	DefaultBehaviours["FlasksArea.Up"] = function () {
 		/* Change Area, Equipment */
 		LeaveCurrentSubSection(INVENTORY_AREA.EQUIPMENT_AREA);
@@ -778,100 +787,100 @@ var GAME_MODE_INVENTORY = (function() {
 	DefaultBehaviours["FlasksArea.Down"] = function () {
 		LeaveCurrentSubSection(INVENTORY_AREA.BAG_AREA);
 	};
-	
+
 	DefaultBehaviours["FlasksArea.Left"] = function () {
-		if(INVENTORY_INDEX === 0) /* Change to SubSection, if open */ {
+		if (INVENTORY_INDEX === 0) /* Change to SubSection, if open */ {
 			EnterCurrentSubSection();
 		} else {
 			INVENTORY_INDEX--;
 			SET_AREA_POSITION(INVENTORY_INDEX);
 		}
 	};
-	
+
 	DefaultBehaviours["FlasksArea.Right"] = function () {
-		if(INVENTORY_INDEX < 4) {
+		if (INVENTORY_INDEX < 4) {
 			INVENTORY_INDEX++;
 			SET_AREA_POSITION(INVENTORY_INDEX);
 		}
 	};
-	
+
 	DefaultBehaviours["StashArea.Back"] = function () {
 		var posX = w * 0.013;
 		var posY = h * 0.132;
-		
+
 		robot.moveMouse(posX, posY);
-		
-		setTimeout(function() {
+
+		setTimeout(function () {
 			robot.mouseClick("left");
-			setTimeout(function() {
+			setTimeout(function () {
 				SET_AREA_POSITION(INVENTORY_INDEX);
 			}, 24);
 		}, 24);
-		
+
 	};
 
 	DefaultBehaviours["StashArea.Forward"] = function () {
 		var posX = w * 0.320;
 		var posY = h * 0.132;
-		
+
 		robot.moveMouse(posX, posY);
-		
-		setTimeout(function() {
+
+		setTimeout(function () {
 			robot.mouseClick("left");
-			setTimeout(function() {
+			setTimeout(function () {
 				SET_AREA_POSITION(INVENTORY_INDEX);
 			}, 24);
 		}, 24);
 	};
 
 	DefaultBehaviours["StashArea.SelectTab"] = function () {
-		
+
 		var posX = w * 0.028;
 		var posY = h * 0.132;
-		
+
 		robot.moveMouse(posX, posY);
-		
-		setTimeout(function() {
+
+		setTimeout(function () {
 			robot.mouseClick("left");
-			setTimeout(function() {
+			setTimeout(function () {
 				SET_AREA_POSITION(INVENTORY_INDEX);
 			}, 24);
 		}, 24);
-		
+
 	};
-	
+
 	DefaultBehaviours["StashArea.Up"] = function () {
-		if(INVENTORY_INDEX >= 12) {
+		if (INVENTORY_INDEX >= 12) {
 			INVENTORY_INDEX -= 12;
 			SET_AREA_POSITION(INVENTORY_INDEX);
 		}
 	};
 
 	DefaultBehaviours["StashArea.Down"] = function () {
-		if(INVENTORY_INDEX < 132) /* Change Area, Gems */ {
+		if (INVENTORY_INDEX < 132) /* Change Area, Gems */ {
 			INVENTORY_INDEX += 12;
 			SET_AREA_POSITION(INVENTORY_INDEX);
 		}
 	};
-	
+
 	DefaultBehaviours["StashArea.Left"] = function () {
-		if(INVENTORY_INDEX % 12 !== 0){
+		if (INVENTORY_INDEX % 12 !== 0) {
 			INVENTORY_INDEX--;
 			SET_AREA_POSITION(INVENTORY_INDEX);
 		}
 	};
-	
+
 	DefaultBehaviours["StashArea.Right"] = function () {
-		if((INVENTORY_INDEX + 1) % 12 === 0) {
+		if ((INVENTORY_INDEX + 1) % 12 === 0) {
 			LeaveCurrentSubSection(INVENTORY_AREA.BAG_AREA);
 		} else {
 			INVENTORY_INDEX++;
 			SET_AREA_POSITION(INVENTORY_INDEX);
 		}
 	};
-	
+
 	DefaultBehaviours["BagArea.Up"] = function () {
-		if(INVENTORY_INDEX < 12) /* Change Area, Flasks */ {
+		if (INVENTORY_INDEX < 12) /* Change Area, Flasks */ {
 			LeaveCurrentSubSection(INVENTORY_AREA.FLASKS_AREA);
 		} else {
 			INVENTORY_INDEX -= 12;
@@ -880,26 +889,26 @@ var GAME_MODE_INVENTORY = (function() {
 	};
 
 	DefaultBehaviours["BagArea.Down"] = function () {
-		if(INVENTORY_INDEX >= 48) /* Change Area, Gems */ {
-			
+		if (INVENTORY_INDEX >= 48) /* Change Area, Gems */ {
+
 		} else {
 			INVENTORY_INDEX += 12;
 			SET_AREA_POSITION(INVENTORY_INDEX);
 		}
 	};
-	
+
 	DefaultBehaviours["BagArea.Left"] = function () {
-		if(INVENTORY_INDEX % 12 === 0) /* Change to SubSection, if open */ {
+		if (INVENTORY_INDEX % 12 === 0) /* Change to SubSection, if open */ {
 			EnterCurrentSubSection();
 		} else {
 			INVENTORY_INDEX--;
 			SET_AREA_POSITION(INVENTORY_INDEX);
 		}
 	};
-	
+
 	DefaultBehaviours["BagArea.Right"] = function () {
-		if((INVENTORY_INDEX + 1) % 12 === 0) /* Does nothing (?) */ {
-			
+		if ((INVENTORY_INDEX + 1) % 12 === 0) /* Does nothing (?) */ {
+
 		} else {
 			INVENTORY_INDEX++;
 			SET_AREA_POSITION(INVENTORY_INDEX);
@@ -907,38 +916,38 @@ var GAME_MODE_INVENTORY = (function() {
 	};
 
 	DefaultBehaviours["CraftArea.Up"] = function () {
-		if(INVENTORY_INDEX === 7 || INVENTORY_INDEX === 8 || INVENTORY_INDEX === 9) {
+		if (INVENTORY_INDEX === 7 || INVENTORY_INDEX === 8 || INVENTORY_INDEX === 9) {
 			INVENTORY_INDEX -= 2;
 		} else if (INVENTORY_INDEX === 5 || INVENTORY_INDEX === 6) {
 			INVENTORY_INDEX = 0;
 		} else if (INVENTORY_INDEX !== 0) {
 			INVENTORY_INDEX--;
 		}
-		
+
 		SET_AREA_POSITION(INVENTORY_INDEX);
 	};
 
 	DefaultBehaviours["CraftArea.Down"] = function () {
-		if(INVENTORY_INDEX === 7 || INVENTORY_INDEX === 8 || INVENTORY_INDEX === 9) /* Goes to Confirm */ {
+		if (INVENTORY_INDEX === 7 || INVENTORY_INDEX === 8 || INVENTORY_INDEX === 9) /* Goes to Confirm */ {
 			INVENTORY_INDEX = 9;
 		} else if (INVENTORY_INDEX === 5 || INVENTORY_INDEX === 6) {
 			INVENTORY_INDEX += 2;
 		} else {
 			INVENTORY_INDEX++;
 		}
-		
+
 		SET_AREA_POSITION(INVENTORY_INDEX);
 	};
-	
+
 	DefaultBehaviours["CraftArea.Left"] = function () {
-		if(INVENTORY_INDEX === 6 || INVENTORY_INDEX === 8) {
+		if (INVENTORY_INDEX === 6 || INVENTORY_INDEX === 8) {
 			INVENTORY_INDEX--;
 			SET_AREA_POSITION(INVENTORY_INDEX);
 		}
 	};
-	
+
 	DefaultBehaviours["CraftArea.Right"] = function () {
-		if(INVENTORY_INDEX !== 5 && INVENTORY_INDEX !== 7) {
+		if (INVENTORY_INDEX !== 5 && INVENTORY_INDEX !== 7) {
 			LeaveCurrentSubSection(INVENTORY_AREA.BAG_AREA);
 		} else {
 			INVENTORY_INDEX++;
@@ -951,10 +960,10 @@ var GAME_MODE_INVENTORY = (function() {
 		var posY = h * 0.171;
 
 		proxyMoveMouse(posX, posY);
-		
-		setTimeout(function() {
+
+		setTimeout(function () {
 			robot.mouseClick("left");
-			setTimeout(function() {
+			setTimeout(function () {
 				SET_AREA_POSITION(INVENTORY_INDEX);
 			}, 24);
 		}, 24);
@@ -965,38 +974,38 @@ var GAME_MODE_INVENTORY = (function() {
 		var posY = h * 0.547;
 
 		proxyMoveMouse(posX, posY);
-		
-		setTimeout(function() {
+
+		setTimeout(function () {
 			robot.mouseClick("left");
-			setTimeout(function() {
+			setTimeout(function () {
 				SET_AREA_POSITION(INVENTORY_INDEX);
 			}, 24);
 		}, 24);
 	};
-	
+
 	DefaultBehaviours["SellArea.Up"] = function () {
-		if(INVENTORY_INDEX >= 12) {
+		if (INVENTORY_INDEX >= 12) {
 			INVENTORY_INDEX -= 12;
 			SET_AREA_POSITION(INVENTORY_INDEX);
 		}
 	};
 
 	DefaultBehaviours["SellArea.Down"] = function () {
-		if(INVENTORY_INDEX < 48) /* Change Area, Gems */ {
+		if (INVENTORY_INDEX < 48) /* Change Area, Gems */ {
 			INVENTORY_INDEX += 12;
 			SET_AREA_POSITION(INVENTORY_INDEX);
 		}
 	};
-	
+
 	DefaultBehaviours["SellArea.Left"] = function () {
-		if(INVENTORY_INDEX % 12 !== 0) /* Change to SubSection, if open */ {
+		if (INVENTORY_INDEX % 12 !== 0) /* Change to SubSection, if open */ {
 			INVENTORY_INDEX--;
 			SET_AREA_POSITION(INVENTORY_INDEX);
 		}
 	};
-	
+
 	DefaultBehaviours["SellArea.Right"] = function () {
-		if((INVENTORY_INDEX + 1) % 12 === 0) /* Does nothing (?) */ {
+		if ((INVENTORY_INDEX + 1) % 12 === 0) /* Does nothing (?) */ {
 			LeaveCurrentSubSection(INVENTORY_AREA.BAG_AREA);
 		} else {
 			INVENTORY_INDEX++;
@@ -1007,22 +1016,22 @@ var GAME_MODE_INVENTORY = (function() {
 	DefaultBehaviours["SellArea.Confirm"] = function () {
 		var posX = w * 0.194;
 		var posY = h * 0.758;
-		
+
 		robot.moveMouse(posX, posY);
 	};
 
 	DefaultBehaviours["SellArea.Cancel"] = function () {
 		var posX = w * 0.456;
 		var posY = h * 0.758;
-		
+
 		robot.moveMouse(posX, posY);
 	};
-	
+
 	DefaultBehaviours["BagArea.CenterClick"] = function () {
 		robot.moveMouse(BasePosition.x, BasePosition.y);
-		setTimeout(function() {
+		setTimeout(function () {
 			robot.mouseClick("left");
-			setTimeout(function() {
+			setTimeout(function () {
 				SET_AREA_POSITION(INVENTORY_INDEX);
 			}, 24);
 		}, 24);
@@ -1030,11 +1039,11 @@ var GAME_MODE_INVENTORY = (function() {
 
 	var KeysOfExile = {};
 	var DPADOfExile = {};
-	
-	for(var i in INVENTORY_AREA) {
+
+	for (var i in INVENTORY_AREA) {
 		KeysOfExile[INVENTORY_AREA[i]] = {};
 		DPADOfExile[INVENTORY_AREA[i]] = {};
-		
+
 		KeysOfExile[INVENTORY_AREA[i]][KEYS.KEY_DOWN] = "left";
 		KeysOfExile[INVENTORY_AREA[i]][KEYS.KEY_RIGHT] = "right";
 	}
@@ -1042,21 +1051,21 @@ var GAME_MODE_INVENTORY = (function() {
 	// sell area
 	KeysOfExile[INVENTORY_AREA.CRAFT][KEYS.KEY_LEFT] = "CraftArea.ScrollDown";
 	KeysOfExile[INVENTORY_AREA.CRAFT][KEYS.KEY_UP] = "CraftArea.ScrollUp";
-	
+
 	DPADOfExile[INVENTORY_AREA.CRAFT][KEYS.DPAD_UP] = "CraftArea.Up";
 	DPADOfExile[INVENTORY_AREA.CRAFT][KEYS.DPAD_DOWN] = "CraftArea.Down";
 	DPADOfExile[INVENTORY_AREA.CRAFT][KEYS.DPAD_LEFT] = "CraftArea.Left";
 	DPADOfExile[INVENTORY_AREA.CRAFT][KEYS.DPAD_RIGHT] = "CraftArea.Right";
-	
+
 	// sell area
 	KeysOfExile[INVENTORY_AREA.SELL][KEYS.KEY_UP] = "SellArea.Cancel";
 	KeysOfExile[INVENTORY_AREA.SELL][KEYS.KEY_LEFT] = "SellArea.Confirm";
-	
+
 	DPADOfExile[INVENTORY_AREA.SELL][KEYS.DPAD_UP] = "SellArea.Up";
 	DPADOfExile[INVENTORY_AREA.SELL][KEYS.DPAD_DOWN] = "SellArea.Down";
 	DPADOfExile[INVENTORY_AREA.SELL][KEYS.DPAD_LEFT] = "SellArea.Left";
 	DPADOfExile[INVENTORY_AREA.SELL][KEYS.DPAD_RIGHT] = "SellArea.Right";
-	
+
 	// bag area
 	KeysOfExile[INVENTORY_AREA.BAG_AREA][KEYS.KEY_SHOULDER_LEFT] = "control";
 	KeysOfExile[INVENTORY_AREA.BAG_AREA][KEYS.KEY_SHOULDER_RIGHT] = "shift";
@@ -1067,9 +1076,9 @@ var GAME_MODE_INVENTORY = (function() {
 	DPADOfExile[INVENTORY_AREA.BAG_AREA][KEYS.DPAD_DOWN] = "BagArea.Down";
 	DPADOfExile[INVENTORY_AREA.BAG_AREA][KEYS.DPAD_LEFT] = "BagArea.Left";
 	DPADOfExile[INVENTORY_AREA.BAG_AREA][KEYS.DPAD_RIGHT] = "BagArea.Right";
-	
+
 	// rewards
-	
+
 	DPADOfExile[INVENTORY_AREA.REWARDS][KEYS.DPAD_UP] = "RewardsArea.Up";
 	DPADOfExile[INVENTORY_AREA.REWARDS][KEYS.DPAD_DOWN] = "RewardsArea.Down";
 	DPADOfExile[INVENTORY_AREA.REWARDS][KEYS.DPAD_LEFT] = "RewardsArea.Left";
@@ -1083,19 +1092,19 @@ var GAME_MODE_INVENTORY = (function() {
 	KeysOfExile[INVENTORY_AREA.STASH][KEYS.KEY_LEFT] = "StashArea.Back";
 	KeysOfExile[INVENTORY_AREA.STASH][KEYS.KEY_UP] = "StashArea.Forward";
 	KeysOfExile[INVENTORY_AREA.STASH][KEYS.KEY_SELECT] = "StashArea.SelectTab";
-	
+
 	DPADOfExile[INVENTORY_AREA.STASH][KEYS.DPAD_UP] = "StashArea.Up";
 	DPADOfExile[INVENTORY_AREA.STASH][KEYS.DPAD_DOWN] = "StashArea.Down";
 	DPADOfExile[INVENTORY_AREA.STASH][KEYS.DPAD_LEFT] = "StashArea.Left";
 	DPADOfExile[INVENTORY_AREA.STASH][KEYS.DPAD_RIGHT] = "StashArea.Right";
-	
+
 	// equipments
 
 	DPADOfExile[INVENTORY_AREA.EQUIPMENT_AREA][KEYS.DPAD_UP] = "EquipmentArea.Up";
 	DPADOfExile[INVENTORY_AREA.EQUIPMENT_AREA][KEYS.DPAD_DOWN] = "EquipmentArea.Down";
 	DPADOfExile[INVENTORY_AREA.EQUIPMENT_AREA][KEYS.DPAD_LEFT] = "EquipmentArea.Left";
 	DPADOfExile[INVENTORY_AREA.EQUIPMENT_AREA][KEYS.DPAD_RIGHT] = "EquipmentArea.Right";
-	
+
 	// flasks
 
 	DPADOfExile[INVENTORY_AREA.FLASKS_AREA][KEYS.DPAD_UP] = "FlasksArea.Up";
@@ -1123,29 +1132,29 @@ var GAME_MODE_INVENTORY = (function() {
 	};
 
 	// Set all DPAD keys
-	for(var key in DPADOfExile) {
+	for (var key in DPADOfExile) {
 		var dpadSetKeys = DPADOfExile[key];
-		for(var inner in dpadSetKeys) {
+		for (var inner in dpadSetKeys) {
 			var v = dpadSetKeys[inner];
 			BehaviorOfExile[v] = [v];
 		}
 	}
-	
+
 	var InputDPAD = {};
 	var InputKeys = {};
 
 	var INVENTORY_INDEX = null;
-	
+
 	var SET_AREA_POSITION = null;
-	
+
 	var SquareItemIcr = h * 0.0479;
-	
+
 	function SetEquipmentAreaPosition(Position) {
-	
+
 		var basePositionX = w;
 		var basePositionY = h;
-	
-		switch(Position) {
+
+		switch (Position) {
 			case EquipmentIndexTable.MAIN_HAND:
 				basePositionX *= 0.719;
 				basePositionY *= 0.301;
@@ -1181,15 +1190,15 @@ var GAME_MODE_INVENTORY = (function() {
 			case EquipmentIndexTable.BOOTS:
 				basePositionX *= 0.916;
 				basePositionY *= 0.412;
-			break;
+				break;
 			case EquipmentIndexTable.AMULET:
 				basePositionX *= 0.891;
 				basePositionY *= 0.240;
 		}
-		
+
 		robot.moveMouse(basePositionX, basePositionY);
 	}
-	
+
 	function EnterEquipmentArea() {
 		CURRENT_AREA = INVENTORY_AREA.EQUIPMENT_AREA;
 		INVENTORY_INDEX = 0;
@@ -1197,16 +1206,16 @@ var GAME_MODE_INVENTORY = (function() {
 		SET_AREA_POSITION = SetEquipmentAreaPosition;
 		SetEquipmentAreaPosition(INVENTORY_INDEX);
 	}
-	
+
 	function SetFlasksAreaPosition(Position) {
 		var positionX = INVENTORY_INDEX;
-		
+
 		var basePositionX = w * 0.775;
 		var basePositionY = h * 0.478;
-		
+
 		robot.moveMouse(basePositionX + positionX * SquareItemIcr, basePositionY);
 	}
-	
+
 	function EnterFlasksArea() {
 		CURRENT_AREA = INVENTORY_AREA.FLASKS_AREA;
 		INVENTORY_INDEX = 0;
@@ -1214,17 +1223,17 @@ var GAME_MODE_INVENTORY = (function() {
 		SET_AREA_POSITION = SetFlasksAreaPosition;
 		SetFlasksAreaPosition(INVENTORY_INDEX);
 	}
-	
+
 	function SetRewardAreaPosition(Position) {
 		var positionX = (INVENTORY_INDEX % 10);
 		var positionY = parseInt(INVENTORY_INDEX / 10);
-		
+
 		var basePositionX = w * 0.202;
 		var basePositionY = h * 0.3426;
-		
+
 		robot.moveMouse(basePositionX + positionX * SquareItemIcr, basePositionY + positionY * SquareItemIcr);
 	}
-	
+
 	function EnterRewardArea() {
 		CURRENT_AREA = INVENTORY_AREA.REWARDS;
 		INVENTORY_INDEX = 0;
@@ -1232,32 +1241,32 @@ var GAME_MODE_INVENTORY = (function() {
 		SET_AREA_POSITION = SetRewardAreaPosition;
 		SetRewardAreaPosition(INVENTORY_INDEX);
 	}
-	
+
 	function SetCraftAreaPosition(Position) {
-	
+
 		var posX;
 		var posY;
-	
-		if(Position === 9) {
+
+		if (Position === 9) {
 			posX = w * 0.326;
 			posY = h * 0.816;
 		} else if (Position >= 5 && Position <= 8) {
-			
+
 			var basePositionX = w * 0.313;
 			var basePositionY = h * 0.676;
-		
+
 			posX = basePositionX + parseInt((INVENTORY_INDEX - 5) % 2) * SquareItemIcr;
 			posY = basePositionY + parseInt((INVENTORY_INDEX - 5) / 2) * SquareItemIcr;
 		} else {
 			posX = w * 0.326;
 			posY = h * 0.200;
-			
+
 			posY += h * 0.083 * INVENTORY_INDEX;
 		}
-	
+
 		proxyMoveMouse(posX, posY);
 	}
-	
+
 	function EnterCraftArea() {
 		CURRENT_AREA = INVENTORY_AREA.CRAFT;
 		INVENTORY_INDEX = 0;
@@ -1265,17 +1274,17 @@ var GAME_MODE_INVENTORY = (function() {
 		SET_AREA_POSITION = SetCraftAreaPosition;
 		SetCraftAreaPosition(INVENTORY_INDEX);
 	}
-	
+
 	function SetDivinationCardAreaPosition(Position) {
 		var positionX = (INVENTORY_INDEX % 10);
 		var positionY = parseInt(INVENTORY_INDEX / 10);
-		
+
 		var basePositionX = w * 0.33;
 		var basePositionY = h * 0.33;
-		
+
 		robot.moveMouse(basePositionX + positionX * SquareItemIcr, basePositionY + positionY * SquareItemIcr);
 	}
-	
+
 	function EnterDivinationCardArea() {
 		CURRENT_AREA = INVENTORY_AREA.DIVINATION_CARD;
 		INVENTORY_INDEX = 0;
@@ -1283,17 +1292,17 @@ var GAME_MODE_INVENTORY = (function() {
 		SET_AREA_POSITION = SetDivinationCardAreaPosition;
 		SetDivinationCardAreaPosition(INVENTORY_INDEX);
 	}
-	
+
 	function SetStashAreaPosition(Position) {
 		var positionX = (INVENTORY_INDEX % 12);
 		var positionY = parseInt(INVENTORY_INDEX / 12);
-		
+
 		var basePositionX = w * 0.032;
 		var basePositionY = h * 0.190;
-		
+
 		robot.moveMouse(basePositionX + positionX * SquareItemIcr, basePositionY + positionY * SquareItemIcr);
 	}
-	
+
 	function EnterStashArea() {
 		CURRENT_AREA = INVENTORY_AREA.STASH;
 		INVENTORY_INDEX = 0;
@@ -1301,17 +1310,17 @@ var GAME_MODE_INVENTORY = (function() {
 		SET_AREA_POSITION = SetStashAreaPosition;
 		SetStashAreaPosition(INVENTORY_INDEX);
 	}
-	
+
 	function SetSellAreaPosition(Position) {
 		var positionX = (INVENTORY_INDEX % 12);
 		var positionY = parseInt(INVENTORY_INDEX / 12);
-		
+
 		var basePositionX = w * 0.185;
 		var basePositionY = h * 0.523;
-		
+
 		robot.moveMouse(basePositionX + positionX * SquareItemIcr, basePositionY + positionY * SquareItemIcr);
 	}
-	
+
 	function EnterSellArea() {
 		CURRENT_AREA = INVENTORY_AREA.SELL;
 		INVENTORY_INDEX = 0;
@@ -1319,55 +1328,55 @@ var GAME_MODE_INVENTORY = (function() {
 		SET_AREA_POSITION = SetSellAreaPosition;
 		SetSellAreaPosition(INVENTORY_INDEX);
 	}
-	
+
 	function SetBagAreaPosition(Position) {
 		var positionX = (INVENTORY_INDEX % 12);
 		var positionY = parseInt(INVENTORY_INDEX / 12);
-		
+
 		var basePositionX = w * 0.685;
 		var basePositionY = h * 0.58;
-		
+
 		robot.moveMouse(basePositionX + positionX * SquareItemIcr, basePositionY + positionY * SquareItemIcr);
 	}
-	
-	function EnterBagArea () {
+
+	function EnterBagArea() {
 		CURRENT_AREA = INVENTORY_AREA.BAG_AREA;
 		INVENTORY_INDEX = 0;
 		ResetInputArrays(InputKeys, InputDPAD);
 		SET_AREA_POSITION = SetBagAreaPosition;
 		SetBagAreaPosition(INVENTORY_INDEX);
 	}
-	
+
 	function ResolveInput(data) {
-		
+
 		//console.log(robot.getMousePos());
-		
+
 		var buttons = data[10];
-		
+
 		/* START KEY SPECIAL CASE */
 		var pressed = buttons - 128 >= 0;
 		ActivateKey(KeysOfExile, InputKeys, BehaviorOfExile, 128, pressed);
 		buttons = buttons >= 128 ? buttons - i : buttons;
-		
-		for(var i = 64; i >= 1; i = i / 2) {
+
+		for (var i = 64; i >= 1; i = i / 2) {
 			pressed = buttons - i >= 0;
 			ActivateKey(KeysOfExile[CURRENT_AREA], InputKeys, BehaviorOfExile, i, pressed);
 			buttons = buttons >= i ? buttons - i : buttons;
 		}
-		
+
 		// solve dpad
 		ResolveDpadInput(data[11], DPADOfExile[CURRENT_AREA], InputDPAD, BehaviorOfExile, true);
 	}
 
 	var SubSectionDetectionInterval = null;
-	
-	function LeaveArea () {
+
+	function LeaveArea() {
 		SignatureDetectionWorker.postMessage({cmd: 'set-subsigs', data: null});
 		clearInterval(SubSectionDetectionInterval);
 		SubSectionDetectionInterval = null;
 		CurrentSubSection = null;
 	}
-	
+
 	function EnterArea() {
 		//console.log('enter area');
 		//robot.mouseToggle("up");
@@ -1379,30 +1388,30 @@ var GAME_MODE_INVENTORY = (function() {
 		}, DETECTION_INTERVAL_MS);
 		EnterBagArea();
 	}
-	
+
 	function ChangeCurrentSubSection(mode) {
 		console.log('change current sub section');
 		CurrentSubSection = mode;
 		console.log(IndexOf(GAME_MODE, CurrentSubSection));
 	}
-	
+
 	return {
 		ResolveInput: ResolveInput,
 		EnterArea: EnterArea,
 		LeaveArea: LeaveArea,
 		SubSection: ChangeIntoSubSection
 	};
-	
+
 })();
 
-var GAME_MODE_DEBUG = (function() {
-	
+var GAME_MODE_DEBUG = (function () {
+
 	var InputKeys = {};
-	
+
 	var KeysOfExile = {};
-	
+
 	KeysOfExile[KEYS.KEY_START] = 'Debug.DetectPixelSignature';
-	
+
 	var BehaviorOfExile = {
 		'Debug.CapturePixelSignature': [null, "Debug.CapturePixelSignature"],
 		'Debug.DetectPixelSignature': [null, "Debug.DetectPixelSignature"],
@@ -1410,25 +1419,25 @@ var GAME_MODE_DEBUG = (function() {
 	};
 
 	var SIGNATURE_CAPTURE_ORDER = [{
-		filename: 'signatures.json',
-		mode: [
-			GAME_MODE.INVENTORY,
-			GAME_MODE.PASSIVE_SKILL_TREE,
-			GAME_MODE.WORLD_MAP
-		]
-	},
-	{
-		filename: 'inventory-signatures.json',
-		mode: [
-			GAME_MODE.STASH,
-			GAME_MODE.SELL,
-			GAME_MODE.CRAFT_SCREEN,
-			GAME_MODE.REWARD_SCREEN
-		]
-	}];
+			filename: 'signatures.json',
+			mode: [
+				GAME_MODE.INVENTORY,
+				GAME_MODE.PASSIVE_SKILL_TREE,
+				GAME_MODE.WORLD_MAP
+			]
+		},
+		{
+			filename: 'inventory-signatures.json',
+			mode: [
+				GAME_MODE.STASH,
+				GAME_MODE.SELL,
+				GAME_MODE.CRAFT_SCREEN,
+				GAME_MODE.REWARD_SCREEN
+			]
+		}];
 
 	var SIGNATURE_CAPTURE_STATE = null;
-	
+
 	DefaultBehaviours["Debug.PrintCursorData"] = function () {
 		var c = robot.getMousePos();
 		console.log(c);
@@ -1436,7 +1445,7 @@ var GAME_MODE_DEBUG = (function() {
 
 	var supportedAspects = [
 		{
-			aspect: 16/9,
+			aspect: 16 / 9,
 			coords: {}
 		}
 	];
@@ -1448,29 +1457,29 @@ var GAME_MODE_DEBUG = (function() {
 	supportedAspects[0].coords[GAME_MODE.SELL] = {x: 0.31875, y: 0.08796296296296297};
 	supportedAspects[0].coords[GAME_MODE.CRAFT_SCREEN] = {x: 0.32447916666666665, y: 0.09907407407407408};
 	supportedAspects[0].coords[GAME_MODE.REWARD_SCREEN] = {x: 0.4484375, y: 0.6259259259259259};
-	
+
 	var LastCapturedSignatures = [];
-	
+
 	function FindAspectRatio(aspect) {
 		var ret = -1;
-		
-		for(var i = 0; i < supportedAspects.length && ret === -1; i++) {
-			if(supportedAspects[i].aspect === aspect) {
+
+		for (var i = 0; i < supportedAspects.length && ret === -1; i++) {
+			if (supportedAspects[i].aspect === aspect) {
 				ret = i;
 			}
 		}
-		
+
 		return ret;
 	}
-	
+
 	function GetCaptureCoordinates(mode) {
 		var aspectRatioIndex = FindAspectRatio(w / h);
-		
-		if(aspectRatioIndex === -1) {
-			console.warn('aspect ratio ' + (w/h) + ' not mapped. using ' + supportedAspects[0].aspect + ' as default');
+
+		if (aspectRatioIndex === -1) {
+			console.warn('aspect ratio ' + (w / h) + ' not mapped. using ' + supportedAspects[0].aspect + ' as default');
 			aspectRatioIndex = 0;
 		}
-		
+
 		var coords = supportedAspects[aspectRatioIndex].coords[mode];
 
 		coords.x *= Math.round(w);
@@ -1478,35 +1487,35 @@ var GAME_MODE_DEBUG = (function() {
 
 		return coords;
 	}
-	
+
 	DefaultBehaviours["Debug.DetectPixelSignature"] = function () {
-		if(SIGNATURE_CAPTURE_STATE !== null) {
+		if (SIGNATURE_CAPTURE_STATE !== null) {
 
 			var groupIndex = SIGNATURE_CAPTURE_STATE.group;
 			var modeIndex = SIGNATURE_CAPTURE_STATE.mode;
-		
+
 			var group = SIGNATURE_CAPTURE_ORDER[groupIndex];
-		
+
 			var captureFrame = group.mode[modeIndex];
-			
+
 			var name = IndexOf(GAME_MODE, captureFrame);
-		
+
 			console.log("Capturing " + name);
-		
+
 			var coords = GetCaptureCoordinates(captureFrame);
-		
+
 			var sig = CaptureSignatureAt(coords.x, coords.y);
-			
+
 			sig.gameMode = captureFrame;
 			sig.name = name;
-			
-			LastCapturedSignatures.push(sig);				
-		
+
+			LastCapturedSignatures.push(sig);
+
 			SIGNATURE_CAPTURE_STATE.mode++;
 
 			var nextMode = group.mode[SIGNATURE_CAPTURE_STATE.mode];
-			
-			if(nextMode) {
+
+			if (nextMode) {
 				name = IndexOf(GAME_MODE, nextMode);
 				console.log('open ' + name + ' screen');
 			} else /* Go to another group */ {
@@ -1515,10 +1524,10 @@ var GAME_MODE_DEBUG = (function() {
 				LastCapturedSignatures = [];
 				SIGNATURE_CAPTURE_STATE.mode = 0;
 				SIGNATURE_CAPTURE_STATE.group++;
-				
+
 				var nextGroup = SIGNATURE_CAPTURE_ORDER[SIGNATURE_CAPTURE_STATE.group];
-				
-				if(!nextGroup) /* finished capturing */ {
+
+				if (!nextGroup) /* finished capturing */ {
 					SIGNATURE_CAPTURE_STATE = null;
 					console.log('finished capturing');
 				} else {
@@ -1527,17 +1536,17 @@ var GAME_MODE_DEBUG = (function() {
 					console.log('open ' + name + ' screen');
 				}
 			}
-			
+
 		} else /* start capturing */ {
 			SIGNATURE_CAPTURE_STATE = {group: 0, mode: 0};
-			
+
 			var captureFrame = SIGNATURE_CAPTURE_ORDER[0].mode[0];
 			var name = IndexOf(GAME_MODE, captureFrame);
-		
+
 			console.log('open ' + name + ' screen');
 		}
 	};
-	
+
 	function CaptureSignatureAt(x, y) {
 		var sigWidth = parseInt(w * 0.04);
 		var mouse = robot.getMousePos();
@@ -1545,76 +1554,76 @@ var GAME_MODE_DEBUG = (function() {
 		var sigMin = parseInt(x - sigWidth / 2);
 
 		var sig = {};
-		
+
 		sig.y = y;
 		sig.x = [];
-		
+
 		var sigPart = parseInt(sigWidth / 10);
-		
-		for(var i = sigMin; i < sigMax; i = i + sigPart) {
+
+		for (var i = sigMin; i < sigMax; i = i + sigPart) {
 			var c = robot.getPixelColor(i, y);
 			var sigComponent = {};
 			sigComponent.x = i;
 			sigComponent.color = parseInt(c, 16);
 			sig.x.push(sigComponent);
 		}
-		
+
 		return sig;
 	}
-	
+
 	var capturing = false;
-	
+
 	DefaultBehaviours["Debug.CapturePixelSignature"] = function () {
-		if(!capturing) {
+		if (!capturing) {
 			capturing = true;
 
 			var sig = CaptureSignatureAt(mouse.x, mouse.y);
-			
+
 			var stdin = process.openStdin();
 
 			console.log('input pixel signature name: ');
-			
-			function inputSignatureName (d) {
+
+			function inputSignatureName(d) {
 				sig.name = d.toString().trim();
 				stdin.removeListener("data", inputSignatureName);
-				
-				function readGameMode (d) {
+
+				function readGameMode(d) {
 					sig.gameMode = parseInt(d.toString().trim());
 					stdin.removeListener("data", readGameMode);
-					
+
 					capturing = false;
 					console.log('capture complete\n');
 					console.log(sig);
 					SignatureDetectionWorker.postMessage({cmd: 'persist', data: sig});
 				}
-				
+
 				stdin.addListener("data", readGameMode);
 			}
-			
+
 			stdin.addListener("data", inputSignatureName);
 		}
 	};
-	
+
 	function ResolveInput(data) {
-		
+
 		var buttons = data[10];
-		
-		for(var i = 128; i >= 1; i = i / 2) {
+
+		for (var i = 128; i >= 1; i = i / 2) {
 			var pressed = buttons - i >= 0;
 			ActivateKey(KeysOfExile, InputKeys, BehaviorOfExile, i, pressed);
 			buttons = buttons >= i ? buttons - i : buttons;
 		}
 
 	}
-	
+
 	return {
 		ResolveInput: ResolveInput
 	};
-	
+
 })();
 
 var GAME_MODE_PASSIVE_SKILL_TREE = (function () {
-	
+
 	var BehaviorOfExile = {
 		'left': [],
 		'right': [],
@@ -1648,40 +1657,40 @@ var GAME_MODE_PASSIVE_SKILL_TREE = (function () {
 
 	var InputDPAD = {
 	};
-	
+
 	DefaultBehaviours['PassiveSkillTree.ScrollDown'] = function () {
 	};
 
 	DefaultBehaviours['PassiveSkillTree.ScrollUp'] = function () {
 	};
-	
+
 	function ResolveInput(data) {
-			
+
 		//console.log(robot.getMousePos());
-		
+
 		var buttons = data[10];
-		
-		for(var i = 128; i >= 1; i = i / 2) {
+
+		for (var i = 128; i >= 1; i = i / 2) {
 			pressed = buttons - i >= 0;
 			ActivateKey(KeysOfExile, InputKeys, BehaviorOfExile, i, pressed);
 			buttons = buttons >= i ? buttons - i : buttons;
 		}
-		
+
 		// resolve left thumb axis
-		MoveThumbstick(data[1], data[3], 
-			MAX_INPUT_THUMBSTICK, 
+		MoveThumbstick(data[1], data[3],
+			MAX_INPUT_THUMBSTICK,
 			RIGHT_THUMBSTICK_THRESHOLD,
 			RightThumbIfCallback,
 			RightThumbElseCallback);
 	}
-	
+
 	function EnterArea() {
 	}
-	
+
 	function LeaveArea() {
 		ClearHeldInput(KeysOfExile, InputKeys, DPADOfExile, InputDPAD, BehaviorOfExile);
 	}
-	
+
 	return {
 		EnterArea: EnterArea,
 		ResolveInput: ResolveInput,
@@ -1690,7 +1699,7 @@ var GAME_MODE_PASSIVE_SKILL_TREE = (function () {
 })();
 
 var GAME_MODE_WORLD_MAP = (function () {
-	
+
 	var BehaviorOfExile = {
 		'left': [],
 		'right': [],
@@ -1721,49 +1730,49 @@ var GAME_MODE_WORLD_MAP = (function () {
 	};
 
 	var limitX = w * 0.34;
-	
+
 	function WorldMapIfLeftThumbstick(x, y) {
-	
+
 		var pos = robot.getMousePos();
 		var mouseSpeed = 3;
 		x = mouseSpeed * Math.sign(x) * Math.pow(x, 2);
 		y = mouseSpeed * Math.sign(y) * Math.pow(y, 2);
-		
+
 		var finalX = pos.x + x * mouseSpeed;
-		
-		if(finalX > limitX) {
+
+		if (finalX > limitX) {
 			finalX = limitX;
 		}
-		
+
 		robot.moveMouse(finalX, pos.y + y * mouseSpeed);
-	}	
-	
+	}
+
 	function ResolveInput(data) {
-			
+
 		var buttons = data[10];
-		
-		for(var i = 128; i >= 1; i = i / 2) {
+
+		for (var i = 128; i >= 1; i = i / 2) {
 			pressed = buttons - i >= 0;
 			ActivateKey(KeysOfExile, InputKeys, BehaviorOfExile, i, pressed);
 			buttons = buttons >= i ? buttons - i : buttons;
 		}
-		
+
 		// resolve left thumb axis
-		MoveThumbstick(data[1], data[3], 
-			MAX_INPUT_THUMBSTICK, 
+		MoveThumbstick(data[1], data[3],
+			MAX_INPUT_THUMBSTICK,
 			RIGHT_THUMBSTICK_THRESHOLD,
 			WorldMapIfLeftThumbstick,
 			RightThumbElseCallback);
 	}
-	
+
 	function EnterArea() {
 		robot.moveMouse(limitX / 2, h * 0.5);
 	}
-	
+
 	function LeaveArea() {
 		ClearHeldInput(KeysOfExile, InputKeys, DPADOfExile, InputDPAD, BehaviorOfExile);
 	}
-	
+
 	return {
 		EnterArea: EnterArea,
 		ResolveInput: ResolveInput,
@@ -1774,8 +1783,8 @@ var GAME_MODE_WORLD_MAP = (function () {
 var GLOBAL_MOVE_ANGLE = 0;
 var GLOBAL_MOVE_RADIUS = null;
 
-var GAME_MODE_ARPG = (function() {
-	
+var GAME_MODE_ARPG = (function () {
+
 	var BehaviorOfExile = {
 		'q': [],
 		'w': [],
@@ -1786,7 +1795,7 @@ var GAME_MODE_ARPG = (function() {
 		'ARPG.OptionsMenu': [null, 'ARPG.OptionsMenu'],
 		'ARPG.FetchLoot': ["ARPG.FetchLootHold", "ARPG.FetchLootRelease"],
 	};
-	
+
 	var KeysOfExile = {
 		1: 'w',
 		2: 'e',
@@ -1820,28 +1829,28 @@ var GAME_MODE_ARPG = (function() {
 
 	var InputDPAD = {
 	};
-	
-	DefaultBehaviours['ARPG.OptionsMenu'] = function() {
+
+	DefaultBehaviours['ARPG.OptionsMenu'] = function () {
 		// check if possible to open menu (eg: if esc menu is not open)
 		var color = robot.getPixelColor(parseInt(w * 0.1421875), parseInt(h * 0.89351851852));
-		if(color > "777777") {
+		if (color > "777777") {
 			ChangeGameMode(GAME_MODE.OPTIONS_MENU);
 		}
 	};
-	
+
 	var moving = false;
 	var lastTimeClick = 0;
 
 	var LEFT_THUMBSTICK_THRESHOLD = 0.25;
 
 	var LastIncrementActionTimeout = null;
-	
+
 	function MouseWithIncrementKeyDown(R, key) {
-		if(LastIncrementActionTimeout === null) {
+		if (LastIncrementActionTimeout === null) {
 			GLOBAL_MOVE_RADIUS = R;
 			robot.moveMouse(BasePosition.x + R * Math.cos(GLOBAL_MOVE_ANGLE), BasePosition.y + R * Math.sin(GLOBAL_MOVE_ANGLE));
-			
-			LastIncrementActionTimeout = setTimeout(function() {
+
+			LastIncrementActionTimeout = setTimeout(function () {
 				ActionKey(key, "down");
 				LastIncrementActionTimeout = null;
 			}, InputInterval * 1.5);
@@ -1849,7 +1858,7 @@ var GAME_MODE_ARPG = (function() {
 	}
 
 	function MouseWithIncrementKeyUp() {
-		GLOBAL_MOVE_RADIUS = null;	
+		GLOBAL_MOVE_RADIUS = null;
 	}
 
 	DefaultBehaviours['arpg.ShiftMouseLastAngleLow.KeyDown'] = function (args, key) {
@@ -1861,7 +1870,7 @@ var GAME_MODE_ARPG = (function() {
 		clearAttackInPlace();
 		DefaultBehaviours['arpg.MouseLastAngleLow.KeyUp'](args, key);
 	}
-	
+
 	DefaultBehaviours['arpg.ShiftMouseLastAngleMid.KeyDown'] = function (args, key) {
 		setAttackInPlace();
 		DefaultBehaviours['arpg.MouseLastAngleMid.KeyDown'](args, key);
@@ -1871,17 +1880,17 @@ var GAME_MODE_ARPG = (function() {
 		clearAttackInPlace();
 		DefaultBehaviours['arpg.MouseLastAngleMid.KeyUp'](args, key);
 	}
-	
+
 	DefaultBehaviours['arpg.ShiftMouseLastAngleHigh.KeyDown'] = function (args, key) {
 		setAttackInPlace();
 		DefaultBehaviours['arpg.MouseLastAngleHigh.KeyDown'](args, key);
 	}
-	
+
 	DefaultBehaviours['arpg.ShiftMouseLastAngleHigh.KeyUp'] = function (args, key) {
 		clearAttackInPlace();
 		DefaultBehaviours['arpg.MouseLastAngleHigh.KeyUp'](args, key);
 	}
-	
+
 	DefaultBehaviours['arpg.MouseLastAngleLow.KeyDown'] = function (args, key) {
 		MouseWithIncrementKeyDown(h * 0.1, key);
 	}
@@ -1889,7 +1898,7 @@ var GAME_MODE_ARPG = (function() {
 	DefaultBehaviours['arpg.MouseLastAngleLow.KeyUp'] = function (args, key) {
 		MouseWithIncrementKeyUp();
 	}
-	
+
 	DefaultBehaviours['arpg.MouseLastAngleMid.KeyDown'] = function (args, key) {
 		MouseWithIncrementKeyDown(h * 0.225, key);
 	}
@@ -1897,31 +1906,31 @@ var GAME_MODE_ARPG = (function() {
 	DefaultBehaviours['arpg.MouseLastAngleMid.KeyUp'] = function (args, key) {
 		MouseWithIncrementKeyUp();
 	}
-	
+
 	DefaultBehaviours['arpg.MouseLastAngleHigh.KeyDown'] = function (args, key) {
 		MouseWithIncrementKeyDown(h * 0.35, key);
 	}
-	
+
 	DefaultBehaviours['arpg.MouseLastAngleHigh.KeyUp'] = function (args, key) {
 		MouseWithIncrementKeyUp();
 	}
-	
+
 	function move(angle, extMoving) {
 		var R;
 		var aspectFix;
-		
-		if(GLOBAL_MOVE_RADIUS === null) {
+
+		if (GLOBAL_MOVE_RADIUS === null) {
 			R = h * 0.0908;
 			aspectFix = 1;
 		} else {
 			R = GLOBAL_MOVE_RADIUS;
 			aspectFix = SCREEN_ASPECT_RATIO;
 		}
-		
+
 		robot.moveMouse(BasePosition.x + R * Math.cos(angle) * aspectFix, BasePosition.y + R * Math.sin(angle));
-		if(!extMoving && !ATTACK_IN_PLACE) {
+		if (!extMoving && !ATTACK_IN_PLACE) {
 			moving = true;
-			setTimeout(function() {
+			setTimeout(function () {
 				robot.mouseToggle("down");
 			}, 20);
 		}
@@ -1933,74 +1942,74 @@ var GAME_MODE_ARPG = (function() {
 		robot.mouseToggle("up");
 		moving = false;
 	}
-	
-	function LeftThumbIfCallback (x, y) {
+
+	function LeftThumbIfCallback(x, y) {
 		GLOBAL_MOVE_ANGLE = Math.atan2(y, x);
 		move(GLOBAL_MOVE_ANGLE, moving);
 	}
-	
-	function LeftThumbElseCallback() {		
-		if(moving) {
+
+	function LeftThumbElseCallback() {
+		if (moving) {
 			stop();
 		}
 	}
 
 	var LastTimestampStart = 0;
-	
+
 	var StartBlockInterval = 750;
-	
+
 	function ResolveDataInput(data) {
 
 		var CurrentTimestampStart = new Date().getTime();
-	
+
 		// resolve buttons
-		
+
 		var buttons = data[10];
-		
+
 		var pressed = buttons - KEYS.KEY_START >= 0;
 		ActivateKey(KeysOfExile, InputKeys, BehaviorOfExile, KEYS.KEY_START, pressed);
-		
-		if(pressed) {
-		
+
+		if (pressed) {
+
 			// unpress other buttons
-			for(var i = 64; i >= 1; i = i / 2) {
+			for (var i = 64; i >= 1; i = i / 2) {
 				ActivateKey(KeysOfExile, InputKeys, BehaviorOfExile, i, false);
 			}
-			
+
 			// clear l3 and r3
 			ActivateKey(DPADOfExile, InputDPAD, BehaviorOfExile, 2, false);
 			ActivateKey(DPADOfExile, InputDPAD, BehaviorOfExile, 1, false);
-			
+
 			// clear dpad
 			ResolveDpadInput(0, DPADOfExile, InputDPAD, BehaviorOfExile);
 
 			LastTimestampStart = CurrentTimestampStart;
-			
+
 		} else if (CurrentTimestampStart - LastTimestampStart > StartBlockInterval) {
-		
-			for(var i = 64; i >= 1; i = i / 2) {
+
+			for (var i = 64; i >= 1; i = i / 2) {
 				var pressed = buttons - i >= 0;
 				ActivateKey(KeysOfExile, InputKeys, BehaviorOfExile, i, pressed);
 				buttons = buttons >= i ? buttons - i : buttons;
 			}
-		
-			
+
+
 			// resolve left thumb axis
-			
-			MoveThumbstick(data[1], data[3], 
-				MAX_INPUT_THUMBSTICK, 
-				LEFT_THUMBSTICK_THRESHOLD, 
+
+			MoveThumbstick(data[1], data[3],
+				MAX_INPUT_THUMBSTICK,
+				LEFT_THUMBSTICK_THRESHOLD,
 				LeftThumbIfCallback,
 				LeftThumbElseCallback);
-			
+
 			// resolve r3 and l3
 
 			buttons = data[11] % 4;
 
-			if(DPADOfExile[buttons]) /* Cases 1 or 2 */ {
+			if (DPADOfExile[buttons]) /* Cases 1 or 2 */ {
 				var key = DPADOfExile[buttons];
 				ActivateKey(DPADOfExile, InputDPAD, BehaviorOfExile, buttons, true);
-				if(buttons === 1) {
+				if (buttons === 1) {
 					ActivateKey(DPADOfExile, InputDPAD, BehaviorOfExile, 2, false);
 				} else {
 					ActivateKey(DPADOfExile, InputDPAD, BehaviorOfExile, 1, false);
@@ -2009,33 +2018,33 @@ var GAME_MODE_ARPG = (function() {
 				ActivateKey(DPADOfExile, InputDPAD, BehaviorOfExile, 2, false);
 				ActivateKey(DPADOfExile, InputDPAD, BehaviorOfExile, 1, false);
 			}
-			
+
 			// resolve dpad
-			
+
 			ResolveDpadInput(data[11], DPADOfExile, InputDPAD, BehaviorOfExile);
-			
+
 			var timestamp = new Date().getTime();
-			
-			if(data[9] < 128 && timestamp - lastTimeClick > 500) {
+
+			if (data[9] < 128 && timestamp - lastTimeClick > 500) {
 
 				robot.keyToggle("alt", "down");
 
-				setTimeout(function() {
-			
+				setTimeout(function () {
+
 					robot.mouseClick("left");
-					
-					setTimeout(function() {
+
+					setTimeout(function () {
 						robot.keyToggle("alt", "up");
 					}, 22);
-					
+
 				}, 50);
 
 				lastTimeClick = timestamp;
-			} else if(data[9] > 128 && timestamp - lastTimeClick > 500) {
+			} else if (data[9] > 128 && timestamp - lastTimeClick > 500) {
 				robot.keyTap("escape");
 				lastTimeClick = timestamp;
 			}
-		
+
 		}
 	}
 
@@ -2043,37 +2052,37 @@ var GAME_MODE_ARPG = (function() {
 		robot.moveMouse(BasePosition.x, BasePosition.y);
 		SignatureDetectionWorker.postMessage({cmd: 'clear-lastsig'});
 	}
-	
+
 	function LeaveArea() {
 		ClearHeldInput(KeysOfExile, InputKeys, DPADOfExile, InputDPAD, BehaviorOfExile);
 	}
-	
+
 	function SetBehaviorFunction(idx, fnc) {
 		var matchKeyDown = fnc.match(/.KeyDown$/g);
-		
+
 		BehaviorOfExile[idx] = [];
-		
-		if(matchKeyDown !== null) {
+
+		if (matchKeyDown !== null) {
 			BehaviorOfExile[idx][0] = fnc;
 			BehaviorOfExile[idx][1] = fnc.replace(/.KeyDown$/g, '.KeyUp');
 		} else {
 			BehaviorOfExile[idx][0] = fnc;
 		}
 	}
-	
+
 	function SetBehavior(inputArgs) {
-		for(var key in inputArgs) {
+		for (var key in inputArgs) {
 			SetBehaviorFunction(KeysOfExile[key], inputArgs[key]);
 		}
 	}
-	
+
 	return {
 		EnterArea: EnterArea,
 		ResolveInput: ResolveDataInput,
 		LeaveArea: LeaveArea,
 		SetBehavior: SetBehavior
 	};
-	
+
 })();
 
 var CURRENT_GAME_MODE = GAME_MODE.ARPG;
@@ -2083,13 +2092,13 @@ var GAME_MODE_OBJECT = GAME_MODE_ARPG;
 
 var MAX_INPUT_THUMBSTICK = 128;
 
-var MoveThumbstick = (function() {
-	
+var MoveThumbstick = (function () {
+
 	var Function = function (DataX, DataY, Max, Threshold, IfCallback, ElseCallback) {
 		var x = (DataX - Max) / Max;
 		var y = (DataY - Max) / Max;
 
-		if(Math.abs(x) > Threshold || Math.abs(y) > Threshold) {
+		if (Math.abs(x) > Threshold || Math.abs(y) > Threshold) {
 			IfCallback(x, y);
 		} else {
 			ElseCallback();
@@ -2098,13 +2107,13 @@ var MoveThumbstick = (function() {
 	};
 
 	return Function;
-	
+
 })();
 
 
 var RIGHT_THUMBSTICK_THRESHOLD = 0.16;
 
-function RightThumbIfCallback (x, y) {
+function RightThumbIfCallback(x, y) {
 	var pos = robot.getMousePos();
 	var mouseSpeed = 3;
 	x = mouseSpeed * Math.sign(x) * Math.pow(x, 2);
@@ -2112,12 +2121,12 @@ function RightThumbIfCallback (x, y) {
 	robot.moveMouse(pos.x + x * mouseSpeed, pos.y + y * mouseSpeed);
 }
 
-function RightThumbElseCallback() {		
+function RightThumbElseCallback() {
 }
 
 var LastInputData = null;
 
-function ControllerListener (data) {
+function ControllerListener(data) {
 	LastInputData = data;
 }
 
@@ -2138,7 +2147,7 @@ var cbInitGame = null;
 function StartControllerListener(DEBUG_MODE, callbackInitGame) {
 	Controller.addDataListener(ControllerListener);
 	cbInitGame = callbackInitGame;
-	if(!DEBUG_MODE) {
+	if (!DEBUG_MODE) {
 		SignatureDetectionWorker.postMessage({cmd: 'init', data: {defaultGameMode: GAME_MODE.ARPG, resolutionPrefix: fileResolutionPrefix}});
 	}
 }
@@ -2174,12 +2183,12 @@ var EXPORTED_INPUT_MODES = {
 		{
 			name: "Medium increment to cursor position",
 			key: "arpg.MouseLastAngleMid.KeyDown",
-			help: "Use a medium increment to the cursor position last angle before pressing the button. Good for totems, traps and skills like leap slam"		
+			help: "Use a medium increment to the cursor position last angle before pressing the button. Good for totems, traps and skills like leap slam"
 		},
 		{
 			name: "High increment to cursor position",
 			key: "arpg.MouseLastAngleHigh.KeyDown",
-			help: "Use a high increment to the cursor position last angle before pressing the button. Good for totems, traps and skills like leap slam"		
+			help: "Use a high increment to the cursor position last angle before pressing the button. Good for totems, traps and skills like leap slam"
 		}
 	],
 	"Holding position": [
@@ -2191,17 +2200,17 @@ var EXPORTED_INPUT_MODES = {
 		{
 			name: "(H. Position) Medium increment to cursor position",
 			key: "arpg.ShiftMouseLastAngleMid.KeyDown",
-			help: "Use a medium increment to the cursor position last angle before pressing the button and while holding attack in place. Good for ranged attacks and spells"		
+			help: "Use a medium increment to the cursor position last angle before pressing the button and while holding attack in place. Good for ranged attacks and spells"
 		},
 		{
 			name: "(H. Position) High increment to cursor position",
 			key: "arpg.ShiftMouseLastAngleHigh.KeyDown",
-			help: "Use a high increment to the cursor position last angle before pressing the button and while holding attack in place. Good for ranged attacks and spells"		
+			help: "Use a high increment to the cursor position last angle before pressing the button and while holding attack in place. Good for ranged attacks and spells"
 		}
 	]
 };
 
-if(DEBUG_MODE) {
+if (DEBUG_MODE) {
 	showAllDevTools();
 	CURRENT_GAME_MODE = GAME_MODE.DEBUG;
 	GAME_MODE_OBJECT = GAME_MODE_DEBUG;
@@ -2210,8 +2219,8 @@ if(DEBUG_MODE) {
 }
 
 /*exec("nw . --disable-gpu --force-cpu-draw", function(error, stdout, stderr) {
-	console.log(stdout);
-	if(error) {
-		return console.error(stderr);
-	}
-});*/
+ console.log(stdout);
+ if(error) {
+ return console.error(stderr);
+ }
+ });*/
