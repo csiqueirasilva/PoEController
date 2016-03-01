@@ -49,6 +49,10 @@ This solution has several drawbacks. It costs a lot, in terms of performance, an
 
 ## Requirements
 
+### In-game
+
+- Left mouse click needs to be set to "move"
+
 ### Supported resolutions
 
 - 1360x768
