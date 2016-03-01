@@ -45,7 +45,6 @@ key_pickup=1`;
 	var defaultCorpseTargeting = `
 corpse_targeting=key`;
 	
-	
 	var videoSettings = `borderless_windowed_fullscreen=true
 fullscreen=false
 post_processing=true

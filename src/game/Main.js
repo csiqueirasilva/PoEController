@@ -1,17 +1,25 @@
 var DETECTION_INTERVAL_MS = 750;
 var RepeatActionInterval = 90;
 var InputInterval = 15;
-var DEBUG_MODE = false;
+var DEBUG_MODE = true;
 
-var GAME_MODE = require('./game/Enums.js').GAME_MODE;
-var KEYS = require('./game/Enums.js').KEYS;
+var ENUMS = require('./game/Enums.js');
+
+var GAME_MODE = ENUMS.GAME_MODE;
+var KEYS = ENUMS.KEYS;
 
 var fs = require('fs');
 var robot = require("robotjs");
-
 var dialog = require('dialog');
+var gui = require('nw.gui');
 
 var ABORTING_APPLICATION = false;
+
+function showAllDevTools() {
+	for(var i in global.__nwWindowsStore) {
+		global.__nwWindowsStore[i].showDevTools();
+	}
+}
 
 function hideAllGUIWindows() {
 	for(var i in global.__nwWindowsStore) {
@@ -19,23 +27,19 @@ function hideAllGUIWindows() {
 	}
 }
 
-var xbox;
+var Controller = require('./game/Controller');
 
-try {
-	xbox = require('xbox-controller-node');
-} catch (e) {
+if(!Controller.found) {
 	hideAllGUIWindows();
-	dialog.warn('Error while connecting to xbox controller driver. Please ensure it is correctly connected and configured.', function(err) {
-		var App = require('nw.gui').App;
-		App.quit();
+	dialog.warn('Error while connecting to xbox 360/one controller driver. Please ensure it is correctly connected and configured.', function(err) {
+		gui.App.quit();
 	});
-}
-
-if(xbox.HIDController === null) {
-	hideAllGUIWindows();
-	dialog.warn('No xbox controller detected. Please ensure it is correctly connected and configured.', function(err) {
-		var App = require('nw.gui').App;
-		App.quit();
+} else {
+	Controller.addErrorListener(function() {
+		hideAllGUIWindows();
+		dialog.warn('Error while reading information from the controller. Please ensure it is correctly connected and run PoEController again.', function(err) {
+			gui.App.quit();
+		});
 	});
 }
 
@@ -79,8 +83,6 @@ if(!DEBUG_MODE) {
 		}
 
 		if(quitGame) {
-			var gui = require('nw.gui');
-			
 			hideAllGUIWindows();
 			
 			dialog.warn('Unsupported screen resolution. Supported screen resolutions are ' + SUPPORTED_RESOLUTIONS.toString(), function(err) {
@@ -110,8 +112,6 @@ var BasePosition = {
 function SignatureNotFound (filename) {
 
 	if(!DEBUG_MODE && !ABORTING_APPLICATION) {
-		var gui = require('nw.gui');
-		
 		hideAllGUIWindows();
 		
 		dialog.warn('Signature file ' + filename + ' not found. Could not start the application.', function(err) {
@@ -2095,61 +2095,12 @@ var MoveThumbstick = (function() {
 			ElseCallback();
 		}
 
-	}
+	};
 
 	return Function;
 	
 })();
 
-/*
-
-Indexes
-1  - X Axis - Left Thumbstick
-3  - Y Axis - Left Thumbstick
-
-5 - X Axis - Right Thumbstick
-7 - Y Axis - Right Thumbstick
-
-8 & 9 - Triggers
-	= 00 (8) & 128 (9) Neutral
-	< 128 (9) Right Trigger
-	> 128 (9) Left Trigger
-	= 00 (9) & 128 (8) RT + LT
-	
-10 - Keys
-
-	Values
-	1   - X
-	2   - Circle
-	4   - Square	
-	8   - Triangle
-	16  - L1
-	32  - R1
-	64  - Select
-	128 - Start
-	
-11 - POV Hat, L3 and R3
-	
-	Calculation: (INPUT % 4) = L3 and R3 values
-				 INT(INPUT / 4) * 4 = POV Hat switch
-	
-	Values
-	
-	1 	- L3
-	2	- R3
-	3	- L3 + R3
-	
-	POV Hat
-	4	- Up
-	8	- Up + Right
-	12 	- Right
-	16 	- Down + Right
-	20	- Down
-	24	- Down + Left
-	28 	- Left
-	32	- Up + Left
-	
-*/
 
 var RIGHT_THUMBSTICK_THRESHOLD = 0.16;
 
@@ -2185,7 +2136,7 @@ function clearAttackInPlace() {
 var cbInitGame = null;
 
 function StartControllerListener(DEBUG_MODE, callbackInitGame) {
-	xbox.HIDController.addListener('data', ControllerListener);
+	Controller.addDataListener(ControllerListener);
 	cbInitGame = callbackInitGame;
 	if(!DEBUG_MODE) {
 		SignatureDetectionWorker.postMessage({cmd: 'init', data: {defaultGameMode: GAME_MODE.ARPG, resolutionPrefix: fileResolutionPrefix}});
@@ -2193,7 +2144,7 @@ function StartControllerListener(DEBUG_MODE, callbackInitGame) {
 }
 
 function RemoveControllerListener() {
-	xbox.HIDController.removeListener('data', ControllerListener);
+	Controller.removeDataListener(ControllerListener);
 	clearInterval(DetectPollingInterval);
 	clearInterval(RightThumbstickMouseInterval);
 	DetectPollingInterval = null;
@@ -2251,6 +2202,7 @@ var EXPORTED_INPUT_MODES = {
 };
 
 if(DEBUG_MODE) {
+	showAllDevTools();
 	CURRENT_GAME_MODE = GAME_MODE.DEBUG;
 	GAME_MODE_OBJECT = GAME_MODE_DEBUG;
 	StartControllerListener();

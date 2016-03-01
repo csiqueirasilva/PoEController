@@ -7,7 +7,6 @@
 	var ctx = menuCanvas.getContext('2d');
 
 	var LABEL_IDS = {
-
 		DPAD_UP: 'button-dpad-up',
 		DPAD_LEFT: 'button-dpad-left',
 		DPAD_RIGHT: 'button-dpad-right',
