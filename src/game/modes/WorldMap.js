@@ -1,8 +1,8 @@
-var Enums = require('./game/Enums');
+var Enums = require('../Enums');
 var KEYS = Enums.KEYS;
 var robot = require('robotjs');
-var Window = require('./game/Window');
-var Input = require('./game/Input');
+var Window = require('../Window');
+var Input = require('../Input');
 
 var BehaviorOfExile = {
 	'left': [],

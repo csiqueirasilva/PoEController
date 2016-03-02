@@ -1,21 +1,21 @@
-var behaviors = require('./game/Behaviors').functions;
+var behaviors = require('../Behaviors').functions;
 var robot = require('robotjs');
-var Input = require('./game/Input');
-var Movement = require('./game/behaviors/Movement');
-var AttackInPlace = require('./game/behaviors/AttackInPlace');
-var MAX_INPUT_THUMBSTICK = require('./game/Enums').MAX_INPUT_THUMBSTICK;
-var KEYS = require('./game/Enums').KEYS;
-var Game = require('./game/Game');
+var Input = require('../Input');
+var Movement = require('../behaviors/Movement');
+var AttackInPlace = require('../behaviors/AttackInPlace');
+var MAX_INPUT_THUMBSTICK = require('../Enums').MAX_INPUT_THUMBSTICK;
+var KEYS = require('../Enums').KEYS;
+var Game = require('../Game');
 var SignatureDetectionWorker = Game.signatureDetectionWorker;
-var Enums = require('./game/Enums');
+var Enums = require('../Enums');
 var GAME_MODE = Enums.GAME_MODE;
-var Window = require('./game/Window.js');
+var Window = require('../Window.js');
 
 behaviors['ARPG.Fixed.OptionsMenu'] = function () {
 	// check if possible to open menu (eg: if esc menu is not open)
 	var color = robot.getPixelColor(parseInt(Window.width * 0.1421875), parseInt(Window.height * 0.89351851852));
 	if (color > "777777") {
-		ChangeGameMode(GAME_MODE.OPTIONS_MENU);
+		Game.changeMode(GAME_MODE.OPTIONS_MENU);
 	}
 };
 
@@ -30,7 +30,7 @@ behaviors['ARPG.Fixed.FetchLootRelease'] = function () {
 
 behaviors["ARPG.Fixed.EscapeAndReturn"] = function () {
 	robot.keyTap("escape");
-	Game.ChangeGameMode(GAME_MODE.ARPG);
+	Game.changeMode(GAME_MODE.ARPG);
 };
 
 var BehaviorOfExile = {};
@@ -54,8 +54,12 @@ KeysOfExile[KEYS.KEY_SHOULDER_RIGHT] = 'right';
 KeysOfExile[KEYS.KEY_SELECT] = 'ARPG.Fixed.FetchLoot';
 KeysOfExile[KEYS.KEY_START] = 'ARPG.Fixed.OptionsMenu';
 
-for (var key in KeysOfExile) {
+for (var key in DPADOfExile) {
 	BehaviorOfExile[DPADOfExile[key]] = [];
+}
+
+for (var key in KeysOfExile) {
+	BehaviorOfExile[KeysOfExile[key]] = [];
 }
 
 BehaviorOfExile['ARPG.Fixed.OptionsMenu'][0] = null;
@@ -218,7 +222,7 @@ function SetBehavior(inputArgs) {
 	}
 }
 
-modules.export = {
+module.exports = {
 	enterArea: EnterArea,
 	resolveInput: ResolveDataInput,
 	leaveArea: LeaveArea,

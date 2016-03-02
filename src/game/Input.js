@@ -1,11 +1,11 @@
 var robot = require('robotjs');
-var Window = require('./game/Window');
-var KEYS = require('./game/Enums').KEYS;
-var behaviors = require('./game/Behaviors').functions;
-var Movement = require('./game/behaviors/Movement');
-var MAX_INPUT_THUMBSTICK = require('./game/Enums').MAX_INPUT_THUMBSTICK;
+var Window = require('./Window');
+var KEYS = require('./Enums').KEYS;
+var behaviors = require('./Behaviors').functions;
+var Movement = require('./behaviors/Movement');
+var MAX_INPUT_THUMBSTICK = require('./Enums').MAX_INPUT_THUMBSTICK;
 
-var InputInterval = 15;
+var GlobalInterval = 15;
 var RepeatActionInterval = 90;
 
 robot.setMouseDelay(0);
@@ -98,7 +98,7 @@ function ActionKeyUp(key, behaviorReference) {
 	ActionKey(key, "up");
 
 	var behavior = behaviorReference[key];
-	if (behavior instanceof Array && behavior.length > 1 && behaviors[behavior[1]] instanceof Function) {
+	if (behavior instanceof Array && behavior.length > 1 && typeof behaviors[behavior[1]] === "function") {
 		behaviors[behavior[1]](behavior, key);
 	}
 }
@@ -114,7 +114,7 @@ function ActivateKey(keys, reference, behaviorReference, index, pressed, skipKey
 
 		var behaviorIndex = null;
 
-		if (behavior instanceof Array && behavior.length > 0 && behaviors[behavior[0]] instanceof Function) {
+		if (behavior instanceof Array && behavior.length > 0 && typeof behaviors[behavior[0]] === "function") {
 			behaviorIndex = behavior[0];
 		} else if (!(behavior instanceof Array) || !behaviors[behavior[0]]) {
 			behaviorIndex = "arpg.nothing";
@@ -195,7 +195,7 @@ function MouseWithIncrementKeyDown(R, key) {
 		LastIncrementActionTimeout = setTimeout(function () {
 			ActionKey(key, "down");
 			LastIncrementActionTimeout = null;
-		}, InputInterval * 1.5);
+		}, GlobalInterval * 1.5);
 	}
 }
 
@@ -214,7 +214,11 @@ function LeftThumbstickMouse(data, cb) {
 		
 }
 
-modules.export = {
+function RightThumbstickMouse(data) {
+	
+}
+
+module.exports = {
 	basePosition: basePosition,
 	mouseWithIncrementKeyDown: MouseWithIncrementKeyDown,
 	mouseWithIncrementKeyUp: MouseWithIncrementKeyUp,
@@ -222,5 +226,7 @@ modules.export = {
 	actionKey: ActionKey,
 	resetInputArrays: ResetInputArrays,
 	leftThumbstickMouse: LeftThumbstickMouse,
-	clearHeld: ClearHeldInput
+	clearHeld: ClearHeldInput,
+	rightThumbstick: RightThumbstickMouse,
+	globalInterval: GlobalInterval
 };

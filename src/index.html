@@ -10,8 +10,6 @@
 		<link rel="stylesheet" type="text/css" href="lib/bootstrap/bootstrap.min.css" />
 		<link rel="stylesheet" type="text/css" href="lib/select2/select2.min.css" />
 		
-		<script src="game/Main.js"></script>
-		
 		<link rel="stylesheet" type="text/css" href="style.css" />
 		
 	</head>
@@ -139,12 +137,16 @@
 		<img style="display: none;" id="ps3-img" src="imgs/ps3.png" />
 		<!-- imgs -->
 
-		<script src="menu/UI.js"></script>
-		<script src="menu/usersettings.js"></script>
-		<script src="menu/poesettings.js"></script>
-
 		<script>
 	
+			global.$ = $;
+			global.document = document;
+	
+			require('./game/Main');
+			require('./menu/UI');
+			var UserSettings = require('./menu/UserSettings');
+			var PoESettings = require('./menu/PoESettings');
+			
 			global.menuWindow.on('focus', function() {
 				global.hideAllHelp();
 			});
@@ -216,7 +218,7 @@
 				}
 			});
 
-			var gui = require ('nw.gui');
+			var gui = require('nw.gui');
 			
 			function QuitApplication() {
 				UserSettings.Save(function() {

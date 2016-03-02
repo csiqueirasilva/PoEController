@@ -1,10 +1,23 @@
-var DEBUG_MODE = require('./game/Enums').DEBUG_MODE;
-var Logger = require('./game/Logger');
-var Window = require('./game/Window');
-var Input = require('./game/Input');
+/* global Function */
+
+/* global modules */
+
+var DEBUG_MODE = require('./Enums').DEBUG_MODE;
+var Logger = require('./Logger');
+var Window = require('./Window');
+var Input = require('./Input');
 var Worker = require('workerjs');
 var exec = require('child_process').exec;
 var fs = require('fs');
+var GAME_MODE = require('./Enums').GAME_MODE;
+var Controller = require('./Controller');
+
+var GameModeARPG = require('./modes/ARPG');
+var GameModeDebug = require('./modes/Debug');
+var GameModeInventory = require('./modes/Inventory');
+var GameModeOptionsMenu = require('./modes/OptionsMenu');
+var GameModePassiveSkillTree = require('./modes/PassiveSkillTree');
+var GameModeWorldMap = require('./modes/WorldMap');
 
 var SignatureDetectionWorker = new Worker('src/game/SignatureDetectionWorker.js');
 
@@ -52,7 +65,7 @@ SignatureDetectionWorker.onmessage = function (event) {
 	switch (cmd) {
 		case 'detect-sub':
 			console.log('detect-sub', IndexOf(GAME_MODE, data));
-			if (GAME_MODE_OBJECT.SubSection instanceof Function) {
+			if (typeof GAME_MODE_OBJECT.SubSection === "function") {
 				GAME_MODE_OBJECT.SubSection(data);
 			}
 			break;
@@ -74,17 +87,11 @@ function PollGamepadEvents() {
 	RightThumbstickMouseInterval = setInterval(function () {
 
 		if (LastInputData !== null) {
-			// resolve right thumb axis
-			MoveThumbstick(LastInputData[5], LastInputData[7],
-				MAX_INPUT_THUMBSTICK,
-				RIGHT_THUMBSTICK_THRESHOLD,
-				RightThumbIfCallback,
-				RightThumbElseCallback);
-
-			GAME_MODE_OBJECT.ResolveInput(LastInputData);
+			Input.rightThumbstick(LastInputData);
+			GAME_MODE_OBJECT.resolveInput(LastInputData);
 		}
 
-	}, InputInterval);
+	}, Input.globalInterval);
 }
 
 function InitGame() {
@@ -102,7 +109,7 @@ function InitGame() {
 		}
 	});
 
-	if (cbInitGame instanceof Function) {
+	if (typeof cbInitGame === "function") {
 		cbInitGame();
 	}
 }
@@ -143,12 +150,12 @@ function Init() {
 	if (DEBUG_MODE) {
 		showAllDevTools();
 		CURRENT_GAME_MODE = GAME_MODE.DEBUG;
-		GAME_MODE_OBJECT = GAME_MODE_DEBUG;
+		GAME_MODE_OBJECT = GameModeDebug;
 		StartControllerListener();
 		PollGamepadEvents();
 	} else {
 		CURRENT_GAME_MODE = GAME_MODE.ARPG;
-		GAME_MODE_OBJECT = GAME_MODE_ARPG;
+		GAME_MODE_OBJECT = GameModeARPG;
 	}
 }
 
@@ -162,38 +169,38 @@ function ChangeGameMode(NewGameMode) {
 
 		//console.log(IndexOf(GAME_MODE, oldGameMode) + " to " + IndexOf(GAME_MODE, NewGameMode));
 
-		if (GAME_MODE_OBJECT && GAME_MODE_OBJECT.LeaveArea instanceof Function) {
-			GAME_MODE_OBJECT.LeaveArea();
+		if (GAME_MODE_OBJECT && typeof GAME_MODE_OBJECT.leaveArea === "function") {
+			GAME_MODE_OBJECT.leaveArea();
 		}
 
 		var mode = null;
 
 		switch (NewGameMode) {
 			case GAME_MODE.DEBUG:
-				mode = GAME_MODE_DEBUG;
+				mode = GameModeDebug;
 				break;
 			case GAME_MODE.INVENTORY:
-				mode = GAME_MODE_INVENTORY;
+				mode = GameModeInventory;
 				break;
 			case GAME_MODE.OPTIONS_MENU:
-				mode = GAME_MODE_OPTIONS_MENU;
+				mode = GameModeOptionsMenu;
 				break;
 			case GAME_MODE.PASSIVE_SKILL_TREE:
-				mode = GAME_MODE_PASSIVE_SKILL_TREE;
+				mode = GameModePassiveSkillTree;
 				break;
 			case GAME_MODE.WORLD_MAP:
-				mode = GAME_MODE_WORLD_MAP;
+				mode = GameModeWorldMap;
 				break;
 			default:
-				mode = GAME_MODE_ARPG;
+				mode = GameModeARPG;
 		}
 
 		CURRENT_GAME_MODE = NewGameMode;
 
 		GAME_MODE_OBJECT = mode;
 
-		if (oldGameMode !== CURRENT_GAME_MODE && mode.EnterArea instanceof Function) {
-			mode.EnterArea();
+		if (oldGameMode !== CURRENT_GAME_MODE && typeof mode.enterArea === "function") {
+			mode.enterArea();
 		}
 
 		UpdateUI(CURRENT_GAME_MODE);
@@ -205,12 +212,12 @@ function setGameModeUpdateCallback(cb) {
 }
 
 function UpdateUI(mode) {
-	if(ChangeGameModeUpdateUICallback instanceof Function) {
+	if(typeof ChangeGameModeUpdateUICallback === "function") {
 		ChangeGameModeUpdateUICallback(mode);
 	}
 }
 
-modules.export({
+module.exports = {
 	DETECTION_INTERVAL_MS: DETECTION_INTERVAL_MS,
 	setGameModeUpdateCallback: setGameModeUpdateCallback,
 	init: Init,
@@ -219,4 +226,4 @@ modules.export({
 	updateUI: UpdateUI,
 	signatureDetectionWorker: SignatureDetectionWorker,
 	changeMode: ChangeGameMode
-});
+};

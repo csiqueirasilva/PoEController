@@ -16,7 +16,7 @@ function isAttackInPlace() {
 	return ATTACK_IN_PLACE;
 }
 
-modules.export = {
+module.exports = {
 	setAttackInPlace: setAttackInPlace,
 	clearAttackInPlace: clearAttackInPlace,
 	state: isAttackInPlace

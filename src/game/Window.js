@@ -1,7 +1,6 @@
-var Logger = require('./game/Logger');
 var dialog = require('dialog');
 var robot = require('robotjs');
-var DEBUG_MODE = require('./game/Enums').DEBUG_MODE;
+var DEBUG_MODE = require('./Enums').DEBUG_MODE;
 var gui = window.require('nw.gui');
 
 var w = robot.getScreenSize().width;
@@ -67,9 +66,7 @@ if (!DEBUG_MODE) {
 	}
 }
 
-Logger.info('using screen resolution: ' + Window.resolution);
-
-modules.export = {
+module.exports = {
 	quit: quit,
 	quitIf: quitIf,
 	width: w,

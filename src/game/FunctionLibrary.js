@@ -9,6 +9,6 @@ function IndexOf(o, value) {
 	return -1;
 }
 
-modules.export = {
+module.exports = {
 	indexOf: IndexOf
 };

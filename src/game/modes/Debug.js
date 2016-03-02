@@ -1,11 +1,11 @@
-var Enums = require('./game/Enums');
+var Enums = require('../Enums');
 var KEYS = Enums.KEYS;
 var GAME_MODE = Enums.GAME_MODE;
 var robot = require('robotjs');
-var Window = require('./game/Window');
-var Input = require('./game/Input');
-var behaviors = require('./game/Behaviors').functions;
-var SignatureDetectionWorker = require('./game/Game').signatureDetectionWorker;
+var Window = require('../Window');
+var Input = require('../Input');
+var behaviors = require('../Behaviors').functions;
+var SignatureDetectionWorker = require('../Game').signatureDetectionWorker;
 
 var InputKeys = {};
 

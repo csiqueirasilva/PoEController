@@ -1,7 +1,7 @@
-var Inventory = require('./game/Inventory');
+var Inventory = require('../Inventory');
 var robot = require('robotjs');
-var Window = require('./game/Window');
-var behaviors = require('./game/Behaviors');
+var Window = require('../../Window');
+var behaviors = require('../../Behaviors');
 
 var globalDiffY = (-(Window.height / 1080) + 1) * 100;
 
@@ -102,6 +102,6 @@ function SetCraftAreaPosition(Position) {
 	proxyMoveMouse(posX, posY);
 }
 
-modules.export = {
+module.exports = {
 	setPosition: SetCraftAreaPosition
 };

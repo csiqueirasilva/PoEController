@@ -1,5 +1,6 @@
 var winston = require('winston');
 var fs = require('fs');
+var Window = require('./Window');
 
 var logFile = 'output.log';
 
@@ -27,4 +28,6 @@ try {
 } catch (e) {
 }
 
-module.exports = null;
+Window.quitIf(logger === null, "Could not create log file.");
+
+module.exports = logger;

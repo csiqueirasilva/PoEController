@@ -1,8 +1,8 @@
-var Inventory = require('./game/Inventory');
+var Inventory = require('../Inventory');
 var robot = require('robotjs');
-var behaviors = require('./game/Behaviors');
-var Input = require('./game/Input');
-var Window = require('./game/Window');
+var behaviors = require('../../Behaviors');
+var Input = require('../../Input');
+var Window = require('../../Window');
 
 behaviors["BagArea.Up"] = function () {
 	if (Inventory.INVENTORY_INDEX < 12) /* Change Area, Flasks */ {
@@ -60,6 +60,6 @@ function SetBagAreaPosition(Position) {
 	robot.moveMouse(basePositionX + positionX * Inventory.ITEM_SQUARE_ICR, basePositionY + positionY * Inventory.ITEM_SQUARE_ICR);
 }
 
-modules.export = {
+module.exports = {
 	setPosition: SetBagAreaPosition
 };

@@ -1,7 +1,7 @@
-var Inventory = require('./game/Inventory');
-var Window = require('./game/Window');
+var Inventory = require('../Inventory');
+var Window = require('../../Window');
 var robot = require('robotjs');
-var behaviors = require('./game/Behaviors');
+var behaviors = require('../../Behaviors');
 
 behaviors["SellArea.Up"] = function () {
 	if (Inventory.INVENTORY_INDEX >= 12) {
@@ -57,6 +57,6 @@ function SetSellAreaPosition(Position) {
 	robot.moveMouse(basePositionX + positionX * Inventory.ITEM_SQUARE_ICR, basePositionY + positionY * Inventory.ITEM_SQUARE_ICR);
 }
 
-modules.export = {
+module.exports = {
 	setPosition: SetSellAreaPosition
 };

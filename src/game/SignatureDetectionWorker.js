@@ -1,3 +1,5 @@
+/* global self */
+
 var fs = require('fs');
 var robot = require("robotjs");
 
@@ -8,7 +10,7 @@ function PersistSignatureToFile(filename, data) {
 		}
 
 		console.log("Persisted signature file to disk.");
-	}); 
+	});
 }
 
 function DetectPixelSignature (SigCollection) {
@@ -90,7 +92,7 @@ self.onmessage = function(event) {
 						self.postMessage({cmd: 'detect', data: ret.gameMode});
 						console.log(ret.name);
 					}
-				} else if (!IsDefaultMode && LastDetectedSig == null) {
+				} else if (!IsDefaultMode && LastDetectedSig === null) {
 					IsDefaultMode = true;
 					self.postMessage({cmd: 'detect', data: DEFAULT_GAME_MODE});
 					console.log('Signature not detected. Going into default game mode.');

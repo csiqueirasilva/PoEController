@@ -1,6 +1,6 @@
 (function() {
 
-	var EXPORTED_INPUT_MODES = require('./game/Behaviour');
+	var EXPORTED_INPUT_MODES = require('../game/Behaviors').exported;
 
 	var xboxImg = document.getElementById('xbox-img');
 	var ps3Img = document.getElementById('ps3-img');

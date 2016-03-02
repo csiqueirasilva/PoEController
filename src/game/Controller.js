@@ -48,6 +48,8 @@ Indexes
 	
 */
 
+var Window = require('./Window');
+
 var HID = require ('node-hid');
 
 var VID = 0x45E; // Microsoft
@@ -82,6 +84,8 @@ if(HIDController !== null) {
 	HIDController.addListener('error', function () {
 		Window.quit('Error while reading information from the controller. Please ensure it is correctly connected and run PoEController again.');
 	});
+} else {
+	Window.quit("Error while connecting to xbox 360/one controller driver. Please ensure it is correctly connected and configured.");	
 }
 
 module.exports = {

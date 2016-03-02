@@ -1,6 +1,7 @@
-var Inventory = require('./game/Inventory');
+var Inventory = require('../Inventory');
 var robot = require('robotjs');
-var Window = require('./game/Window');
+var Window = require('../../Window');
+var behaviors = require('../../Behaviors');
 
 var EquipmentIndexTable = Inventory.EQUIPMENT_INDEX_TABLE;
 
@@ -93,6 +94,6 @@ function SetEquipmentAreaPosition(Position) {
 	robot.moveMouse(basePositionX, basePositionY);
 }
 
-modules.export = {
+module.exports = {
 	setPosition: SetEquipmentAreaPosition
 };

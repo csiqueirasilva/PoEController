@@ -1,5 +1,5 @@
-var basePosition = require('./game/Input').basePosition;
-var Window = require('./game/Window');
+var basePosition = require('../Input').basePosition;
+var Window = require('../Window');
 var robot = require('robotjs');
 
 var globalMoveAngle = 0;
@@ -18,14 +18,14 @@ function move(cb) {
 	}
 
 	robot.moveMouse(basePosition.x + R * Math.cos(globalMoveAngle) * aspectFix, basePosition.y + R * Math.sin(globalMoveAngle));
-	if(cb instanceof Function) {
+	if(typeof cb === "function") {
 		cb();
 	}
 }
 
 function stop(cb) {
 	robot.mouseToggle("up");
-	if(cb instanceof Function) {
+	if(typeof cb === "function") {
 		cb();
 	}
 }

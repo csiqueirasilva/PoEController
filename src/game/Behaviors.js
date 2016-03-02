@@ -1,7 +1,7 @@
 var robot = require('robotjs');
-var AttackInPlace = require('./game/behaviors/AttackInPlace');
-var Input = require('./game/Input');
-var Window = require('./game/Window');
+var AttackInPlace = require('./behaviors/AttackInPlace');
+var Input = require('./Input');
+var Window = require('./Window');
 
 var behaviors = {};
 
