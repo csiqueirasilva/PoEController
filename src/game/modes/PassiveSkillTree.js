@@ -1,3 +1,9 @@
+var behaviors = require('../Behaviors');
+
+behaviors['PassiveSkillTree.ScrollDown'] = function () {};
+
+behaviors['PassiveSkillTree.ScrollUp'] = function () {};
+
 var Enums = require('../Enums');
 var KEYS = Enums.KEYS;
 var GAME_MODE = Enums.GAME_MODE;
@@ -5,7 +11,6 @@ var Game = require('../Game');
 var robot = require('robotjs');
 var Window = require('../Window');
 var Input = require('../Input');
-var behaviors = require('../Behaviors');
 
 var BehaviorOfExile = {
 	'left': [],
@@ -29,10 +34,6 @@ var DPADOfExile = {};
 var InputKeys = {};
 
 var InputDPAD = {};
-
-behaviors['PassiveSkillTree.ScrollDown'] = function () {};
-
-behaviors['PassiveSkillTree.ScrollUp'] = function () {};
 
 function ResolveInput(data) {
 
@@ -59,5 +60,6 @@ function LeaveArea() {
 module.exports = {
 	enterArea: EnterArea,
 	resolveInput: ResolveInput,
-	leaveArea: LeaveArea
+	leaveArea: LeaveArea,
+	id: GAME_MODE.PASSIVE_SKILL_TREE
 };

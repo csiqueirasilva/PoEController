@@ -1,10 +1,76 @@
+var behaviors = require('../Behaviors').functions;
+
+behaviors["Debug.PrintCursorData"] = function () {
+	var c = robot.getMousePos();
+	console.log(c);
+};
+
+behaviors["Debug.DetectPixelSignature"] = function () {
+	if (SIGNATURE_CAPTURE_STATE !== null) {
+
+		var groupIndex = SIGNATURE_CAPTURE_STATE.group;
+		var modeIndex = SIGNATURE_CAPTURE_STATE.mode;
+
+		var group = SIGNATURE_CAPTURE_ORDER[groupIndex];
+
+		var captureFrame = group.mode[modeIndex];
+
+		var name = FunctionLibrary.indexOf(GAME_MODE, captureFrame);
+
+		console.log("Capturing " + name);
+
+		var coords = GetCaptureCoordinates(captureFrame);
+
+		var sig = CaptureSignatureAt(coords.x, coords.y);
+
+		sig.gameMode = captureFrame;
+		sig.name = name;
+
+		LastCapturedSignatures.push(sig);
+
+		SIGNATURE_CAPTURE_STATE.mode++;
+
+		var nextMode = group.mode[SIGNATURE_CAPTURE_STATE.mode];
+
+		if (nextMode) {
+			name = FunctionLibrary.indexOf(GAME_MODE, nextMode);
+			console.log('open ' + name + ' screen');
+		} else /* Go to another group */ {
+			SignatureDetectionWorker.postMessage({cmd: 'persist', data: {sigs: LastCapturedSignatures, filename: Window.width + 'x' + Window.height + group.filename}});
+
+			LastCapturedSignatures = [];
+			SIGNATURE_CAPTURE_STATE.mode = 0;
+			SIGNATURE_CAPTURE_STATE.group++;
+
+			var nextGroup = SIGNATURE_CAPTURE_ORDER[SIGNATURE_CAPTURE_STATE.group];
+
+			if (!nextGroup) /* finished capturing */ {
+				SIGNATURE_CAPTURE_STATE = null;
+				console.log('finished capturing');
+			} else {
+				nextMode = nextGroup.mode[SIGNATURE_CAPTURE_STATE.mode];
+				name = FunctionLibrary.indexOf(GAME_MODE, nextMode);
+				console.log('open ' + name + ' screen');
+			}
+		}
+
+	} else /* start capturing */ {
+		SIGNATURE_CAPTURE_STATE = {group: 0, mode: 0};
+
+		var captureFrame = SIGNATURE_CAPTURE_ORDER[0].mode[0];
+		var name = FunctionLibrary.indexOf(GAME_MODE, captureFrame);
+
+		console.log('open ' + name + ' screen');
+	}
+};
+
 var Enums = require('../Enums');
 var KEYS = Enums.KEYS;
 var GAME_MODE = Enums.GAME_MODE;
 var robot = require('robotjs');
 var Window = require('../Window');
 var Input = require('../Input');
-var behaviors = require('../Behaviors').functions;
+var FunctionLibrary = require('../FunctionLibrary');
 var SignatureDetectionWorker = require('../Game').signatureDetectionWorker;
 
 var InputKeys = {};
@@ -37,11 +103,6 @@ var SIGNATURE_CAPTURE_ORDER = [{
 	}];
 
 var SIGNATURE_CAPTURE_STATE = null;
-
-behaviors["Debug.PrintCursorData"] = function () {
-	var c = robot.getMousePos();
-	console.log(c);
-};
 
 var supportedAspects = [
 	{
@@ -88,65 +149,6 @@ function GetCaptureCoordinates(mode) {
 	return coords;
 }
 
-behaviors["Debug.DetectPixelSignature"] = function () {
-	if (SIGNATURE_CAPTURE_STATE !== null) {
-
-		var groupIndex = SIGNATURE_CAPTURE_STATE.group;
-		var modeIndex = SIGNATURE_CAPTURE_STATE.mode;
-
-		var group = SIGNATURE_CAPTURE_ORDER[groupIndex];
-
-		var captureFrame = group.mode[modeIndex];
-
-		var name = IndexOf(GAME_MODE, captureFrame);
-
-		console.log("Capturing " + name);
-
-		var coords = GetCaptureCoordinates(captureFrame);
-
-		var sig = CaptureSignatureAt(coords.x, coords.y);
-
-		sig.gameMode = captureFrame;
-		sig.name = name;
-
-		LastCapturedSignatures.push(sig);
-
-		SIGNATURE_CAPTURE_STATE.mode++;
-
-		var nextMode = group.mode[SIGNATURE_CAPTURE_STATE.mode];
-
-		if (nextMode) {
-			name = IndexOf(GAME_MODE, nextMode);
-			console.log('open ' + name + ' screen');
-		} else /* Go to another group */ {
-			SignatureDetectionWorker.postMessage({cmd: 'persist', data: {sigs: LastCapturedSignatures, filename: Window.width + 'x' + Window.height + group.filename}});
-
-			LastCapturedSignatures = [];
-			SIGNATURE_CAPTURE_STATE.mode = 0;
-			SIGNATURE_CAPTURE_STATE.group++;
-
-			var nextGroup = SIGNATURE_CAPTURE_ORDER[SIGNATURE_CAPTURE_STATE.group];
-
-			if (!nextGroup) /* finished capturing */ {
-				SIGNATURE_CAPTURE_STATE = null;
-				console.log('finished capturing');
-			} else {
-				nextMode = nextGroup.mode[SIGNATURE_CAPTURE_STATE.mode];
-				name = IndexOf(GAME_MODE, nextMode);
-				console.log('open ' + name + ' screen');
-			}
-		}
-
-	} else /* start capturing */ {
-		SIGNATURE_CAPTURE_STATE = {group: 0, mode: 0};
-
-		var captureFrame = SIGNATURE_CAPTURE_ORDER[0].mode[0];
-		var name = IndexOf(GAME_MODE, captureFrame);
-
-		console.log('open ' + name + ' screen');
-	}
-};
-
 function CaptureSignatureAt(x, y) {
 	var sigWidth = parseInt(Window.width * 0.04);
 	var sigMax = parseInt(x + sigWidth / 2);
@@ -183,5 +185,6 @@ function ResolveInput(data) {
 }
 
 module.exports = {
-	resolveInput: ResolveInput
+	resolveInput: ResolveInput,
+	id: GAME_MODE.DEBUG
 };

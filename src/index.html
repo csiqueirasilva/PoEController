@@ -167,8 +167,6 @@
 				global.showGameOverlay($('#select-input-method').val(), mode);
 			}
 	
-			ChangeGameModeUpdateUICallback = updateGameOverlay;
-	
 			// src: https://github.com/nwjs/nw.js/issues/1162
 			$('a[target=_blank]').on('click', function(){
 				require('nw.gui').Shell.openExternal( this.href );

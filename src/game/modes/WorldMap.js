@@ -1,5 +1,6 @@
 var Enums = require('../Enums');
 var KEYS = Enums.KEYS;
+var GAME_MODE = Enums.GAME_MODE;
 var robot = require('robotjs');
 var Window = require('../Window');
 var Input = require('../Input');
@@ -64,5 +65,6 @@ function LeaveArea() {
 module.exports = {
 	enterArea: EnterArea,
 	resolveInput: ResolveInput,
-	leaveArea: LeaveArea
+	leaveArea: LeaveArea,
+	id: GAME_MODE.WORLD_MAP
 };

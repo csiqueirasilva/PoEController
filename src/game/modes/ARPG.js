@@ -1,22 +1,10 @@
 var behaviors = require('../Behaviors').functions;
-var robot = require('robotjs');
-var Input = require('../Input');
-var Movement = require('../behaviors/Movement');
-var AttackInPlace = require('../behaviors/AttackInPlace');
-var MAX_INPUT_THUMBSTICK = require('../Enums').MAX_INPUT_THUMBSTICK;
-var KEYS = require('../Enums').KEYS;
-var Game = require('../Game');
-var SignatureDetectionWorker = Game.signatureDetectionWorker;
-var Enums = require('../Enums');
-var GAME_MODE = Enums.GAME_MODE;
-var Window = require('../Window');
-var Logger = require('../Logger');
 
 behaviors['ARPG.Fixed.OptionsMenu'] = function () {
 	// check if possible to open menu (eg: if esc menu is not open)
 	var color = robot.getPixelColor(parseInt(Window.width * 0.1421875), parseInt(Window.height * 0.89351851852));
 	if (color > "777777") {
-		Game.changeMode(GAME_MODE.OPTIONS_MENU);
+		//Mode.change(OptionsMenu);
 	}
 };
 
@@ -31,8 +19,23 @@ behaviors['ARPG.Fixed.FetchLootRelease'] = function () {
 
 behaviors["ARPG.Fixed.EscapeAndReturn"] = function () {
 	robot.keyTap("escape");
-	Game.changeMode(GAME_MODE.ARPG);
+	Mode.change(module.exports);
 };
+
+var robot = require('robotjs');
+var Input = require('../Input');
+var Movement = require('../behaviors/Movement');
+var AttackInPlace = require('../behaviors/AttackInPlace');
+var MAX_INPUT_THUMBSTICK = require('../Enums').MAX_INPUT_THUMBSTICK;
+var KEYS = require('../Enums').KEYS;
+var Game = require('../Game');
+var SignatureDetectionWorker = Game.signatureDetectionWorker;
+var Enums = require('../Enums');
+var GAME_MODE = Enums.GAME_MODE;
+var OptionsMenu = require('./OptionsMenu');
+var Mode = require('../Mode');
+var Window = require('../Window');
+var Logger = require('../Logger');
 
 var BehaviorOfExile = {};
 var KeysOfExile = {};
@@ -227,5 +230,6 @@ module.exports = {
 	enterArea: EnterArea,
 	resolveInput: ResolveDataInput,
 	leaveArea: LeaveArea,
-	setBehavior: SetBehavior
+	setBehavior: SetBehavior,
+	id: GAME_MODE.ARPG
 };

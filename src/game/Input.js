@@ -2,6 +2,7 @@ var robot = require('robotjs');
 var KEYS = require('./Enums').KEYS;
 var behaviors = require('./Behaviors').functions;
 var KeyHandler = require('./behaviors/KeyHandler');
+var FunctionLibrary = require('./FunctionLibrary');
 var MAX_INPUT_THUMBSTICK = require('./Enums').MAX_INPUT_THUMBSTICK;
 
 var RepeatActionInterval = 90;
@@ -63,9 +64,9 @@ function ClearHeldInput(KeysOfExile, InputKeys, DPADOfExile, InputDPAD, Behavior
 	robot.mouseToggle("up");
 
 	for (var key in BehaviorOfExile) {
-		var ref = IndexOf(KeysOfExile, key);
+		var ref = FunctionLibrary.indexOf(KeysOfExile, key);
 		if (ref === -1) {
-			ref = IndexOf(DPADOfExile, key);
+			ref = FunctionLibrary.indexOf(DPADOfExile, key);
 			if (InputDPAD[ref]) {
 				ActionKeyUp(key, BehaviorOfExile);
 			}

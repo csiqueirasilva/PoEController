@@ -1,11 +1,3 @@
-var Enums = require('../Enums');
-var KEYS = Enums.KEYS;
-var GAME_MODE = Enums.GAME_MODE;
-var Game = require('../Game');
-var Window = require('../Window');
-var Input = require('../Input');
-var SubSectionSignatures = Game.inventorySignatures;
-
 var BagArea = require('../modes/inventory/Bag');
 var Craft = require('../modes/inventory/Craft');
 var FlasksArea = require('../modes/inventory/Flasks');
@@ -13,6 +5,14 @@ var EquipmentArea = require('../modes/inventory/Equipment');
 var Reward = require('../modes/inventory/Reward');
 var Sell = require('../modes/inventory/Sell');
 var Stash = require('../modes/inventory/Stash');
+
+var Enums = require('../Enums');
+var KEYS = Enums.KEYS;
+var GAME_MODE = Enums.GAME_MODE;
+var Game = require('../Game');
+var Window = require('../Window');
+var Input = require('../Input');
+var SubSectionSignatures = Game.inventorySignatures;
 
 var AreaId = {
 	FLASKS_AREA: 0,
@@ -141,7 +141,7 @@ function EnterCurrentSubSection() {
 function ChangeIntoSubSection(mode) {
 	CurrentSubSection = mode;
 	if (CurrentSubSection !== null) {
-		Game.updateUI(CurrentSubSection);
+		window.updateGameOverlay(CurrentSubSection);
 	}
 }
 
@@ -345,5 +345,6 @@ module.exports = {
 	subSection: ChangeIntoSubSection,
 	resetInputArrays: ResetInputArrays,
 	enterCurrentSubSection: EnterCurrentSubSection,
-	leaveCurrentSubSection: LeaveCurrentSubSection
+	leaveCurrentSubSection: LeaveCurrentSubSection,
+	id: GAME_MODE.INVENTORY
 };

@@ -1,7 +1,6 @@
 var Inventory = require('../Inventory');
 var robot = require('robotjs');
 var behaviors = require('../../Behaviors');
-var Input = require('../../Input');
 var Window = require('../../Window');
 
 behaviors["BagArea.Up"] = function () {

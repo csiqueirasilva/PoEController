@@ -1,10 +1,3 @@
-var Enums = require('../Enums');
-var KEYS = Enums.KEYS;
-var GAME_MODE = Enums.GAME_MODE;
-var Game = require('../Game');
-var robot = require('robotjs');
-var Window = require('../Window');
-var Input = require('../Input');
 var behaviors = require('../Behaviors');
 
 behaviors["OptionsMenu.Down"] = function () {
@@ -19,19 +12,30 @@ behaviors["OptionsMenu.Up"] = function () {
 
 behaviors["OptionsMenu.Cancel"] = function () {
 	robot.keyTap('escape');
-	Game.changeMode(GAME_MODE.ARPG);
+	Mode.change(ARPG);
 };
 
 behaviors["OptionsMenu.Confirm"] = function () {
 	robot.mouseClick("left");
 	if (CURSOR_INDEX === 0) {
-		Game.changeMode(GAME_MODE.INVENTORY);
+		Mode.change(Inventory);
 	} else if (CURSOR_INDEX === 2) {
-		Game.changeMode(GAME_MODE.PASSIVE_SKILL_TREE);
+		Mode.change(PassiveSkillTree);
 	} else {
-		Game.changeMode(GAME_MODE.ARPG);
+		Mode.change(ARPG);
 	}
 };
+
+var Enums = require('../Enums');
+var KEYS = Enums.KEYS;
+var GAME_MODE = Enums.GAME_MODE;
+var Mode = require('../Mode');
+var PassiveSkillTree = require('./PassiveSkillTree');
+var ARPG = require('./ARPG');
+var Inventory = require('./Inventory');
+var robot = require('robotjs');
+var Window = require('../Window');
+var Input = require('../Input');
 
 var KeysOfExile = {};
 
@@ -118,5 +122,6 @@ function LeaveArea() {
 module.exports = {
 	resolveInput: ResolveInput,
 	enterArea: EnterArea,
-	leaveArea: LeaveArea
+	leaveArea: LeaveArea,
+	id: GAME_MODE.OPTIONS_MENU
 };
