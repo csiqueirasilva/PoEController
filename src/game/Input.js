@@ -3,6 +3,7 @@ var Window = require('./game/Window');
 var KEYS = require('./game/Enums').KEYS;
 var behaviors = require('./game/Behaviors').functions;
 var Movement = require('./game/behaviors/Movement');
+var MAX_INPUT_THUMBSTICK = require('./game/Enums').MAX_INPUT_THUMBSTICK;
 
 var InputInterval = 15;
 var RepeatActionInterval = 90;
@@ -202,11 +203,23 @@ function MouseWithIncrementKeyUp() {
 	Movement.setRadius(null);
 }
 
+function LeftThumbstickMouse(data, cb) {
+	
+	// resolve left thumb axis
+	MoveThumbstick(data[1], data[3],
+		MAX_INPUT_THUMBSTICK,
+		RIGHT_THUMBSTICK_THRESHOLD,
+		cb,
+		RightThumbElseCallback);
+		
+}
+
 modules.export = {
 	basePosition: basePosition,
 	mouseWithIncrementKeyDown: MouseWithIncrementKeyDown,
 	mouseWithIncrementKeyUp: MouseWithIncrementKeyUp,
 	activateKey: ActivateKey,
 	actionKey: ActionKey,
-	resetInputArrays: ResetInputArrays
+	resetInputArrays: ResetInputArrays,
+	leftThumbstickMouse: LeftThumbstickMouse
 };

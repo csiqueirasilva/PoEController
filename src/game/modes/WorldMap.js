@@ -1,8 +1,6 @@
 var Enums = require('./game/Enums');
 var KEYS = Enums.KEYS;
 var robot = require('robotjs');
-var GAME_MODE = Enums.GAME_MODE;
-var Game = require('./game/Game');
 var Window = require('./game/Window');
 var Input = require('./game/Input');
 
@@ -52,12 +50,7 @@ function ResolveInput(data) {
 		buttons = buttons >= i ? buttons - i : buttons;
 	}
 
-	// resolve left thumb axis
-	MoveThumbstick(data[1], data[3],
-		MAX_INPUT_THUMBSTICK,
-		RIGHT_THUMBSTICK_THRESHOLD,
-		WorldMapIfLeftThumbstick,
-		RightThumbElseCallback);
+	Input.leftThumbstickMouse(data, WorldMapIfLeftThumbstick);
 }
 
 function EnterArea() {
