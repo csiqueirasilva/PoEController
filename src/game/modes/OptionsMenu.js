@@ -79,7 +79,7 @@ function ResolveInput(data) {
 		}
 
 		// solve dpad
-		ResolveDpadInput(data[11], DPADOfExile, InputDPAD, BehaviorOfExile, true);
+		Input.dpad(data[11], DPADOfExile, InputDPAD, BehaviorOfExile, true);
 	}
 }
 

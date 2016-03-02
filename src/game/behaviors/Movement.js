@@ -1,4 +1,3 @@
-var basePosition = require('../Input').basePosition;
 var Window = require('../Window');
 var robot = require('robotjs');
 
@@ -16,8 +15,8 @@ function move(cb) {
 		R = globalMoveRadius;
 		aspectFix = Window.aspect;
 	}
-
-	robot.moveMouse(basePosition.x + R * Math.cos(globalMoveAngle) * aspectFix, basePosition.y + R * Math.sin(globalMoveAngle));
+	
+	robot.moveMouse(Window.basePosition.x + R * Math.cos(globalMoveAngle) * aspectFix, Window.basePosition.y + R * Math.sin(globalMoveAngle));
 	if(typeof cb === "function") {
 		cb();
 	}

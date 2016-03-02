@@ -1,3 +1,5 @@
+/* global menuWindow */
+
 (function() {
 
 	var EXPORTED_INPUT_MODES = require('../game/Behaviors').exported;
@@ -82,8 +84,8 @@
 	
 	function drawControllerReferencemenuCanvas(op) {
 		
-		menuCanvas.width = window.innerWidth;
-		menuCanvas.height = window.innerHeight;
+		menuCanvas.width = menuWindow.window.innerWidth;
+		menuCanvas.height = menuWindow.window.innerHeight;
 		
 		ctx.clearRect(0, 0, menuCanvas.width, menuCanvas.height);
 		
@@ -97,8 +99,8 @@
 
 	function drawInputLine(coords, elementId) {
 	
-		var iX = coords[0] * window.innerWidth;
-		var iY = coords[1] * window.innerHeight;
+		var iX = coords[0] * menuCanvas.width;
+		var iY = coords[1] * menuCanvas.height;
 		
 		var domCoords = getElementCenterPosition(elementId);
 		

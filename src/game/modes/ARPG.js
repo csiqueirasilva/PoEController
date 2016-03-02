@@ -9,7 +9,8 @@ var Game = require('../Game');
 var SignatureDetectionWorker = Game.signatureDetectionWorker;
 var Enums = require('../Enums');
 var GAME_MODE = Enums.GAME_MODE;
-var Window = require('../Window.js');
+var Window = require('../Window');
+var Logger = require('../Logger');
 
 behaviors['ARPG.Fixed.OptionsMenu'] = function () {
 	// check if possible to open menu (eg: if esc menu is not open)
@@ -21,7 +22,7 @@ behaviors['ARPG.Fixed.OptionsMenu'] = function () {
 
 behaviors['ARPG.Fixed.FetchLootHold'] = function () {
 	robot.keyToggle('alt', 'down');
-	robot.moveMouse(Input.basePosition.x, Input.basePosition.y);
+	robot.moveMouse(Window.basePosition.x, Window.basePosition.y);
 };
 
 behaviors['ARPG.Fixed.FetchLootRelease'] = function () {
@@ -81,7 +82,7 @@ function stopMovementCallback() {
 }
 
 function startMovementCallback() {
-	if (!moving && !AttackInPlace.state) {
+	if (!moving && !AttackInPlace.state()) {
 		moving = true;
 		setTimeout(function () {
 			robot.mouseToggle("down");
@@ -92,12 +93,12 @@ function startMovementCallback() {
 function LeftThumbIfCallback(x, y) {
 	var angle = Math.atan2(y, x);
 	Movement.setAngle(angle);
-	move(startMovementCallback);
+	Movement.move(startMovementCallback);
 }
 
 function LeftThumbElseCallback() {
 	if (moving) {
-		stop(stopMovementCallback);
+		Movement.stop(stopMovementCallback);
 	}
 }
 
@@ -129,7 +130,7 @@ function ResolveDataInput(data) {
 		Input.activateKey(DPADOfExile, InputDPAD, BehaviorOfExile, 1, false);
 
 		// clear dpad
-		ResolveDpadInput(0, DPADOfExile, InputDPAD, BehaviorOfExile);
+		Input.dpad(0, DPADOfExile, InputDPAD, BehaviorOfExile);
 
 		LastTimestampStart = CurrentTimestampStart;
 
@@ -143,7 +144,7 @@ function ResolveDataInput(data) {
 
 		// resolve left thumb axis
 
-		MoveThumbstick(data[1], data[3],
+		Input.moveStick(data[1], data[3],
 			MAX_INPUT_THUMBSTICK,
 			LEFT_THUMBSTICK_THRESHOLD,
 			LeftThumbIfCallback,
@@ -167,7 +168,7 @@ function ResolveDataInput(data) {
 
 		// resolve dpad
 
-		ResolveDpadInput(data[11], DPADOfExile, InputDPAD, BehaviorOfExile);
+		Input.dpad(data[11], DPADOfExile, InputDPAD, BehaviorOfExile);
 
 		var timestamp = new Date().getTime();
 
@@ -195,7 +196,7 @@ function ResolveDataInput(data) {
 }
 
 function EnterArea() {
-	robot.moveMouse(Input.basePosition.x, Input.basePosition.y);
+	robot.moveMouse(Window.basePosition.x, Window.basePosition.y);
 	SignatureDetectionWorker.postMessage({cmd: 'clear-lastsig'});
 }
 

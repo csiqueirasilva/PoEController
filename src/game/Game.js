@@ -9,7 +9,8 @@ var Input = require('./Input');
 var Worker = require('workerjs');
 var exec = require('child_process').exec;
 var fs = require('fs');
-var GAME_MODE = require('./Enums').GAME_MODE;
+var Enums = require('./Enums');
+var GAME_MODE = Enums.GAME_MODE;
 var Controller = require('./Controller');
 
 var GameModeARPG = require('./modes/ARPG');
@@ -91,7 +92,7 @@ function PollGamepadEvents() {
 			GAME_MODE_OBJECT.resolveInput(LastInputData);
 		}
 
-	}, Input.globalInterval);
+	}, Enums.GLOBAL_INTERVAL);
 }
 
 function InitGame() {
@@ -126,7 +127,7 @@ function ControllerListener(data) {
 
 var cbInitGame = null;
 
-function StartControllerListener(DEBUG_MODE, callbackInitGame) {
+function StartControllerListener(callbackInitGame) {
 	Controller.addDataListener(ControllerListener);
 	cbInitGame = callbackInitGame;
 	if (!DEBUG_MODE) {
@@ -225,5 +226,7 @@ module.exports = {
 	inventorySignatures: inventorySignatures,
 	updateUI: UpdateUI,
 	signatureDetectionWorker: SignatureDetectionWorker,
-	changeMode: ChangeGameMode
+	changeMode: ChangeGameMode,
+	start: StartControllerListener,
+	finish: RemoveControllerListener
 };

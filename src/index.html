@@ -146,6 +146,10 @@
 			require('./menu/UI');
 			var UserSettings = require('./menu/UserSettings');
 			var PoESettings = require('./menu/PoESettings');
+			var KEYS = require('./game/Enums').KEYS;
+			var GAME_MODE = require('./game/Enums').GAME_MODE;
+			var GameModeARPG = require('./game/modes/ARPG');
+			var Game = require('./game/Game');
 			
 			global.menuWindow.on('focus', function() {
 				global.hideAllHelp();
@@ -183,7 +187,7 @@
 			
 				if($(this).html() === "Stop gamepad") {
 					global.hideGameOverlay();
-					RemoveControllerListener();
+					Game.finish();
 					$(this).html("Start gamepad");
 					otherInputs.prop('disabled', false);
 				} else {
@@ -198,17 +202,17 @@
 					inputArgs[KEYS.KEY_RIGHT] = $('#button-key-right select').val();
 					inputArgs[KEYS.KEY_DOWN] = $('#button-key-down select').val();
 					
-					GAME_MODE_ARPG.SetBehavior(inputArgs);
+					GameModeARPG.setBehavior(inputArgs);
 
 					var btn = $(this);
 					
-					StartControllerListener(false, function() {
+					Game.start(function() {
 						global.gameOverlay.focus();
 						setTimeout(function() {
 							updateGameOverlay(GAME_MODE.ARPG);
 							$('#flash-msg').hide();
 							btn.prop('disabled', false);
-						}, 8000);
+						}, 6500);
 					});
 
 					$('#flash-msg').html("If you have Path of Exile Steam Version it will open (or focus the window, if already open).<br />If not, please open Path of Exile's game client.");

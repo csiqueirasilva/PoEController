@@ -1,32 +1,13 @@
 var robot = require('robotjs');
-var Window = require('./Window');
 var KEYS = require('./Enums').KEYS;
 var behaviors = require('./Behaviors').functions;
-var Movement = require('./behaviors/Movement');
+var KeyHandler = require('./behaviors/KeyHandler');
 var MAX_INPUT_THUMBSTICK = require('./Enums').MAX_INPUT_THUMBSTICK;
 
-var GlobalInterval = 15;
 var RepeatActionInterval = 90;
 
 robot.setMouseDelay(0);
 robot.setKeyboardDelay(0);
-
-var basePosition = {
-	x: Window.width / 2,
-	y: Window.height * 0.44
-};
-
-function IsMouseInput(Key) {
-	return Key === "left" || Key === "right" || Key === "middle";
-}
-
-function ActionKey(Key, Action) {
-	if (IsMouseInput(Key)) {
-		robot.mouseToggle(Action, Key);
-	} else if (Key.match(/\./) === null) {
-		robot.keyToggle(Key, Action);
-	}
-}
 
 function ResolveDpadInput(data, DpadMapping, InputMapping, BehaviorMapping, skipKeyUp) {
 
@@ -95,7 +76,7 @@ function ClearHeldInput(KeysOfExile, InputKeys, DPADOfExile, InputDPAD, Behavior
 }
 
 function ActionKeyUp(key, behaviorReference) {
-	ActionKey(key, "up");
+	KeyHandler.handle(key, "up");
 
 	var behavior = behaviorReference[key];
 	if (behavior instanceof Array && behavior.length > 1 && typeof behaviors[behavior[1]] === "function") {
@@ -153,23 +134,16 @@ function ResetInputArrays(Keys, Dpad) {
 	}
 }
 
-var MoveThumbstick = (function () {
+function MoveThumbstick(DataX, DataY, Max, Threshold, IfCallback, ElseCallback) {
+	var x = (DataX - Max) / Max;
+	var y = (DataY - Max) / Max;
 
-	var Function = function (DataX, DataY, Max, Threshold, IfCallback, ElseCallback) {
-		var x = (DataX - Max) / Max;
-		var y = (DataY - Max) / Max;
-
-		if (Math.abs(x) > Threshold || Math.abs(y) > Threshold) {
-			IfCallback(x, y);
-		} else {
-			ElseCallback();
-		}
-
-	};
-
-	return Function;
-
-})();
+	if (Math.abs(x) > Threshold || Math.abs(y) > Threshold) {
+		IfCallback(x, y);
+	} else {
+		ElseCallback();
+	}
+};
 
 var RIGHT_THUMBSTICK_THRESHOLD = 0.16;
 
@@ -184,49 +158,29 @@ function RightThumbIfCallback(x, y) {
 function RightThumbElseCallback() {
 }
 
-var LastIncrementActionTimeout = null;
-
-function MouseWithIncrementKeyDown(R, key) {
-	if (LastIncrementActionTimeout === null) {
-		Movement.setRadius(R);
-		var angle = Movement.getAngle();
-		robot.moveMouse(basePosition.x + R * Math.cos(angle), basePosition.y + R * Math.sin(angle));
-
-		LastIncrementActionTimeout = setTimeout(function () {
-			ActionKey(key, "down");
-			LastIncrementActionTimeout = null;
-		}, GlobalInterval * 1.5);
-	}
-}
-
-function MouseWithIncrementKeyUp() {
-	Movement.setRadius(null);
-}
-
-function LeftThumbstickMouse(data, cb) {
-	
+function LeftThumbstickMouse(data, cbIf, cbElse) {
 	// resolve left thumb axis
 	MoveThumbstick(data[1], data[3],
 		MAX_INPUT_THUMBSTICK,
 		RIGHT_THUMBSTICK_THRESHOLD,
-		cb || RightThumbIfCallback,
-		RightThumbElseCallback);
-		
+		cbIf || RightThumbIfCallback,
+		cbElse || RightThumbElseCallback);
 }
 
 function RightThumbstickMouse(data) {
-	
+	MoveThumbstick(data[5], data[7],
+		MAX_INPUT_THUMBSTICK,
+		RIGHT_THUMBSTICK_THRESHOLD,
+		RightThumbIfCallback,
+		RightThumbElseCallback);
 }
 
 module.exports = {
-	basePosition: basePosition,
-	mouseWithIncrementKeyDown: MouseWithIncrementKeyDown,
-	mouseWithIncrementKeyUp: MouseWithIncrementKeyUp,
 	activateKey: ActivateKey,
-	actionKey: ActionKey,
 	resetInputArrays: ResetInputArrays,
 	leftThumbstickMouse: LeftThumbstickMouse,
 	clearHeld: ClearHeldInput,
 	rightThumbstick: RightThumbstickMouse,
-	globalInterval: GlobalInterval
+	moveStick: MoveThumbstick,
+	dpad: ResolveDpadInput
 };

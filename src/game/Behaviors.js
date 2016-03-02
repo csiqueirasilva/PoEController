@@ -1,17 +1,18 @@
 var robot = require('robotjs');
 var AttackInPlace = require('./behaviors/AttackInPlace');
-var Input = require('./Input');
+var KeyHandler = require('./behaviors/KeyHandler');
 var Window = require('./Window');
+var IncrementedCursorPosition = require('./behaviors/IncrementedCursorPosition');
 
 var behaviors = {};
 
 behaviors['arpg.nothing'] = function (args, key) {
-	Input.actionKey(key, "down");
+	KeyHandler.handle(key, "down");
 };
 
 behaviors['ARPG.MouseNeutral'] = function (args, key) {
-	robot.moveMouse(Input.basePosition.x, Input.basePosition.y);
-	Input.actionKey(key, "down");
+	robot.moveMouse(Window.basePosition.x, Window.basePosition.y);
+	KeyHandler.handle(key, "down");
 };
 
 behaviors['arpg.ShiftMouseLastAngleLow.KeyDown'] = function (args, key) {
@@ -45,27 +46,27 @@ behaviors['arpg.ShiftMouseLastAngleHigh.KeyUp'] = function (args, key) {
 };
 
 behaviors['arpg.MouseLastAngleLow.KeyDown'] = function (args, key) {
-	Input.mouseWithIncrementKeyDown(Window.height * 0.1, key);
+	IncrementedCursorPosition.mouseWithIncrementKeyDown(Window.height * 0.1, key);
 };
 
 behaviors['arpg.MouseLastAngleLow.KeyUp'] = function (args, key) {
-	Input.mouseWithIncrementKeyUp();
+	IncrementedCursorPosition.mouseWithIncrementKeyUp(key);
 };
 
 behaviors['arpg.MouseLastAngleMid.KeyDown'] = function (args, key) {
-	Input.mouseWithIncrementKeyDown(Window.height * 0.225, key);
+	IncrementedCursorPosition.mouseWithIncrementKeyDown(Window.height * 0.225, key);
 };
 
 behaviors['arpg.MouseLastAngleMid.KeyUp'] = function (args, key) {
-	Input.mouseWithIncrementKeyUp();
+	IncrementedCursorPosition.mouseWithIncrementKeyUp(key);
 };
 
 behaviors['arpg.MouseLastAngleHigh.KeyDown'] = function (args, key) {
-	Input.mouseWithIncrementKeyDown(Window.height * 0.35, key);
+	IncrementedCursorPosition.mouseWithIncrementKeyDown(Window.height * 0.35, key);
 };
 
 behaviors['arpg.MouseLastAngleHigh.KeyUp'] = function (args, key) {
-	Input.mouseWithIncrementKeyUp();
+	IncrementedCursorPosition.mouseWithIncrementKeyUp(key);
 };
 
 var exported = {

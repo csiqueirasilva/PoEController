@@ -305,7 +305,7 @@ function ResolveInput(data) {
 	}
 
 	// solve dpad
-	ResolveDpadInput(data[11], DPADOfExile[CURRENT_AREA], InputDPAD, BehaviorOfExile, true);
+	Input.dpad(data[11], DPADOfExile[CURRENT_AREA], InputDPAD, BehaviorOfExile, true);
 }
 
 var SubSectionDetectionInterval = null;

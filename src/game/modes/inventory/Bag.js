@@ -41,7 +41,7 @@ behaviors["BagArea.Right"] = function () {
 };
 
 behaviors["BagArea.CenterClick"] = function () {
-	robot.moveMouse(Input.basePosition.x, Input.basePosition.y);
+	robot.moveMouse(Window.basePosition.x, Window.basePosition.y);
 	setTimeout(function () {
 		robot.mouseClick("left");
 		setTimeout(function () {
