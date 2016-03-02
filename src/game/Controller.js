@@ -55,6 +55,7 @@ var PID = [0x28E, 0x28F, 0x2D1]; // Searches for Xbox 360 Controller, Xbox 360 W
 								 // http://www.linux-usb.org/usb.ids
 
 var HIDController = null;
+var controllerFound = false;
 
 for(var i = 0; i < PID.length && HIDController === null; i++) {
 	try {
@@ -76,22 +77,15 @@ function removeDataListener(cb) {
 	}
 }
 
-function addErrorListener(cb) {
-	if(HIDController !== null) {
-		HIDController.addListener('error', cb);
-	}
-}
-
-function removeErrorListener(cb) {
-	if(HIDController !== null) {
-		HIDController.removeListener('error', cb);
-	}
+if(HIDController !== null) {
+	controllerFound = true;
+	HIDController.addListener('error', function () {
+		Window.quit('Error while reading information from the controller. Please ensure it is correctly connected and run PoEController again.');
+	});
 }
 
 module.exports = {
-	found: HIDController !== null,
+	found: controllerFound,
 	addDataListener: addDataListener,
-	removeDataListener: removeDataListener,
-	addErrorListener: addErrorListener,
-	removeErrorListener: removeErrorListener
+	removeDataListener: removeDataListener
 };
