@@ -1,10 +1,12 @@
 var Inventory = require('./game/Inventory');
 var robot = require('robotjs');
 var behaviors = require('./game/Behaviors');
+var Input = require('./game/Input');
+var Window = require('./game/Window');
 
 behaviors["BagArea.Up"] = function () {
 	if (Inventory.INVENTORY_INDEX < 12) /* Change Area, Flasks */ {
-		Inventory.leaveCurrentSubSection(AreaId.FLASKS_AREA);
+		Inventory.leaveCurrentSubSection(Inventory.AREA_ID.FLASKS_AREA);
 	} else {
 		Inventory.INVENTORY_INDEX -= 12;
 		Inventory.SET_AREA_POSITION_CB(Inventory.INVENTORY_INDEX);
@@ -39,7 +41,7 @@ behaviors["BagArea.Right"] = function () {
 };
 
 behaviors["BagArea.CenterClick"] = function () {
-	robot.moveMouse(BasePosition.x, BasePosition.y);
+	robot.moveMouse(Input.basePosition.x, Input.basePosition.y);
 	setTimeout(function () {
 		robot.mouseClick("left");
 		setTimeout(function () {

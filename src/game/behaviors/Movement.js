@@ -1,6 +1,7 @@
 var basePosition = require('./game/Input').basePosition;
 var Window = require('./game/Window');
-	
+var robot = require('robotjs');
+
 var globalMoveAngle = 0;
 var globalMoveRadius = null;
 

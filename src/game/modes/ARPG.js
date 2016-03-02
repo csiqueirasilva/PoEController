@@ -5,6 +5,11 @@ var Movement = require('./game/behaviors/Movement');
 var AttackInPlace = require('./game/behaviors/AttackInPlace');
 var MAX_INPUT_THUMBSTICK = require('./game/Enums').MAX_INPUT_THUMBSTICK;
 var KEYS = require('./game/Enums').KEYS;
+var Game = require('./game/Game');
+var SignatureDetectionWorker = Game.signatureDetectionWorker;
+var Enums = require('./game/Enums');
+var GAME_MODE = Enums.GAME_MODE;
+var Window = require('./game/Window.js');
 
 behaviors['ARPG.Fixed.OptionsMenu'] = function () {
 	// check if possible to open menu (eg: if esc menu is not open)
@@ -191,7 +196,7 @@ function EnterArea() {
 }
 
 function LeaveArea() {
-	ClearHeldInput(KeysOfExile, InputKeys, DPADOfExile, InputDPAD, BehaviorOfExile);
+	Input.clearHeld(KeysOfExile, InputKeys, DPADOfExile, InputDPAD, BehaviorOfExile);
 }
 
 function SetBehaviorFunction(idx, fnc) {

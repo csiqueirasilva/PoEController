@@ -209,7 +209,7 @@ function LeftThumbstickMouse(data, cb) {
 	MoveThumbstick(data[1], data[3],
 		MAX_INPUT_THUMBSTICK,
 		RIGHT_THUMBSTICK_THRESHOLD,
-		cb,
+		cb || RightThumbIfCallback,
 		RightThumbElseCallback);
 		
 }
@@ -221,5 +221,6 @@ modules.export = {
 	activateKey: ActivateKey,
 	actionKey: ActionKey,
 	resetInputArrays: ResetInputArrays,
-	leftThumbstickMouse: LeftThumbstickMouse
+	leftThumbstickMouse: LeftThumbstickMouse,
+	clearHeld: ClearHeldInput
 };

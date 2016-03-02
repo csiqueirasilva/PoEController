@@ -2,6 +2,7 @@ var Enums = require('./game/Enums');
 var KEYS = Enums.KEYS;
 var GAME_MODE = Enums.GAME_MODE;
 var Game = require('./game/Game');
+var robot = require('robotjs');
 var Window = require('./game/Window');
 var Input = require('./game/Input');
 var behaviors = require('./game/Behaviors');

@@ -1,3 +1,5 @@
+var robot = require('robotjs');
+
 var ATTACK_IN_PLACE = false;
 
 function setAttackInPlace() {

@@ -1,9 +1,18 @@
+var Enums = require('./game/Enums');
+var KEYS = Enums.KEYS;
+var GAME_MODE = Enums.GAME_MODE;
+var Game = require('./game/Game');
+var robot = require('robotjs');
+var Window = require('./game/Window');
+var Input = require('./game/Input');
+var behaviors = require('./game/Behaviors');
+
 var BehaviorOfExile = {
 	'left': [],
 	'right': [],
 	'PassiveSkillTree.ScrollDown': ["PassiveSkillTree.ScrollDown"],
 	'PassiveSkillTree.ScrollUp': ["PassiveSkillTree.ScrollUp"],
-	'ARPG.FetchLoot': ["ARPG.FetchLootHold", "ARPG.FetchLootRelease"],
+	'ARPG.FetchLoot': ["ARPG.Fixed.FetchLootHold", "ARPG.Fixed.FetchLootRelease"],
 	'ARPG.Fixed.EscapeAndReturn': [null, 'ARPG.Fixed.EscapeAndReturn']
 };
 
@@ -15,28 +24,15 @@ var KeysOfExile = {
 	128: 'ARPG.Fixed.EscapeAndReturn'
 };
 
-var DPADOfExile = {
-};
+var DPADOfExile = {};
 
-var InputKeys = {
-	1: false,
-	2: false,
-	4: false,
-	8: false,
-	16: false,
-	32: false,
-	64: false,
-	128: false
-};
+var InputKeys = {};
 
-var InputDPAD = {
-};
+var InputDPAD = {};
 
-DefaultBehaviours['PassiveSkillTree.ScrollDown'] = function () {
-};
+behaviors['PassiveSkillTree.ScrollDown'] = function () {};
 
-DefaultBehaviours['PassiveSkillTree.ScrollUp'] = function () {
-};
+behaviors['PassiveSkillTree.ScrollUp'] = function () {};
 
 function ResolveInput(data) {
 
@@ -50,19 +46,14 @@ function ResolveInput(data) {
 		buttons = buttons >= i ? buttons - i : buttons;
 	}
 
-	// resolve left thumb axis
-	MoveThumbstick(data[1], data[3],
-		MAX_INPUT_THUMBSTICK,
-		RIGHT_THUMBSTICK_THRESHOLD,
-		RightThumbIfCallback,
-		RightThumbElseCallback);
+	Input.leftThumbstickMouse(data);
 }
 
 function EnterArea() {
 }
 
 function LeaveArea() {
-	ClearHeldInput(KeysOfExile, InputKeys, DPADOfExile, InputDPAD, BehaviorOfExile);
+	Input.clearHeld(KeysOfExile, InputKeys, DPADOfExile, InputDPAD, BehaviorOfExile);
 }
 
 module.exports = {

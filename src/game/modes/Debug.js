@@ -4,6 +4,8 @@ var GAME_MODE = Enums.GAME_MODE;
 var robot = require('robotjs');
 var Window = require('./game/Window');
 var Input = require('./game/Input');
+var behaviors = require('./game/Behaviors').functions;
+var SignatureDetectionWorker = require('./game/Game').signatureDetectionWorker;
 
 var InputKeys = {};
 
@@ -12,7 +14,6 @@ var KeysOfExile = {};
 KeysOfExile[KEYS.KEY_START] = 'Debug.DetectPixelSignature';
 
 var BehaviorOfExile = {
-	'Debug.CapturePixelSignature': [null, "Debug.CapturePixelSignature"],
 	'Debug.DetectPixelSignature': [null, "Debug.DetectPixelSignature"],
 	'Debug.PrintCursorData': [null, "Debug.PrintCursorData"]
 };
@@ -148,8 +149,7 @@ behaviors["Debug.DetectPixelSignature"] = function () {
 
 function CaptureSignatureAt(x, y) {
 	var sigWidth = parseInt(Window.width * 0.04);
-	var mouse = robot.getMousePos();
-	var sigMax = parseInt(x + sigWidth / 2)
+	var sigMax = parseInt(x + sigWidth / 2);
 	var sigMin = parseInt(x - sigWidth / 2);
 
 	var sig = {};
@@ -169,39 +169,6 @@ function CaptureSignatureAt(x, y) {
 
 	return sig;
 }
-
-var capturing = false;
-
-behaviors["Debug.CapturePixelSignature"] = function () {
-	if (!capturing) {
-		capturing = true;
-
-		var sig = CaptureSignatureAt(mouse.x, mouse.y);
-
-		var stdin = process.openStdin();
-
-		console.log('input pixel signature name: ');
-
-		function inputSignatureName(d) {
-			sig.name = d.toString().trim();
-			stdin.removeListener("data", inputSignatureName);
-
-			function readGameMode(d) {
-				sig.gameMode = parseInt(d.toString().trim());
-				stdin.removeListener("data", readGameMode);
-
-				capturing = false;
-				console.log('capture complete\n');
-				console.log(sig);
-				SignatureDetectionWorker.postMessage({cmd: 'persist', data: sig});
-			}
-
-			stdin.addListener("data", readGameMode);
-		}
-
-		stdin.addListener("data", inputSignatureName);
-	}
-};
 
 function ResolveInput(data) {
 

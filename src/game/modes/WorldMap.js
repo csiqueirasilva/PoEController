@@ -58,7 +58,7 @@ function EnterArea() {
 }
 
 function LeaveArea() {
-	ClearHeldInput(KeysOfExile, InputKeys, DPADOfExile, InputDPAD, BehaviorOfExile);
+	Input.clearHeld(KeysOfExile, InputKeys, DPADOfExile, InputDPAD, BehaviorOfExile);
 }
 
 module.exports = {
