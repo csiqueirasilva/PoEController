@@ -34,6 +34,9 @@ var inventorySignatures = null;
 function loadAllSignatureFiles () {
 	mainModesSignatures = ReadSignatureFile(Window.resolution  + "signatures.json");
 	inventorySignatures = ReadSignatureFile(Window.resolution + "inventory-signatures.json");
+	
+	Logger.info('setting signatures');
+	
 	SignatureDetectionWorker.postMessage({cmd: "load-signatures-file", data: mainModesSignatures});
 }
 
@@ -77,7 +80,7 @@ SignatureDetectionWorker.onmessage = function (event) {
 			Mode.subSection(data);
 			break;
 		case 'detect':
-			Mode.change(data);
+			ChangeModeById(data);
 			break;
 		case 'init':
 			InitGame();
@@ -173,6 +176,11 @@ function GetModeById(id) {
 function SetModeById(id) {
 	var mode = GetModeById(id);
 	Mode.set(mode);
+}
+
+function ChangeModeById(id) {
+	var mode = GetModeById(id);
+	Mode.change(mode);
 }
 
 function Init() {

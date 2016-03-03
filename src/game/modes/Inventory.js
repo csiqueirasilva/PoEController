@@ -44,7 +44,6 @@ var EquipmentIndexTable = {
 };
 
 var INVENTORY_INDEX = null;
-var SET_AREA_POSITION_CB = null;
 var ITEM_SQUARE_ICR = Window.height * 0.0479;
 
 var EquipmentGraph = [];
@@ -150,7 +149,9 @@ function ChangeIntoSubSection(mode) {
 function ChangeActiveInputArea(mode) {
 	
 	CURRENT_AREA = mode;
-	
+
+	var SET_AREA_POSITION_CB = null;
+
 	switch (CURRENT_AREA) {
 		case AreaId.BAG_AREA:
 			SET_AREA_POSITION_CB = BagArea.setPosition;
@@ -331,11 +332,33 @@ function EnterArea() {
 }
 
 function ResetInputArrays() {
-	Input.ResetInputArrays(InputKeys, InputDPAD);
+	Input.resetInputArrays(InputKeys, InputDPAD);
 }
 
-module.exports.INVENTORY_INDEX = INVENTORY_INDEX;
-module.exports.SET_AREA_POSITION_CB = SET_AREA_POSITION_CB;
+module.exports.addIndex = function(n) { 
+	INVENTORY_INDEX += n;
+};
+
+module.exports.subIndex = function(n) { 
+	INVENTORY_INDEX -= n;
+};
+
+module.exports.decIndex = function() { 
+	INVENTORY_INDEX--;
+};
+
+module.exports.icrIndex = function() { 
+	INVENTORY_INDEX++;
+};
+
+module.exports.setIndex = function(i) { 
+	INVENTORY_INDEX = i;
+};
+
+module.exports.getIndex = function() {
+	return INVENTORY_INDEX;
+};
+
 module.exports.ITEM_SQUARE_ICR = ITEM_SQUARE_ICR;
 module.exports.EQUIPMENT_INDEX_TABLE = EquipmentIndexTable;
 module.exports.AREA_ID = AreaId;
@@ -344,7 +367,6 @@ module.exports.resolveInput = ResolveInput;
 module.exports.enterArea = EnterArea;
 module.exports.leaveArea = LeaveArea;
 module.exports.subSection = ChangeIntoSubSection;
-module.exports.resetInputArrays = ResetInputArrays;
 module.exports.enterCurrentSubSection = EnterCurrentSubSection;
 module.exports.leaveCurrentSubSection = LeaveCurrentSubSection;
 module.exports.id = GAME_MODE.INVENTORY;

@@ -6,7 +6,7 @@ behaviors['ARPG.Fixed.OptionsMenu'] = function () {
 	// check if possible to open menu (eg: if esc menu is not open)
 	var color = robot.getPixelColor(parseInt(Window.width * 0.1421875), parseInt(Window.height * 0.89351851852));
 	if (color > "777777") {
-		//Mode.change(OptionsMenu);
+		Mode.change(OptionsMenu);
 	}
 };
 
@@ -31,7 +31,6 @@ var AttackInPlace = require('../behaviors/AttackInPlace');
 var MAX_INPUT_THUMBSTICK = require('../Enums').MAX_INPUT_THUMBSTICK;
 var KEYS = require('../Enums').KEYS;
 var Game = require('../Game');
-var SignatureDetectionWorker = Game.signatureDetectionWorker;
 var Enums = require('../Enums');
 var GAME_MODE = Enums.GAME_MODE;
 var OptionsMenu = require('./OptionsMenu');
@@ -202,7 +201,7 @@ function ResolveDataInput(data) {
 
 function EnterArea() {
 	robot.moveMouse(Window.basePosition.x, Window.basePosition.y);
-	SignatureDetectionWorker.postMessage({cmd: 'clear-lastsig'});
+	Game.signatureDetectionWorker.postMessage({cmd: 'clear-lastsig'});
 }
 
 function LeaveArea() {

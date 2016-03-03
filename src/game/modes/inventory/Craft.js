@@ -3,7 +3,7 @@ module.exports = {};
 var Inventory = require('../Inventory');
 var robot = require('robotjs');
 var Window = require('../../Window');
-var behaviors = require('../../Behaviors');
+var behaviors = require('../../Behaviors').functions;
 
 var globalDiffY = (-(Window.height / 1080) + 1) * 100;
 
@@ -12,42 +12,42 @@ function proxyMoveMouse(x, y) {
 }
 
 behaviors["CraftArea.Up"] = function () {
-	if (Inventory.INVENTORY_INDEX === 7 || Inventory.INVENTORY_INDEX === 8 || Inventory.INVENTORY_INDEX === 9) {
-		Inventory.INVENTORY_INDEX -= 2;
-	} else if (Inventory.INVENTORY_INDEX === 5 || Inventory.INVENTORY_INDEX === 6) {
-		Inventory.INVENTORY_INDEX = 0;
-	} else if (Inventory.INVENTORY_INDEX !== 0) {
-		Inventory.INVENTORY_INDEX--;
+	if (Inventory.getIndex() === 7 || Inventory.getIndex() === 8 || Inventory.getIndex() === 9) {
+		Inventory.subIndex(2);
+	} else if (Inventory.getIndex() === 5 || Inventory.getIndex() === 6) {
+		Inventory.setIndex(0);
+	} else if (Inventory.getIndex() !== 0) {
+		Inventory.decIndex();
 	}
 
-	Inventory.SET_AREA_POSITION_CB(Inventory.INVENTORY_INDEX);
+	SetCraftAreaPosition(Inventory.getIndex());
 };
 
 behaviors["CraftArea.Down"] = function () {
-	if (Inventory.INVENTORY_INDEX === 7 || Inventory.INVENTORY_INDEX === 8 || Inventory.INVENTORY_INDEX === 9) /* Goes to Confirm */ {
-		Inventory.INVENTORY_INDEX = 9;
-	} else if (Inventory.INVENTORY_INDEX === 5 || Inventory.INVENTORY_INDEX === 6) {
-		Inventory.INVENTORY_INDEX += 2;
+	if (Inventory.getIndex() === 7 || Inventory.getIndex() === 8 || Inventory.getIndex() === 9) /* Goes to Confirm */ {
+		Inventory.setIndex(9);
+	} else if (Inventory.getIndex() === 5 || Inventory.getIndex() === 6) {
+		Inventory.addIndex(2);
 	} else {
-		Inventory.INVENTORY_INDEX++;
+		Inventory.icrIndex();
 	}
 
-	Inventory.SET_AREA_POSITION_CB(Inventory.INVENTORY_INDEX);
+	SetCraftAreaPosition(Inventory.getIndex());
 };
 
 behaviors["CraftArea.Left"] = function () {
-	if (Inventory.INVENTORY_INDEX === 6 || Inventory.INVENTORY_INDEX === 8) {
-		Inventory.INVENTORY_INDEX--;
-		Inventory.SET_AREA_POSITION_CB(Inventory.INVENTORY_INDEX);
+	if (Inventory.getIndex() === 6 || Inventory.getIndex() === 8) {
+		Inventory.decIndex();
+		SetCraftAreaPosition(Inventory.getIndex());
 	}
 };
 
 behaviors["CraftArea.Right"] = function () {
-	if (Inventory.INVENTORY_INDEX !== 5 && Inventory.INVENTORY_INDEX !== 7) {
+	if (Inventory.getIndex() !== 5 && Inventory.getIndex() !== 7) {
 		Inventory.leaveCurrentSubSection(Inventory.AREA_ID.BAG_AREA);
 	} else {
-		Inventory.INVENTORY_INDEX++;
-		Inventory.SET_AREA_POSITION_CB(Inventory.INVENTORY_INDEX);
+		Inventory.icrIndex();
+		SetCraftAreaPosition(Inventory.getIndex());
 	}
 };
 
@@ -60,7 +60,7 @@ behaviors["CraftArea.ScrollUp"] = function () {
 	setTimeout(function () {
 		robot.mouseClick("left");
 		setTimeout(function () {
-			Inventory.SET_AREA_POSITION_CB(Inventory.INVENTORY_INDEX);
+			SetCraftAreaPosition(Inventory.getIndex());
 		}, 24);
 	}, 24);
 };
@@ -74,7 +74,7 @@ behaviors["CraftArea.ScrollDown"] = function () {
 	setTimeout(function () {
 		robot.mouseClick("left");
 		setTimeout(function () {
-			Inventory.SET_AREA_POSITION_CB(Inventory.INVENTORY_INDEX);
+			SetCraftAreaPosition(Inventory.getIndex());
 		}, 24);
 	}, 24);
 };
@@ -92,13 +92,13 @@ function SetCraftAreaPosition(Position) {
 		var basePositionX = Window.width * 0.313;
 		var basePositionY = Window.height * 0.676;
 
-		posX = basePositionX + parseInt((Inventory.INVENTORY_INDEX - 5) % 2) * Inventory.ITEM_SQUARE_ICR;
-		posY = basePositionY + parseInt((Inventory.INVENTORY_INDEX - 5) / 2) * Inventory.ITEM_SQUARE_ICR;
+		posX = basePositionX + parseInt((Inventory.getIndex() - 5) % 2) * Inventory.ITEM_SQUARE_ICR;
+		posY = basePositionY + parseInt((Inventory.getIndex() - 5) / 2) * Inventory.ITEM_SQUARE_ICR;
 	} else {
 		posX = Window.width * 0.326;
 		posY = Window.height * 0.200;
 
-		posY += Window.height * 0.083 * Inventory.INVENTORY_INDEX;
+		posY += Window.height * 0.083 * Inventory.getIndex();
 	}
 
 	proxyMoveMouse(posX, posY);

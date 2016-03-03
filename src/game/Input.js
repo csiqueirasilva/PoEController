@@ -6,6 +6,7 @@ var behaviors = require('./Behaviors').functions;
 var KeyHandler = require('./behaviors/KeyHandler');
 var FunctionLibrary = require('./FunctionLibrary');
 var MAX_INPUT_THUMBSTICK = require('./Enums').MAX_INPUT_THUMBSTICK;
+var Logger = require('./Logger');
 
 var RepeatActionInterval = 90;
 
@@ -105,12 +106,18 @@ function ActivateKey(keys, reference, behaviorReference, index, pressed, skipKey
 		}
 
 		if (reference[index] && !pressed) {
+			Logger.info("original: " + behavior);
+			Logger.info(behaviors[behavior[0]]);
+			Logger.info("key up: " + behaviorIndex);
 			reference[index] = false;
 			delete ActionRepeatTimestamps[behaviorIndex];
 			if (!skipKeyUp) {
 				ActionKeyUp(keys[index], behaviorReference);
 			}
 		} else if (!reference[index] && pressed) {
+			Logger.info("original: " + behavior);
+			Logger.info(behaviors[behavior[0]]);
+			Logger.info("key down: " + behaviorIndex);
 			reference[index] = true;
 			ActionRepeatTimestamps[behaviorIndex] = timestamp;
 			behaviors[behaviorIndex](behavior, keys[index]);

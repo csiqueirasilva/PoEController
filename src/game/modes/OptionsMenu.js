@@ -1,6 +1,6 @@
 module.exports = {};
 
-var behaviors = require('../Behaviors');
+var behaviors = require('../Behaviors').functions;
 
 behaviors["OptionsMenu.Down"] = function () {
 	CURSOR_INDEX = (CURSOR_INDEX + 1) % CURSOR_TOTAL;
@@ -38,6 +38,7 @@ var Inventory = require('./Inventory');
 var robot = require('robotjs');
 var Window = require('../Window');
 var Input = require('../Input');
+var Logger = require('../Logger');
 
 var KeysOfExile = {};
 

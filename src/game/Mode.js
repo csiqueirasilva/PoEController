@@ -1,3 +1,7 @@
+var Logger = require('./Logger');
+var FunctionLibrary = require('./FunctionLibrary');
+var GAME_MODE = require('./Enums').GAME_MODE;
+
 var CurrentMode = null;
 
 function SubSection(mode) {
@@ -24,6 +28,8 @@ function IsBlockedGameMode() {
 
 function ChangeGameMode(NewGameMode) {
 
+	Logger.info('changing game mode to ' + FunctionLibrary.indexOf(GAME_MODE, NewGameMode.id));
+
 	var oldGameMode = CurrentMode;
 
 	if (oldGameMode !== NewGameMode) {
@@ -38,7 +44,7 @@ function ChangeGameMode(NewGameMode) {
 			CurrentMode.enterArea();
 		}
 
-		window.updateGameOverlay(CurrentMode.id);
+		//window.updateGameOverlay(CurrentMode.id);
 	}
 }
 

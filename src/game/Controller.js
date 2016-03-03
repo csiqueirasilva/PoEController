@@ -50,6 +50,8 @@ Indexes
 
 var Window = require('./Window');
 
+var Logger = require('./Logger');
+
 var HID = require ('node-hid');
 
 var VID = 0x45E; // Microsoft
@@ -63,7 +65,7 @@ for(var i = 0; i < PID.length && HIDController === null; i++) {
 	try {
 		HIDController = new HID.HID(VID, PID[i]);
 	} catch (e) {
-		console.log(e);
+		Logger.warn(e);
 	}
 }
 

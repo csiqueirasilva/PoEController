@@ -2,42 +2,42 @@ module.exports = {};
 
 var Inventory = require('../Inventory');
 var robot = require('robotjs');
-var behaviors = require('../../Behaviors');
+var behaviors = require('../../Behaviors').functions;
 var Window = require('../../Window');
 
 behaviors["BagArea.Up"] = function () {
-	if (Inventory.INVENTORY_INDEX < 12) /* Change Area, Flasks */ {
+	if (Inventory.getIndex() < 12) /* Change Area, Flasks */ {
 		Inventory.leaveCurrentSubSection(Inventory.AREA_ID.FLASKS_AREA);
 	} else {
-		Inventory.INVENTORY_INDEX -= 12;
-		Inventory.SET_AREA_POSITION_CB(Inventory.INVENTORY_INDEX);
+		Inventory.subIndex(12);
+		SetBagAreaPosition(Inventory.getIndex());
 	}
 };
 
 behaviors["BagArea.Down"] = function () {
-	if (Inventory.INVENTORY_INDEX >= 48) /* Change Area, Gems */ {
+	if (Inventory.getIndex() >= 48) /* Change Area, Gems */ {
 
 	} else {
-		Inventory.INVENTORY_INDEX += 12;
-		Inventory.SET_AREA_POSITION_CB(Inventory.INVENTORY_INDEX);
+		Inventory.addIndex(12);
+		SetBagAreaPosition(Inventory.getIndex());
 	}
 };
 
 behaviors["BagArea.Left"] = function () {
-	if (Inventory.INVENTORY_INDEX % 12 === 0) /* Change to SubSection, if open */ {
+	if (Inventory.getIndex() % 12 === 0) /* Change to SubSection, if open */ {
 		Inventory.enterCurrentSubSection();
 	} else {
-		Inventory.INVENTORY_INDEX--;
-		Inventory.SET_AREA_POSITION_CB(Inventory.INVENTORY_INDEX);
+		Inventory.decIndex();
+		SetBagAreaPosition(Inventory.getIndex());
 	}
 };
 
 behaviors["BagArea.Right"] = function () {
-	if ((Inventory.INVENTORY_INDEX + 1) % 12 === 0) /* Does nothing (?) */ {
+	if ((Inventory.getIndex() + 1) % 12 === 0) /* Does nothing (?) */ {
 
 	} else {
-		Inventory.INVENTORY_INDEX++;
-		Inventory.SET_AREA_POSITION_CB(Inventory.INVENTORY_INDEX);
+		Inventory.icrIndex();
+		SetBagAreaPosition(Inventory.getIndex());
 	}
 };
 
@@ -46,14 +46,14 @@ behaviors["BagArea.CenterClick"] = function () {
 	setTimeout(function () {
 		robot.mouseClick("left");
 		setTimeout(function () {
-			Inventory.SET_AREA_POSITION_CB(Inventory.INVENTORY_INDEX);
+			SetBagAreaPosition(Inventory.getIndex());
 		}, 24);
 	}, 24);
 };
 
 function SetBagAreaPosition(Position) {
-	var positionX = (Inventory.INVENTORY_INDEX % 12);
-	var positionY = parseInt(Inventory.INVENTORY_INDEX / 12);
+	var positionX = (Inventory.getIndex() % 12);
+	var positionY = parseInt(Inventory.getIndex() / 12);
 
 	var basePositionX = Window.width * 0.685;
 	var basePositionY = Window.height * 0.58;

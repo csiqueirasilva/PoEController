@@ -3,41 +3,41 @@ module.exports = {};
 var Inventory = require('../Inventory');
 var Window = require('../../Window');
 var robot = require('robotjs');
-var behaviors = require('../../Behaviors');
+var behaviors = require('../../Behaviors').functions;
 
 behaviors["RewardsArea.Up"] = function () {
-	if (Inventory.INVENTORY_INDEX >= 10) {
-		Inventory.INVENTORY_INDEX -= 10;
-		Inventory.SET_AREA_POSITION_CB(Inventory.INVENTORY_INDEX);
+	if (Inventory.getIndex() >= 10) {
+		Inventory.subIndex(10);
+		SetRewardAreaPosition(Inventory.getIndex());
 	}
 };
 
 behaviors["RewardsArea.Down"] = function () {
-	if (Inventory.INVENTORY_INDEX < 50) {
-		Inventory.INVENTORY_INDEX += 10;
-		Inventory.SET_AREA_POSITION_CB(Inventory.INVENTORY_INDEX);
+	if (Inventory.getIndex() < 50) {
+		Inventory.addIndex(10);
+		SetRewardAreaPosition(Inventory.getIndex());
 	}
 };
 
 behaviors["RewardsArea.Left"] = function () {
-	if (Inventory.INVENTORY_INDEX % 10 !== 0) {
-		Inventory.INVENTORY_INDEX--;
-		Inventory.SET_AREA_POSITION_CB(Inventory.INVENTORY_INDEX);
+	if (Inventory.getIndex() % 10 !== 0) {
+		Inventory.decIndex();
+		SetRewardAreaPosition(Inventory.getIndex());
 	}
 };
 
 behaviors["RewardsArea.Right"] = function () {
-	if ((Inventory.INVENTORY_INDEX + 1) % 10 === 0) /* Goes Back to BagArea */ {
+	if ((Inventory.getIndex() + 1) % 10 === 0) /* Goes Back to BagArea */ {
 		Inventory.leaveCurrentSubSection(Inventory.AREA_ID.BAG_AREA);
 	} else {
-		Inventory.INVENTORY_INDEX++;
-		Inventory.SET_AREA_POSITION_CB(Inventory.INVENTORY_INDEX);
+		Inventory.icrIndex();
+		SetRewardAreaPosition(Inventory.getIndex());
 	}
 };
 
 function SetRewardAreaPosition(Position) {
-	var positionX = (Inventory.INVENTORY_INDEX % 10);
-	var positionY = parseInt(Inventory.INVENTORY_INDEX / 10);
+	var positionX = (Inventory.getIndex() % 10);
+	var positionY = parseInt(Inventory.getIndex() / 10);
 
 	var basePositionX = Window.width * 0.202;
 	var basePositionY = Window.height * 0.3426;

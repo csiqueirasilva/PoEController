@@ -5,8 +5,8 @@ var Window = require('../../Window');
 var robot = require('robotjs');
 
 function SetDivinationCardAreaPosition(Position) {
-	var positionX = (Inventory.INVENTORY_INDEX % 10);
-	var positionY = parseInt(Inventory.INVENTORY_INDEX / 10);
+	var positionX = (Inventory.getIndex() % 10);
+	var positionY = parseInt(Inventory.getIndex() / 10);
 
 	var basePositionX = Window.width * 0.33;
 	var basePositionY = Window.height * 0.33;

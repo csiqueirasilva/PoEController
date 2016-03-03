@@ -3,7 +3,7 @@ module.exports = {};
 var Inventory = require('../Inventory');
 var Window = require('../../Window');
 var robot = require('robotjs');
-var behaviors = require('../../Behaviors');
+var behaviors = require('../../Behaviors').functions;
 
 behaviors["StashArea.Back"] = function () {
 	var posX = Window.width * 0.013;
@@ -14,7 +14,7 @@ behaviors["StashArea.Back"] = function () {
 	setTimeout(function () {
 		robot.mouseClick("left");
 		setTimeout(function () {
-			Inventory.SET_AREA_POSITION_CB(Inventory.INVENTORY_INDEX);
+			SetStashAreaPosition(Inventory.getIndex());
 		}, 24);
 	}, 24);
 
@@ -29,7 +29,7 @@ behaviors["StashArea.Forward"] = function () {
 	setTimeout(function () {
 		robot.mouseClick("left");
 		setTimeout(function () {
-			Inventory.SET_AREA_POSITION_CB(Inventory.INVENTORY_INDEX);
+			SetStashAreaPosition(Inventory.getIndex());
 		}, 24);
 	}, 24);
 };
@@ -44,45 +44,45 @@ behaviors["StashArea.SelectTab"] = function () {
 	setTimeout(function () {
 		robot.mouseClick("left");
 		setTimeout(function () {
-			Inventory.SET_AREA_POSITION_CB(Inventory.INVENTORY_INDEX);
+			SetStashAreaPosition(Inventory.getIndex());
 		}, 24);
 	}, 24);
 
 };
 
 behaviors["StashArea.Up"] = function () {
-	if (Inventory.INVENTORY_INDEX >= 12) {
-		Inventory.INVENTORY_INDEX -= 12;
-		Inventory.SET_AREA_POSITION_CB(Inventory.INVENTORY_INDEX);
+	if (Inventory.getIndex() >= 12) {
+		Inventory.subIndex(12);
+		SetStashAreaPosition(Inventory.getIndex());
 	}
 };
 
 behaviors["StashArea.Down"] = function () {
-	if (Inventory.INVENTORY_INDEX < 132) /* Change Area, Gems */ {
-		Inventory.INVENTORY_INDEX += 12;
-		Inventory.SET_AREA_POSITION_CB(Inventory.INVENTORY_INDEX);
+	if (Inventory.getIndex() < 132) /* Change Area, Gems */ {
+		Inventory.addIndex(12);
+		SetStashAreaPosition(Inventory.getIndex());
 	}
 };
 
 behaviors["StashArea.Left"] = function () {
-	if (Inventory.INVENTORY_INDEX % 12 !== 0) {
-		Inventory.INVENTORY_INDEX--;
-		Inventory.SET_AREA_POSITION_CB(Inventory.INVENTORY_INDEX);
+	if (Inventory.getIndex() % 12 !== 0) {
+		Inventory.decIndex();
+		SetStashAreaPosition(Inventory.getIndex());
 	}
 };
 
 behaviors["StashArea.Right"] = function () {
-	if ((Inventory.INVENTORY_INDEX + 1) % 12 === 0) {
+	if ((Inventory.getIndex() + 1) % 12 === 0) {
 		Inventory.leaveCurrentSubSection(Inventory.AREA_ID.BAG_AREA);
 	} else {
-		Inventory.INVENTORY_INDEX++;
-		Inventory.SET_AREA_POSITION_CB(Inventory.INVENTORY_INDEX);
+		Inventory.icrIndex();
+		SetStashAreaPosition(Inventory.getIndex());
 	}
 };
 
 function SetStashAreaPosition(Position) {
-	var positionX = (Inventory.INVENTORY_INDEX % 12);
-	var positionY = parseInt(Inventory.INVENTORY_INDEX / 12);
+	var positionX = (Inventory.getIndex() % 12);
+	var positionY = parseInt(Inventory.getIndex() / 12);
 
 	var basePositionX = Window.width * 0.032;
 	var basePositionY = Window.height * 0.190;

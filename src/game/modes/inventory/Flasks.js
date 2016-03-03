@@ -3,7 +3,7 @@ module.exports = {};
 var Inventory = require('../Inventory');
 var Window = require('../../Window');
 var robot = require('robotjs');
-var behaviors = require('../../Behaviors');
+var behaviors = require('../../Behaviors').functions;
 
 behaviors["FlasksArea.Up"] = function () {
 	/* Change Area, Equipment */
@@ -15,23 +15,23 @@ behaviors["FlasksArea.Down"] = function () {
 };
 
 behaviors["FlasksArea.Left"] = function () {
-	if (Inventory.INVENTORY_INDEX === 0) /* Change to SubSection, if open */ {
-		EnterCurrentSubSection();
+	if (Inventory.getIndex() === 0) /* Change to SubSection, if open */ {
+		Inventory.enterCurrentSubSection();
 	} else {
-		Inventory.INVENTORY_INDEX--;
-		Inventory.SET_AREA_POSITION_CB(Inventory.INVENTORY_INDEX);
+		Inventory.decIndex();
+		SetFlasksAreaPosition(Inventory.getIndex());
 	}
 };
 
 behaviors["FlasksArea.Right"] = function () {
-	if (Inventory.INVENTORY_INDEX < 4) {
-		Inventory.INVENTORY_INDEX++;
-		Inventory.SET_AREA_POSITION_CB(Inventory.INVENTORY_INDEX);
+	if (Inventory.getIndex() < 4) {
+		Inventory.icrIndex();
+		SetFlasksAreaPosition(Inventory.getIndex());
 	}
 };
 
 function SetFlasksAreaPosition(Position) {
-	var positionX = Inventory.INVENTORY_INDEX;
+	var positionX = Inventory.getIndex();
 
 	var basePositionX = Window.width * 0.775;
 	var basePositionY = Window.height * 0.478;

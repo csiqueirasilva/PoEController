@@ -1,6 +1,6 @@
 module.exports = {};
 
-var behaviors = require('../Behaviors');
+var behaviors = require('../Behaviors').functions;
 
 behaviors['PassiveSkillTree.ScrollDown'] = function () {};
 
