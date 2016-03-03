@@ -28,11 +28,11 @@ function IsBlockedGameMode() {
 
 function ChangeGameMode(NewGameMode) {
 
-	Logger.info('changing game mode to ' + FunctionLibrary.indexOf(GAME_MODE, NewGameMode.id));
-
 	var oldGameMode = CurrentMode;
 
-	if (oldGameMode !== NewGameMode) {
+	if (oldGameMode.id !== NewGameMode.id) {
+
+		Logger.info('changing game mode to ' + FunctionLibrary.indexOf(GAME_MODE, NewGameMode.id));
 
 		if (typeof CurrentMode.leaveArea === "function") {
 			CurrentMode.leaveArea();

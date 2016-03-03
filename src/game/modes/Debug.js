@@ -38,7 +38,7 @@ behaviors["Debug.DetectPixelSignature"] = function () {
 			name = FunctionLibrary.indexOf(GAME_MODE, nextMode);
 			console.log('open ' + name + ' screen');
 		} else /* Go to another group */ {
-			Game.signatureDetectionWorker.postMessage({cmd: 'persist', data: {sigs: LastCapturedSignatures, filename: Window.width + 'x' + Window.height + group.filename}});
+			SignatureDetection.persist(Window.width + 'x' + Window.height + group.filename, LastCapturedSignatures);
 
 			LastCapturedSignatures = [];
 			SIGNATURE_CAPTURE_STATE.mode = 0;
@@ -73,7 +73,7 @@ var robot = require('robotjs');
 var Window = require('../Window');
 var Input = require('../Input');
 var FunctionLibrary = require('../FunctionLibrary');
-var Game = require('../Game');
+var SignatureDetection = require('../SignatureDetection');
 
 var InputKeys = {};
 

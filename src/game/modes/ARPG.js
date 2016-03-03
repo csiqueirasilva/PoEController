@@ -30,7 +30,7 @@ var Movement = require('../behaviors/Movement');
 var AttackInPlace = require('../behaviors/AttackInPlace');
 var MAX_INPUT_THUMBSTICK = require('../Enums').MAX_INPUT_THUMBSTICK;
 var KEYS = require('../Enums').KEYS;
-var Game = require('../Game');
+var SignatureDetection = require('../SignatureDetection');
 var Enums = require('../Enums');
 var GAME_MODE = Enums.GAME_MODE;
 var OptionsMenu = require('./OptionsMenu');
@@ -200,7 +200,7 @@ function ResolveDataInput(data) {
 }
 
 function EnterArea() {
-	Game.signatureDetectionWorker.postMessage({cmd: 'clear-lastsig'});
+	SignatureDetection.clearLastSig();
 	robot.moveMouse(Window.basePosition.x, Window.basePosition.y);
 }
 

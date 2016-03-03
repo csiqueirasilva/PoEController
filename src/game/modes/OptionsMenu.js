@@ -93,6 +93,9 @@ function ResolveInput(data) {
 var blockInputs = true;
 
 function EnterArea() {
+	
+	Logger.info('entering menu');
+	
 	robot.moveMouse(CURSOR_X_INITIAL, CURSOR_Y_INITIAL);
 
 	setTimeout(function () {
@@ -108,11 +111,11 @@ function EnterArea() {
 
 			setTimeout(function () {
 				blockInputs = false;
-			}, 50);
+			}, 100);
 
-		}, 50);
+		}, 100);
 
-	}, 50);
+	}, 120);
 }
 
 function LeaveArea() {

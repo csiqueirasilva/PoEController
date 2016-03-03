@@ -24,73 +24,8 @@ var Enums = require('./Enums');
 var GAME_MODE = Enums.GAME_MODE;
 var Controller = require('./Controller');
 
-var SignatureDetectionWorker = new Worker('src/game/SignatureDetectionWorker.js');
+var SignatureDetection = require('./SignatureDetection');
 
-var DETECTION_INTERVAL_MS = 2000;
-
-var mainModesSignatures = null;
-var inventorySignatures = null;
-
-function loadAllSignatureFiles () {
-	mainModesSignatures = ReadSignatureFile(Window.resolution  + "signatures.json");
-	inventorySignatures = ReadSignatureFile(Window.resolution + "inventory-signatures.json");
-	
-	Logger.info('setting signatures');
-	
-	SignatureDetectionWorker.postMessage({cmd: "load-signatures-file", data: mainModesSignatures});
-}
-
-function ReadSignatureFile(filename) {
-
-	var ret = null;
-	
-	var filepath = "signatures/" + (filename || "signatures.json");
-	
-	try {
-		ret = fs.readFileSync(filepath, 'utf8');
-		ret = JSON.parse(ret);
-		Logger.info('Read signature file ' + filepath + ' from disk');
-	} catch (e) {
-		SignatureNotFound(filepath);
-	}
-
-	return ret;
-}
-
-function SignatureNotFound(filename) {
-
-	if (!DEBUG_MODE) {
-		Window.quit('Signature file ' + filename + ' not found. Could not start the application.');
-	} else {
-		Logger.warn('Signature file ' + filename + ' not found.');
-	}
-
-}
-
-SignatureDetectionWorker.onmessage = function (event) {
-	var cmd = event.data.cmd;
-	var data = event.data.data;
-
-	Logger.info('message received');
-	Logger.info(cmd);
-	Logger.info(data);
-
-	switch (cmd) {
-		case 'detect-sub':
-			Mode.subSection(data);
-			break;
-		case 'detect':
-			ChangeModeById(data);
-			break;
-		case 'init':
-			InitGame();
-			break;
-		case 'signature-not-found':
-			SignatureNotFound(data);
-	}
-};
-
-var DetectPollingInterval = null;
 var RightThumbstickMouseInterval = null;
 
 function PollGamepadEvents() {
@@ -104,26 +39,6 @@ function PollGamepadEvents() {
 	}, Enums.GLOBAL_INTERVAL);
 }
 
-function InitGame() {
-	DetectPollingInterval = setInterval(function () {
-		SignatureDetectionWorker.postMessage({cmd: 'detect', data: {CURRENT_GAME_MODE: Mode.getCurrent(), isBlockedGameMode: Mode.isBlocked()}});
-	}, DETECTION_INTERVAL_MS);
-
-	PollGamepadEvents();
-
-	exec("start steam://rungameid/238960", function (error, stdout, stderr) {
-		console.log(stdout);
-
-		if (error) {
-			return console.error(stderr);
-		}
-	});
-
-	if (typeof cbInitGame === "function") {
-		cbInitGame();
-	}
-}
-
 var LastInputData = null;
 
 function ControllerListener(data) {
@@ -134,23 +49,39 @@ var cbInitGame = null;
 
 function StartControllerListener(callbackInitGame) {
 	Controller.addDataListener(ControllerListener);
-	cbInitGame = callbackInitGame;
+
 	if (!DEBUG_MODE) {
-		SignatureDetectionWorker.postMessage({cmd: 'init', data: {defaultGameMode: GAME_MODE.ARPG}});
+		SignatureDetection.init(GAME_MODE.ARPG);
+		
+		SignatureDetection.startDetection();
+
+		PollGamepadEvents();
+
+		exec("start steam://rungameid/238960", function (error, stdout, stderr) {
+			console.log(stdout);
+
+			if (error) {
+				return console.error(stderr);
+			}
+		});
+
+		if (typeof callbackInitGame === "function") {
+			callbackInitGame();
+		}
 	}
 }
 
 function RemoveControllerListener() {
 	Controller.removeDataListener(ControllerListener);
-	clearInterval(DetectPollingInterval);
+	SignatureDetection.stopDetection();
 	clearInterval(RightThumbstickMouseInterval);
-	DetectPollingInterval = null;
 	RightThumbstickMouseInterval = null;
 	LastInputData = null;
 }
 
 function GetModeById(id) {
 	var mode = null;
+	
 	switch (id) {
 		case GAME_MODE.DEBUG:
 			mode = GameModeDebug;
@@ -194,10 +125,7 @@ function Init() {
 	}
 }
 
-module.exports.DETECTION_INTERVAL_MS = DETECTION_INTERVAL_MS;
 module.exports.init = Init;
-module.exports.loadSignatures = loadAllSignatureFiles;
-module.exports.inventorySignatures = inventorySignatures;
-module.exports.signatureDetectionWorker = SignatureDetectionWorker;
 module.exports.start = StartControllerListener;
 module.exports.finish = RemoveControllerListener;
+module.exports.changeById = ChangeModeById;

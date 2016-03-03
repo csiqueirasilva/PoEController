@@ -11,10 +11,9 @@ var Stash = require('../modes/inventory/Stash');
 var Enums = require('../Enums');
 var KEYS = Enums.KEYS;
 var GAME_MODE = Enums.GAME_MODE;
-var Game = require('../Game');
+var SignatureDetection = require('../SignatureDetection');
 var Window = require('../Window');
 var Input = require('../Input');
-var SubSectionSignatures = Game.inventorySignatures;
 
 var AreaId = {
 	FLASKS_AREA: 0,
@@ -311,12 +310,12 @@ function ResolveInput(data) {
 	Input.dpad(data[11], DPADOfExile[CURRENT_AREA], InputDPAD, BehaviorOfExile, true);
 }
 
-var SubSectionDetectionInterval = null;
+
 
 function LeaveArea() {
-	Game.signatureDetectionWorker.postMessage({cmd: 'set-subsigs', data: null});
-	clearInterval(SubSectionDetectionInterval);
-	SubSectionDetectionInterval = null;
+	
+	SignatureDetection.stopSubSigDetection();
+	
 	CurrentSubSection = null;
 }
 
@@ -324,10 +323,9 @@ function EnterArea() {
 	//console.log('enter area');
 	//robot.mouseToggle("up");
 	//console.log('set subsigs');
-	Game.signatureDetectionWorker.postMessage({cmd: 'set-subsigs', data: SubSectionSignatures});
-	SubSectionDetectionInterval = setInterval(function () {
-		Game.signatureDetectionWorker.postMessage({cmd: 'detect-sub'});
-	}, Game.DETECTION_INTERVAL_MS);
+	
+	SignatureDetection.startSubSigDetection(GAME_MODE.INVENTORY);
+	
 	ChangeActiveInputArea(AreaId.BAG_AREA);
 }
 

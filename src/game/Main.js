@@ -5,7 +5,7 @@ var Window = require('./Window');
 Logger.info('using screen resolution: ' + Window.resolution);
 
 var Game = require('./Game');
+var SignatureDetection = require('./SignatureDetection');
 
-Game.loadSignatures();
-
+SignatureDetection.loadSignatures();
 Game.init();
