@@ -26,7 +26,7 @@ var Controller = require('./Controller');
 
 var SignatureDetectionWorker = new Worker('src/game/SignatureDetectionWorker.js');
 
-var DETECTION_INTERVAL_MS = 750;
+var DETECTION_INTERVAL_MS = 2000;
 
 var mainModesSignatures = null;
 var inventorySignatures = null;

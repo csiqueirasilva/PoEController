@@ -40,7 +40,7 @@ function ChangeGameMode(NewGameMode) {
 
 		CurrentMode = NewGameMode;
 
-		if (oldGameMode !== NewGameMode && typeof CurrentMode.enterArea === "function") {
+		if (typeof CurrentMode.enterArea === "function") {
 			CurrentMode.enterArea();
 		}
 

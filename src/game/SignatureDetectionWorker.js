@@ -90,12 +90,10 @@ self.onmessage = function(event) {
 					if(ret !== null) {
 						IsDefaultMode = false;
 						self.postMessage({cmd: 'detect', data: ret.gameMode});
-						console.log(ret.name);
 					}
 				} else if (!IsDefaultMode && LastDetectedSig === null) {
 					IsDefaultMode = true;
 					self.postMessage({cmd: 'detect', data: DEFAULT_GAME_MODE});
-					console.log('Signature not detected. Going into default game mode.');
 				}
 			}
 

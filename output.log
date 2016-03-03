@@ -1,37 +1,55 @@
-2016-03-03T03:41:29.981Z - warn:  Error: cannot open device with vendor id 0x45e and product id 0x28e
-    at Error (native)
-    at new HID (C:\Users\csiqueira\Documents\NetBeansProjects\PoEController\node_modules\node-hid\nodehid.js:28:14)
-    at Object.<anonymous> (C:\Users\csiqueira\Documents\NetBeansProjects\PoEController\src\game\Controller.js:66:19)
-    at Module._compile (module.js:451:26)
-    at Object.Module._extensions..js (module.js:469:10)
-    at Module.load (module.js:346:32)
-    at Function.Module._load (module.js:301:12)
-    at Module.require (module.js:356:17)
-    at require (module.js:375:17)
-    at Object.<anonymous> (C:\Users\csiqueira\Documents\NetBeansProjects\PoEController\src\game\Main.js:2:18)
-2016-03-03T03:41:29.985Z - warn:  Error: cannot open device with vendor id 0x45e and product id 0x28f
-    at Error (native)
-    at new HID (C:\Users\csiqueira\Documents\NetBeansProjects\PoEController\node_modules\node-hid\nodehid.js:28:14)
-    at Object.<anonymous> (C:\Users\csiqueira\Documents\NetBeansProjects\PoEController\src\game\Controller.js:66:19)
-    at Module._compile (module.js:451:26)
-    at Object.Module._extensions..js (module.js:469:10)
-    at Module.load (module.js:346:32)
-    at Function.Module._load (module.js:301:12)
-    at Module.require (module.js:356:17)
-    at require (module.js:375:17)
-    at Object.<anonymous> (C:\Users\csiqueira\Documents\NetBeansProjects\PoEController\src\game\Main.js:2:18)
-2016-03-03T03:41:29.987Z - warn:  Error: cannot open device with vendor id 0x45e and product id 0x2d1
-    at Error (native)
-    at new HID (C:\Users\csiqueira\Documents\NetBeansProjects\PoEController\node_modules\node-hid\nodehid.js:28:14)
-    at Object.<anonymous> (C:\Users\csiqueira\Documents\NetBeansProjects\PoEController\src\game\Controller.js:66:19)
-    at Module._compile (module.js:451:26)
-    at Object.Module._extensions..js (module.js:469:10)
-    at Module.load (module.js:346:32)
-    at Function.Module._load (module.js:301:12)
-    at Module.require (module.js:356:17)
-    at require (module.js:375:17)
-    at Object.<anonymous> (C:\Users\csiqueira\Documents\NetBeansProjects\PoEController\src\game\Main.js:2:18)
-2016-03-03T03:41:30.302Z - info: using screen resolution: 1920x1080
-2016-03-03T03:41:30.659Z - info: Read signature file signatures/1920x1080signatures.json from disk
-2016-03-03T03:41:30.659Z - info: Read signature file signatures/1920x1080inventory-signatures.json from disk
-2016-03-03T03:41:30.659Z - info: setting signatures
+2016-03-03T04:22:33.626Z - info: using screen resolution: 1920x1080
+2016-03-03T04:22:33.979Z - info: Read signature file signatures/1920x1080signatures.json from disk
+2016-03-03T04:22:33.979Z - info: Read signature file signatures/1920x1080inventory-signatures.json from disk
+2016-03-03T04:22:33.979Z - info: setting signatures
+2016-03-03T04:22:35.930Z - info: message received
+2016-03-03T04:22:35.931Z - info: init
+2016-03-03T04:22:35.931Z - info: undefined
+2016-03-03T04:22:42.285Z - info: message received
+2016-03-03T04:22:42.285Z - info: detect
+2016-03-03T04:22:42.285Z - info: 1002
+2016-03-03T04:22:42.285Z - info: changing game mode to INVENTORY
+2016-03-03T04:23:02.321Z - info: changing game mode to ARPG
+2016-03-03T04:23:19.467Z - info: changing game mode to OPTIONS_MENU
+2016-03-03T04:23:20.524Z - info: changing game mode to INVENTORY
+2016-03-03T04:23:22.325Z - info: changing game mode to ARPG
+2016-03-03T04:23:28.783Z - info: changing game mode to OPTIONS_MENU
+2016-03-03T04:23:29.907Z - info: changing game mode to PASSIVE_SKILL_TREE
+2016-03-03T04:24:11.673Z - info: changing game mode to ARPG
+2016-03-03T04:24:13.081Z - info: changing game mode to OPTIONS_MENU
+2016-03-03T04:24:14.161Z - info: changing game mode to ARPG
+2016-03-03T04:24:14.564Z - info: changing game mode to OPTIONS_MENU
+2016-03-03T04:24:15.788Z - info: changing game mode to PASSIVE_SKILL_TREE
+2016-03-03T04:24:16.697Z - info: changing game mode to ARPG
+2016-03-03T04:24:17.214Z - info: changing game mode to OPTIONS_MENU
+2016-03-03T04:24:18.386Z - info: changing game mode to ARPG
+2016-03-03T04:24:19.314Z - info: changing game mode to OPTIONS_MENU
+2016-03-03T04:24:20.101Z - info: changing game mode to ARPG
+2016-03-03T04:24:29.180Z - info: changing game mode to OPTIONS_MENU
+2016-03-03T04:24:30.733Z - info: changing game mode to INVENTORY
+2016-03-03T04:24:32.142Z - info: changing game mode to ARPG
+2016-03-03T04:24:34.965Z - info: changing game mode to OPTIONS_MENU
+2016-03-03T04:24:35.622Z - info: changing game mode to INVENTORY
+2016-03-03T04:24:36.576Z - info: changing game mode to ARPG
+2016-03-03T04:24:37.865Z - info: changing game mode to OPTIONS_MENU
+2016-03-03T04:24:38.752Z - info: changing game mode to INVENTORY
+2016-03-03T04:24:39.547Z - info: changing game mode to ARPG
+2016-03-03T04:24:40.115Z - info: changing game mode to OPTIONS_MENU
+2016-03-03T04:24:40.923Z - info: changing game mode to INVENTORY
+2016-03-03T04:24:41.597Z - info: changing game mode to ARPG
+2016-03-03T04:24:42.798Z - info: changing game mode to OPTIONS_MENU
+2016-03-03T04:24:43.903Z - info: changing game mode to PASSIVE_SKILL_TREE
+2016-03-03T04:24:44.524Z - info: changing game mode to ARPG
+2016-03-03T04:24:45.531Z - info: changing game mode to OPTIONS_MENU
+2016-03-03T04:24:47.543Z - info: changing game mode to ARPG
+2016-03-03T04:24:48.581Z - info: changing game mode to OPTIONS_MENU
+2016-03-03T04:24:50.628Z - info: changing game mode to ARPG
+2016-03-03T04:24:53.097Z - info: changing game mode to OPTIONS_MENU
+2016-03-03T04:24:54.356Z - info: changing game mode to ARPG
+2016-03-03T04:24:55.098Z - info: changing game mode to OPTIONS_MENU
+2016-03-03T04:24:56.845Z - info: changing game mode to PASSIVE_SKILL_TREE
+2016-03-03T04:24:58.283Z - info: changing game mode to ARPG
+2016-03-03T04:25:40.346Z - info: changing game mode to OPTIONS_MENU
+2016-03-03T04:25:41.863Z - info: changing game mode to INVENTORY
+2016-03-03T04:25:43.914Z - info: changing game mode to ARPG
+2016-03-03T04:27:13.894Z - info: changing game mode to OPTIONS_MENU

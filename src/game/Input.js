@@ -106,25 +106,19 @@ function ActivateKey(keys, reference, behaviorReference, index, pressed, skipKey
 		}
 
 		if (reference[index] && !pressed) {
-			Logger.info("original: " + behavior);
-			Logger.info(behaviors[behavior[0]]);
-			Logger.info("key up: " + behaviorIndex);
 			reference[index] = false;
 			delete ActionRepeatTimestamps[behaviorIndex];
 			if (!skipKeyUp) {
 				ActionKeyUp(keys[index], behaviorReference);
 			}
 		} else if (!reference[index] && pressed) {
-			Logger.info("original: " + behavior);
-			Logger.info(behaviors[behavior[0]]);
-			Logger.info("key down: " + behaviorIndex);
 			reference[index] = true;
 			ActionRepeatTimestamps[behaviorIndex] = timestamp;
 			behaviors[behaviorIndex](behavior, keys[index]);
 		} else if (behaviorIndex.charAt(0) === behaviorIndex.charAt(0).toUpperCase()) /* Repeatable Action */ {
 			if (ActionRepeatTimestamps[behaviorIndex] && (timestamp - ActionRepeatTimestamps[behaviorIndex]) > RepeatActionInterval) {
 				ActionRepeatTimestamps[behaviorIndex] = timestamp;
-				//console.log(behaviorIndex);
+				//Logger.info('repeating ' + behaviorIndex);
 				behaviors[behaviorIndex](behavior, keys[index]);
 			}
 		}

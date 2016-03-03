@@ -200,8 +200,8 @@ function ResolveDataInput(data) {
 }
 
 function EnterArea() {
-	robot.moveMouse(Window.basePosition.x, Window.basePosition.y);
 	Game.signatureDetectionWorker.postMessage({cmd: 'clear-lastsig'});
+	robot.moveMouse(Window.basePosition.x, Window.basePosition.y);
 }
 
 function LeaveArea() {
