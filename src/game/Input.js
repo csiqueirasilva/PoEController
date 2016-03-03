@@ -1,3 +1,5 @@
+module.exports = {};
+
 var robot = require('robotjs');
 var KEYS = require('./Enums').KEYS;
 var behaviors = require('./Behaviors').functions;
@@ -176,12 +178,10 @@ function RightThumbstickMouse(data) {
 		RightThumbElseCallback);
 }
 
-module.exports = {
-	activateKey: ActivateKey,
-	resetInputArrays: ResetInputArrays,
-	leftThumbstickMouse: LeftThumbstickMouse,
-	clearHeld: ClearHeldInput,
-	rightThumbstick: RightThumbstickMouse,
-	moveStick: MoveThumbstick,
-	dpad: ResolveDpadInput
-};
+module.exports.activateKey = ActivateKey;
+module.exports.resetInputArrays = ResetInputArrays;
+module.exports.leftThumbstickMouse = LeftThumbstickMouse;
+module.exports.clearHeld = ClearHeldInput;
+module.exports.rightThumbstick = RightThumbstickMouse;
+module.exports.moveStick = MoveThumbstick;
+module.exports.dpad = ResolveDpadInput;

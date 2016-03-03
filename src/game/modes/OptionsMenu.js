@@ -1,3 +1,5 @@
+module.exports = {};
+
 var behaviors = require('../Behaviors');
 
 behaviors["OptionsMenu.Down"] = function () {
@@ -119,9 +121,7 @@ function LeaveArea() {
 	blockInputs = true;
 }
 
-module.exports = {
-	resolveInput: ResolveInput,
-	enterArea: EnterArea,
-	leaveArea: LeaveArea,
-	id: GAME_MODE.OPTIONS_MENU
-};
+module.exports.resolveInput = ResolveInput;
+module.exports.enterArea = EnterArea;
+module.exports.leaveArea = LeaveArea;
+module.exports.id = GAME_MODE.OPTIONS_MENU;

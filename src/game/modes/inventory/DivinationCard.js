@@ -1,3 +1,5 @@
+module.exports = {};
+
 var Inventory = require('../Inventory');
 var Window = require('../../Window');
 var robot = require('robotjs');
@@ -12,6 +14,4 @@ function SetDivinationCardAreaPosition(Position) {
 	robot.moveMouse(basePositionX + positionX * Inventory.ITEM_SQUARE_ICR, basePositionY + positionY * Inventory.ITEM_SQUARE_ICR);
 }
 
-module.exports = {
-	setPosition: SetDivinationCardAreaPosition
-};
+module.exports.setPosition = SetDivinationCardAreaPosition;

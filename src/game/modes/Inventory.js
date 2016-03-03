@@ -1,3 +1,5 @@
+module.exports = {};
+
 var BagArea = require('../modes/inventory/Bag');
 var Craft = require('../modes/inventory/Craft');
 var FlasksArea = require('../modes/inventory/Flasks');
@@ -332,19 +334,17 @@ function ResetInputArrays() {
 	Input.ResetInputArrays(InputKeys, InputDPAD);
 }
 
-module.exports = {
-	INVENTORY_INDEX: INVENTORY_INDEX,
-	SET_AREA_POSITION_CB: SET_AREA_POSITION_CB,
-	ITEM_SQUARE_ICR: ITEM_SQUARE_ICR,
-	EQUIPMENT_INDEX_TABLE: EquipmentIndexTable,
-	AREA_ID: AreaId,
-	EQUIPMENT_GRAPH: EquipmentGraph,
-	resolveInput: ResolveInput,
-	enterArea: EnterArea,
-	leaveArea: LeaveArea,
-	subSection: ChangeIntoSubSection,
-	resetInputArrays: ResetInputArrays,
-	enterCurrentSubSection: EnterCurrentSubSection,
-	leaveCurrentSubSection: LeaveCurrentSubSection,
-	id: GAME_MODE.INVENTORY
-};
+module.exports.INVENTORY_INDEX = INVENTORY_INDEX;
+module.exports.SET_AREA_POSITION_CB = SET_AREA_POSITION_CB;
+module.exports.ITEM_SQUARE_ICR = ITEM_SQUARE_ICR;
+module.exports.EQUIPMENT_INDEX_TABLE = EquipmentIndexTable;
+module.exports.AREA_ID = AreaId;
+module.exports.EQUIPMENT_GRAPH = EquipmentGraph;
+module.exports.resolveInput = ResolveInput;
+module.exports.enterArea = EnterArea;
+module.exports.leaveArea = LeaveArea;
+module.exports.subSection = ChangeIntoSubSection;
+module.exports.resetInputArrays = ResetInputArrays;
+module.exports.enterCurrentSubSection = EnterCurrentSubSection;
+module.exports.leaveCurrentSubSection = LeaveCurrentSubSection;
+module.exports.id = GAME_MODE.INVENTORY;

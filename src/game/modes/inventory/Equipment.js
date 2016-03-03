@@ -1,3 +1,5 @@
+module.exports = {};
+
 var Inventory = require('../Inventory');
 var robot = require('robotjs');
 var Window = require('../../Window');
@@ -94,6 +96,4 @@ function SetEquipmentAreaPosition(Position) {
 	robot.moveMouse(basePositionX, basePositionY);
 }
 
-module.exports = {
-	setPosition: SetEquipmentAreaPosition
-};
+module.exports.setPosition = SetEquipmentAreaPosition;

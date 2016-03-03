@@ -1,3 +1,5 @@
+module.exports = {};
+
 var behaviors = require('../Behaviors').functions;
 
 behaviors["Debug.PrintCursorData"] = function () {
@@ -184,7 +186,5 @@ function ResolveInput(data) {
 
 }
 
-module.exports = {
-	resolveInput: ResolveInput,
-	id: GAME_MODE.DEBUG
-};
+module.exports.resolveInput = ResolveInput;
+module.exports.id = GAME_MODE.DEBUG;

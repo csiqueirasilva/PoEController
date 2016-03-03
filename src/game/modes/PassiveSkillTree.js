@@ -1,3 +1,5 @@
+module.exports = {};
+
 var behaviors = require('../Behaviors');
 
 behaviors['PassiveSkillTree.ScrollDown'] = function () {};
@@ -57,9 +59,7 @@ function LeaveArea() {
 	Input.clearHeld(KeysOfExile, InputKeys, DPADOfExile, InputDPAD, BehaviorOfExile);
 }
 
-module.exports = {
-	enterArea: EnterArea,
-	resolveInput: ResolveInput,
-	leaveArea: LeaveArea,
-	id: GAME_MODE.PASSIVE_SKILL_TREE
-};
+module.exports.enterArea = EnterArea;
+module.exports.resolveInput = ResolveInput;
+module.exports.leaveArea = LeaveArea;
+module.exports.id = GAME_MODE.PASSIVE_SKILL_TREE;

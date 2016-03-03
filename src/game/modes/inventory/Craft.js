@@ -1,3 +1,5 @@
+module.exports = {};
+
 var Inventory = require('../Inventory');
 var robot = require('robotjs');
 var Window = require('../../Window');
@@ -102,6 +104,4 @@ function SetCraftAreaPosition(Position) {
 	proxyMoveMouse(posX, posY);
 }
 
-module.exports = {
-	setPosition: SetCraftAreaPosition
-};
+module.exports.setPosition = SetCraftAreaPosition;

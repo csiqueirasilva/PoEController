@@ -1,3 +1,5 @@
+module.exports = {};
+
 var robot = require('robotjs');
 var AttackInPlace = require('./behaviors/AttackInPlace');
 var KeyHandler = require('./behaviors/KeyHandler');
@@ -118,7 +120,5 @@ var exported = {
 	]
 };
 
-module.exports = {
-	functions: behaviors,
-	exported: exported
-};
+module.exports.functions = behaviors;
+module.exports.exported = exported;

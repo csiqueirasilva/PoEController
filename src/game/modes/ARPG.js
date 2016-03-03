@@ -1,3 +1,5 @@
+module.exports = {};
+
 var behaviors = require('../Behaviors').functions;
 
 behaviors['ARPG.Fixed.OptionsMenu'] = function () {
@@ -226,10 +228,8 @@ function SetBehavior(inputArgs) {
 	}
 }
 
-module.exports = {
-	enterArea: EnterArea,
-	resolveInput: ResolveDataInput,
-	leaveArea: LeaveArea,
-	setBehavior: SetBehavior,
-	id: GAME_MODE.ARPG
-};
+module.exports.enterArea = EnterArea;
+module.exports.resolveInput = ResolveDataInput;
+module.exports.leaveArea = LeaveArea;
+module.exports.setBehavior = SetBehavior;
+module.exports.id = GAME_MODE.ARPG;

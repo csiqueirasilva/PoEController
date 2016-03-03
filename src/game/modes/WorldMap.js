@@ -1,3 +1,5 @@
+module.exports = {};
+
 var Enums = require('../Enums');
 var KEYS = Enums.KEYS;
 var GAME_MODE = Enums.GAME_MODE;
@@ -62,9 +64,7 @@ function LeaveArea() {
 	Input.clearHeld(KeysOfExile, InputKeys, DPADOfExile, InputDPAD, BehaviorOfExile);
 }
 
-module.exports = {
-	enterArea: EnterArea,
-	resolveInput: ResolveInput,
-	leaveArea: LeaveArea,
-	id: GAME_MODE.WORLD_MAP
-};
+module.exports.enterArea = EnterArea;
+module.exports.resolveInput = ResolveInput;
+module.exports.leaveArea = LeaveArea;
+module.exports.id = GAME_MODE.WORLD_MAP;

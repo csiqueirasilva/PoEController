@@ -2,6 +2,8 @@
 
 /* global modules */
 
+module.exports = {};
+
 var Mode = require('./Mode');
 
 var GameModeARPG = require('./modes/ARPG');
@@ -184,12 +186,10 @@ function Init() {
 	}
 }
 
-module.exports = {
-	DETECTION_INTERVAL_MS: DETECTION_INTERVAL_MS,
-	init: Init,
-	loadSignatures: loadAllSignatureFiles,
-	inventorySignatures: inventorySignatures,
-	signatureDetectionWorker: SignatureDetectionWorker,
-	start: StartControllerListener,
-	finish: RemoveControllerListener
-};
+module.exports.DETECTION_INTERVAL_MS = DETECTION_INTERVAL_MS;
+module.exports.init = Init;
+module.exports.loadSignatures = loadAllSignatureFiles;
+module.exports.inventorySignatures = inventorySignatures;
+module.exports.signatureDetectionWorker = SignatureDetectionWorker;
+module.exports.start = StartControllerListener;
+module.exports.finish = RemoveControllerListener;
