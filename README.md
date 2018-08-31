@@ -1,16 +1,24 @@
-#PoEController
+# PoEController
 
 An easy way to play [Path of Exile](http://www.pathofexile.com/) with a gamepad.
 
 <img src="screenshots/main-menu.png" alt="Main menu" width="100%" />
 
-##Goals
+## Goals
 
 The main problem with using a gamepad in Path of Exile is that the game is in no way designed to be friendly to few key bindings. It heavily focuses use of the mouse cursor and several key bindings for optimal gameplay.
 
 Many people provided solutions to play Path of Exile with a gamepad before. However, the main focus of this solution is to reduce the need of using a gamepad input as a mouse cursor to a minimum.
 
-##Solution
+# Solution
+
+After some players' feedback, I decided to remove support for auto detection of game input method using pixels. It was just a very slow method for doing this and it was hard to maintain, as the game keeps being developed and many things change.
+
+In the future, I want to try to scan the game's memory and change the input method based on that. However, it might not be allowed by their EULA terms.
+
+# Old Solution below (1.0)
+
+## Solution
 
 The provided solution focus on mimicking the input methods of another similar game on game consoles, [Diablo 3](http://us.battle.net/d3).
 
@@ -19,7 +27,7 @@ So the focus is to give the players one thumbstick for character movement, some 
 (Notice that you can hide the help overlay text in the main menu!)
 <img src="screenshots/arpg-mode.png" alt="Main menu" width="100%" />
 
-##How it works
+## How it works
 
 The application detects what I called "pixel signatures" from the screen in an attempt to adjust the input methods accordingly to whats needed to be done by the player.
 
@@ -28,7 +36,7 @@ As you can see here, when a player opens his stash, and the application detects 
 
 This solution has several drawbacks. It costs a lot, in terms of performance, and this asynchronous type of state detection creates an error prone environment, which leads to being an application hard to work in. My hopes lies with [GGG](http://www.grindinggear.com/) and the player community seeing this as a viable option to play the game and providing the necessary support to make this in the best possible way (APIs, add-on support, etc).
 
-##General tips
+## General tips
 
 - The application works better with the Steam's Path of Exile client version, since it tries to open it via steam link.
 - Path of Exile's configuration file is rewritten on opening the application and restored when exiting it. There are some expected configurations for this to work properly. One of them is that the game will run in windowed fullscreen.
