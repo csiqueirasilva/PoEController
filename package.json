@@ -1,8 +1,8 @@
 {
   "name": "poe-controller",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Use a joystick to play Path of Exile.",
-  "main": "Main.js",
+  "main": "src/game-overlay.html",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -12,19 +12,24 @@
   ],
   "author": "Caio Siqueira da Silva",
   "license": "ISC",
-  "main": "src/game-overlay.html",
   "window": {
-	"fullscreen": true,
+    "fullscreen": true,
     "frame": false,
-    "toolbar": false,
-	"always-on-top": true,
-	"resizable": false,
-	"transparent": true,
-	"show_in_taskbar": false,
-	"position": "center",
-	"width": 1173,
-	"height": 660,
-	"title": "PoEController - Game Overlay - DONT CLOSE",
-	"icon": "src/imgs/app-icon.png"
+    "resizable": false,
+    "transparent": true,
+    "show_in_taskbar": false,
+    "position": "center",
+    "width": 1173,
+    "height": 660,
+    "title": "PoEController - Game Overlay - DONT CLOSE",
+    "icon": "src/imgs/app-icon.png"
+  },
+  "dependencies": {
+    "dialog": "0.1.8",
+    "node-hid": "0.7.3",
+    "nw": "0.32.4",
+    "robotjs": "0.3.7",
+    "winston": "2.0.0",
+    "workerjs": "0.1.1"
   }
 }

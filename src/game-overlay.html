@@ -2,12 +2,12 @@
 	<head>
 		
 		<link rel="stylesheet" type="text/css" href="style.css" />
-		
+
 		<script src="lib/jquery/jquery.min.js"></script>
 
 	</head>
 	
-	<body style="background: transparent;">
+	<body style="background: transparent; background-color:rgba(0,0,0,0);">
 		
 		<canvas id="main-canvas"></canvas>
 		
@@ -118,7 +118,7 @@
 			</div>
 			
 			<div id="navigate-open-menu">
-				<div class="game-button-text">More options with</div>
+				<div class="game-button-text">Toggle inventory (shortcut 'i')</div>
 				<div class="game-button-icon"></div>
 			</div>
 			
@@ -186,11 +186,10 @@
 			}
 			
 			global.gameOverlay = gui.Window.get();
-			
+			global.gameOverlay.setAlwaysOnTop(true);
+		
 			window.onload = function() {
-			
-				global.menuWindow = gui.Window.open('index.html', {
-					toolbar: false,
+				gui.Window.open('src/index.html', {
 					frame: false,
 					position: 'center',
 					fullscreen: false,
@@ -202,7 +201,6 @@
 					title: 'PoEController - Menu',
 					icon: 'src/imgs/app-icon.png'
 				});
-
 			};
 
 			function hideGameOverlay() {

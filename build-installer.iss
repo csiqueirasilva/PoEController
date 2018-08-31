@@ -1,10 +1,11 @@
 #define MyAppName "PoEController"
-#define MyAppVersion "1.0.0-RC1"
+#define MyAppVersion "1.1.0"
 #define MyAppPublisher "Caio Siqueira da Silva"
 #define MyAppURL "http://github.com/csiqueirasilva/PoEController"
 #define LaunchProgram "Launch program"
 #define DesktopIcon "Desktop icon"
 #define CreateDesktopIcon "Create desktop icon"
+#define RunParameter ". --disable-gpu-compositing --force-cpu-draw"
 
 [Setup]
 AppId={{020D3F3F-186D-4ED1-959D-FED34B08361B}
@@ -30,10 +31,10 @@ Source: "*"; Excludes: "node_modules\nw\node_modules\*,build\config.gypi,bin\*,.
 Name: "desktopicon"; Description: "{#CreateDesktopIcon}"; GroupDescription: "{#DesktopIcon}"
 
 [Icons]
-Name: "{group}\PoEController"; Filename: "{app}\node_modules\nw\nwjs\nw.exe"; Parameters: ". --disable-gpu --force-cpu-draw"; WorkingDir: "{app}"; IconFilename: "{app}/src/imgs/app-icon.ico"
-Name: "{userstartup}\PoEController"; Filename: "{app}\node_modules\nw\nwjs\nw.exe"; Parameters: ". --disable-gpu --force-cpu-draw"; WorkingDir: "{app}"; IconFilename: "{app}/src/imgs/app-icon.ico"
-Name: "{userdesktop}\PoEController"; Filename: "{app}\node_modules\nw\nwjs\nw.exe"; Parameters: ". --disable-gpu --force-cpu-draw"; WorkingDir: "{app}"; IconFilename: "{app}/src/imgs/app-icon.ico"; Tasks: desktopicon
+Name: "{group}\PoEController"; Filename: "{app}\node_modules\nw\nwjs\nw.exe"; Parameters: {#RunParameter}; WorkingDir: "{app}"; IconFilename: "{app}/src/imgs/app-icon.ico"
+Name: "{userstartup}\PoEController"; Filename: "{app}\node_modules\nw\nwjs\nw.exe"; Parameters: {#RunParameter}; WorkingDir: "{app}"; IconFilename: "{app}/src/imgs/app-icon.ico"
+Name: "{userdesktop}\PoEController"; Filename: "{app}\node_modules\nw\nwjs\nw.exe"; Parameters: {#RunParameter}; WorkingDir: "{app}"; IconFilename: "{app}/src/imgs/app-icon.ico"; Tasks: desktopicon
 Name: "{group}\PoEController Unninstall"; Filename: "{uninstallexe}"
 
 [Run]
-Filename: "{app}\node_modules\nw\nwjs\nw.exe"; Parameters: ". --disable-gpu --force-cpu-draw"; WorkingDir: "{app}"; Description: {#LaunchProgram}; Flags: postinstall shellexec
+Filename: "{app}\node_modules\nw\nwjs\nw.exe"; Parameters: {#RunParameter}; WorkingDir: "{app}"; Description: {#LaunchProgram}; Flags: postinstall shellexec

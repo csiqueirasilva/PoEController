@@ -1,4 +1,4 @@
-var UserSettings = (function() {
+module.exports = (function() {
 
 	var fs = require('fs');
 
@@ -49,7 +49,7 @@ var UserSettings = (function() {
 
 			console.log("Persisted user settings file to disk.");
 			
-			if(cb instanceof Function) {
+			if(typeof cb === "function") {
 				cb();
 			}
 		}); 
@@ -72,7 +72,7 @@ var UserSettings = (function() {
 				console.log("Read user settings file from disk.");
 			}
 			
-			if(cb instanceof Function) {
+			if(typeof cb === "function") {
 				cb();
 			}
 		});	

@@ -1,4 +1,8 @@
-var PoESettings = (function() {
+/* global module */
+
+module.exports = (function() {
+
+	var Window = require('../game/Window');
 
 	var defaultActionKeysSettings = `[ACTION_KEYS]
 attack_in_place=16
@@ -45,7 +49,6 @@ key_pickup=1`;
 	var defaultCorpseTargeting = `
 corpse_targeting=key`;
 	
-	
 	var videoSettings = `borderless_windowed_fullscreen=true
 fullscreen=false
 post_processing=true
@@ -58,7 +61,7 @@ screen_shake=false`;
 	}
 
 	var fs = require('fs');
-	var gui = require('nw.gui');
+	var gui = window.require('nw.gui');
 
 	var lastFilePath = null;
 	
@@ -109,7 +112,7 @@ screen_shake=false`;
 		// match actions keys and replace
 		var match = data.match(/(\[ACTION_KEYS\]){1}(\n|.)*?(?=\[)/);
 		
-		if(match != null) {
+		if(match !== null) {
 			originalActionKeys = match[0];
 		}
 		
@@ -118,7 +121,7 @@ screen_shake=false`;
 		// match key_pickup
 		match = finalContent.match(/\nkey_pickup=.*/);
 
-		if(match != null) {
+		if(match !== null) {
 			originalKeyPickup = match[0];
 		}
 		
@@ -126,7 +129,7 @@ screen_shake=false`;
 		
 		match = finalContent.match(/\ncorpse_targeting=.*/);
 
-		if(match != null) {
+		if(match !== null) {
 			originalCorpseTargeting = match[0];
 		}
 		
@@ -134,11 +137,11 @@ screen_shake=false`;
 		
 		match = finalContent.match(/borderless_windowed_fullscreen[\na-z=_0-9]*screen_shake=.*/);
 		
-		if(match!= null) {
+		if(match !== null) {
 			originalVideoSettings = match[0];
 		}
 		
-		videoSettings = videoSettings.replace("%w", w).replace("%h", h);
+		videoSettings = videoSettings.replace("%w", Window.width).replace("%h", Window.height);
 		
 		finalContent = finalContent.replace(originalVideoSettings, videoSettings);
 		

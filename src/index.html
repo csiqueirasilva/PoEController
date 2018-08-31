@@ -10,8 +10,6 @@
 		<link rel="stylesheet" type="text/css" href="lib/bootstrap/bootstrap.min.css" />
 		<link rel="stylesheet" type="text/css" href="lib/select2/select2.min.css" />
 		
-		<script src="game/Main.js"></script>
-		
 		<link rel="stylesheet" type="text/css" href="style.css" />
 		
 	</head>
@@ -139,12 +137,27 @@
 		<img style="display: none;" id="ps3-img" src="imgs/ps3.png" />
 		<!-- imgs -->
 
-		<script src="menu/UI.js"></script>
-		<script src="menu/usersettings.js"></script>
-		<script src="menu/poesettings.js"></script>
-
 		<script>
-	
+			var gui = require('nw.gui');
+			
+			global.$ = $;
+			global.document = document;
+			global.menuWindow = gui.Window.get();
+			
+			require('./game/Main');
+		</script>
+		
+		<script src="./menu/UI.js"></script>
+		
+		<script>
+			
+			var UserSettings = require('./menu/UserSettings');
+			var PoESettings = require('./menu/PoESettings');
+			var KEYS = require('./game/Enums').KEYS;
+			var GAME_MODE = require('./game/Enums').GAME_MODE;
+			var GameModeARPG = require('./game/modes/ARPG');
+			var Game = require('./game/Game');
+			
 			global.menuWindow.on('focus', function() {
 				global.hideAllHelp();
 			});
@@ -160,8 +173,6 @@
 			function updateGameOverlay (mode) {
 				global.showGameOverlay($('#select-input-method').val(), mode);
 			}
-	
-			ChangeGameModeUpdateUICallback = updateGameOverlay;
 	
 			// src: https://github.com/nwjs/nw.js/issues/1162
 			$('a[target=_blank]').on('click', function(){
@@ -181,7 +192,7 @@
 			
 				if($(this).html() === "Stop gamepad") {
 					global.hideGameOverlay();
-					RemoveControllerListener();
+					Game.finish();
 					$(this).html("Start gamepad");
 					otherInputs.prop('disabled', false);
 				} else {
@@ -196,17 +207,17 @@
 					inputArgs[KEYS.KEY_RIGHT] = $('#button-key-right select').val();
 					inputArgs[KEYS.KEY_DOWN] = $('#button-key-down select').val();
 					
-					GAME_MODE_ARPG.SetBehavior(inputArgs);
+					GameModeARPG.setBehavior(inputArgs);
 
 					var btn = $(this);
 					
-					StartControllerListener(false, function() {
+					Game.start(function() {
 						global.gameOverlay.focus();
 						setTimeout(function() {
 							updateGameOverlay(GAME_MODE.ARPG);
 							$('#flash-msg').hide();
 							btn.prop('disabled', false);
-						}, 8000);
+						}, 6500);
 					});
 
 					$('#flash-msg').html("If you have Path of Exile Steam Version it will open (or focus the window, if already open).<br />If not, please open Path of Exile's game client.");
@@ -216,8 +227,6 @@
 				}
 			});
 
-			var gui = require ('nw.gui');
-			
 			function QuitApplication() {
 				UserSettings.Save(function() {
 					PoESettings.restoreConfigFile();
