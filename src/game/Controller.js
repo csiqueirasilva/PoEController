@@ -68,7 +68,6 @@ for(var i = 0; i < PID.length && HIDController === null; i++) {
 	try {
 		HIDController = new HID.HID(VID, PID[i]);
 	} catch (e) {
-		dialog.warn("hidcontroller: " + e, function(){});
 		Logger.warn(e);
 	}
 }
