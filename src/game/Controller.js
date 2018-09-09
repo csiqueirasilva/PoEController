@@ -54,9 +54,10 @@ var Logger = require('./Logger');
 
 var HID = require ('node-hid');
 
+// Searches for Xbox 360 Controller, Xbox 360 Wifi Controller, Xbox One Controller and Xbox 360 Wireless Receiver
+// http://www.linux-usb.org/usb.ids
 var VID = 0x45E; // Microsoft
-var PID = [0x28E, 0x28F, 0x2D1]; // Searches for Xbox 360 Controller, Xbox 360 Wifi Controller and Xbox One Controller
-								 // http://www.linux-usb.org/usb.ids
+var PID = [0x28E, 0x28F, 0x2D1, 0x0719]; 
 
 var HIDController = null;
 var controllerFound = false;
