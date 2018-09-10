@@ -62,8 +62,6 @@ var PID = [0x28E, 0x28F, 0x2D1, 0x0719];
 var HIDController = null;
 var controllerFound = false;
 
-var dialog = require('dialog');
-
 for(var i = 0; i < PID.length && HIDController === null; i++) {
 	try {
 		HIDController = new HID.HID(VID, PID[i]);

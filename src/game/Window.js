@@ -39,37 +39,6 @@ function quit(msg) {
 	});
 }
 
-function SupportedResolution(width, height) {
-	this.w = width;
-	this.h = height;
-}
-
-SupportedResolution.prototype.toString = function () {
-	return this.w + "x" + this.h;
-};
-
-var SUPPORTED_RESOLUTIONS = [
-	new SupportedResolution(1920, 1080),
-	new SupportedResolution(1600, 900),
-	new SupportedResolution(1366, 768),
-	new SupportedResolution(1360, 768)
-];
-
-if (!DEBUG_MODE) {
-	var unsupportedResolution = true;
-
-	for (var i = 0; i < SUPPORTED_RESOLUTIONS.length && unsupportedResolution; i++) {
-		var res = SUPPORTED_RESOLUTIONS[i];
-		if (w === res.w && h === res.h) {
-			unsupportedResolution = false;
-		}
-	}
-
-	if (unsupportedResolution) {
-		quit('Unsupported screen resolution. Supported screen resolutions are ' + SUPPORTED_RESOLUTIONS.toString());
-	}
-}
-
 module.exports = {
 	basePosition: basePosition,
 	quit: quit,

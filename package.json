@@ -1,6 +1,6 @@
 {
   "name": "poe-controller",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Use a joystick to play Path of Exile.",
   "main": "src/game-overlay.html",
   "scripts": {
@@ -29,7 +29,7 @@
     "node-hid": "0.7.3",
     "nw": "0.32.4",
     "robotjs": "0.3.7",
-    "winston": "2.0.0",
+    "winston": "3.1.0",
     "workerjs": "0.1.1"
   }
 }
