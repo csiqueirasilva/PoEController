@@ -1,8 +1,9 @@
 var winston = require('winston');
 var fs = require('fs');
+var Configuration = require('./Configuration');
 var Window = require('./Window');
 
-var logFile = 'output.log';
+var logFile = Configuration.DATA_PATH + '/output.log';
 
 var logger = null;
 var error = false;
@@ -13,7 +14,10 @@ try {
 
 	logger = winston.createLogger({
 		level: 'info',
-		format: winston.format.json(),
+		format: winston.format.combine(
+			winston.format.splat(),
+			winston.format.simple()
+		),
 		transports: [
 			new winston.transports.Console(),
 			new winston.transports.File({ filename: logFile })

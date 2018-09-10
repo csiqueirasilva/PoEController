@@ -62,6 +62,8 @@ var PID = [0x28E, 0x28F, 0x2D1, 0x0719];
 var HIDController = null;
 var controllerFound = false;
 
+Logger.log('info', 'device dump: %j', HID.devices());
+
 for(var i = 0; i < PID.length && HIDController === null; i++) {
 	try {
 		HIDController = new HID.HID(VID, PID[i]);
@@ -88,7 +90,7 @@ if(HIDController !== null) {
 		Window.quit('[CONTROLLER DISCONNECTED] Error while reading information from the controller. Please ensure it is correctly connected and run PoEController again.');
 	});
 } else {
-	Window.quit("[CONTROLLER NOT FOUND] Error while connecting to xbox 360/one controller driver. Please ensure it is correctly connected and configured.");	
+	Window.quit("[CONTROLLER NOT FOUND] Error while connecting to xbox 360/one controller driver. Please ensure it is correctly connected and configured.");
 }
 
 module.exports = {
