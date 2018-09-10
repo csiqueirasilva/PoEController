@@ -4,7 +4,9 @@ var dir = process.env['APPDATA'] + '\\PoeController';
 
 if (!fs.existsSync(dir)){
     fs.mkdirSync(dir);
-	Window.quit('Could not create folder: ' + dir);
+	if(!fs.existsSync(dir)) {
+		Window.quit('Could not create folder: ' + dir);
+	}
 }
 
 module.exports = {
