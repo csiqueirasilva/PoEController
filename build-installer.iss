@@ -1,5 +1,5 @@
 #define MyAppName "PoEController"
-#define MyAppVersion "1.1.2"
+#define MyAppVersion "1.1.3"
 #define MyAppPublisher "Caio Siqueira da Silva"
 #define MyAppURL "http://github.com/csiqueirasilva/PoEController"
 #define LaunchProgram "Launch program"
