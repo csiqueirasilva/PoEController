@@ -1,3 +1,9 @@
+# READ THIS FIRST !
+
+This project is a blast from the past. It was created prior to the introduction of console versions of Path of Exile, when they officially developed a client with the capability of using gamepads. Please refrain from using this program and wait [until Path of Exile 2](https://old.reddit.com/r/Games/comments/im2x1i/ama_im_chris_wilson_from_grinding_gear_games_we/g3wpzjg/) as it will probably have official gamepad support on PC.
+
+# OLD README
+
 # PoEController
 
 An easy way to play [Path of Exile](http://www.pathofexile.com/) with a gamepad.
