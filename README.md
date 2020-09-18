@@ -2,6 +2,10 @@
 
 This project is a blast from the past. It was created prior to the introduction of console versions of Path of Exile, when they officially developed a client with the capability of using gamepads. Please refrain from using this program and wait [until Path of Exile 2](https://old.reddit.com/r/Games/comments/im2x1i/ama_im_chris_wilson_from_grinding_gear_games_we/g3wpzjg/) as it will probably have official gamepad support on PC.
 
+However, due to a request from an user, who did not wish to use similar fan-made softwares for playing PoE with a gamepad on PC, I decided to port the entire project to ElectronJS, instead of NWJS. This new version has a [Developer's Guide](developers.md), since the goal is that it implements many types of gamepads for use within this application (Although I hope to just implement the ones I have).
+
+Other software that does the same stuff as this and is better maintained: [Zhadok's poe-controller project](https://github.com/Zhadok/poe-controller)
+
 # OLD README
 
 # PoEController
