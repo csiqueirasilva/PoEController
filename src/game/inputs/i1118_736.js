@@ -8,13 +8,13 @@ var RIGHT_THUMBSTICK_THRESHOLD = 0.06;
 var MAX_INPUT_THUMBSTICK = 128;
 
 function LeftStick(data) {
-	Input.moveStickL(data[0], data[2],
+	Input.moveStickL(data[1], data[3],
 		MAX_INPUT_THUMBSTICK,
 		LEFT_THUMBSTICK_THRESHOLD);
 }
 
 function RightStick(data) {
-	Input.moveStickR(data[4], data[6],
+	Input.moveStickR(data[5], data[7],
 		MAX_INPUT_THUMBSTICK,
 		RIGHT_THUMBSTICK_THRESHOLD);
 }
