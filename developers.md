@@ -34,7 +34,7 @@ npm start
 
 # configuration file 
 
-The configuration file for the application resides in ***%APPDATA%\PoeController\user-settings.json**.
+The configuration file for the application resides in **%APPDATA%\PoeController\user-settings.json**. It is copied from config_ref.json, on the root of the project, if it doesn't exists.
 
 ```
 {
