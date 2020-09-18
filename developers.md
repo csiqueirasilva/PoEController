@@ -57,7 +57,7 @@ The configuration file for the application resides in ***%APPDATA%\PoeController
 }
 ```
 
-The input translators should reside in **src/game/inputs/**, in the format of i<vid>_<pid>.js with the application shipping with i1356_2508.js for PS4 controller (its what I have to test currently).
+The input translators should reside in **src/game/inputs/**, in the format of i\<vid\>_\<pid\>.js with the application shipping with i1356_2508.js for PS4 controller (its what I have to test currently).
 
 If your controller is not detected, it opens a new interface where you can select the detected usb devices and check the pid/vid for it (and also it writes the first 16 bytes of data from the buffer, so you can do some quick input tests and check whats been read in binary data).
 
