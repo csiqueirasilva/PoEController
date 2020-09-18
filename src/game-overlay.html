@@ -1,10 +1,17 @@
 <html>
 	<head>
-		
+		<title>Overlay</title>
+		<!-- Insert this line above script imports  -->
+		<script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
+	
 		<link rel="stylesheet" type="text/css" href="style.css" />
 
 		<script src="lib/jquery/jquery.min.js"></script>
+		<script src="lib/globals.js"></script>
+		<script src="lib/generalui.js"></script>
 
+		<!-- Insert this line after script imports -->
+		<script>if (window.module) module = window.module;</script>
 	</head>
 	
 	<body style="background: transparent; background-color:rgba(0,0,0,0);">
@@ -127,50 +134,16 @@
 		<img id="buttons-image" src="imgs/buttons.png" style="display: none;" />
 		
 		<script>
-		
+			
 			$('#msg-overlay').children().hide();
 			$('#msg-overlay').show();
-		
-			global.hideAllHelp = function () {
-				$('#msg-overlay').children().hide();
-			};
-		
-			var GAME_MODE = require('./game/Enums.js').GAME_MODE;
-		
-			var gui = require('nw.gui');
-		
+			
 			var	canvas = document.getElementById('main-canvas');
 			var context = canvas.getContext('2d');
 
-			var ARPGHelp = true;
-			var MenuHelp = true;
-			
-			global.setARPGHelp = function(b) {
-				ARPGHelp = b;
-			};
-
-			global.setMenuHelp = function(b) {
-				MenuHelp = b;
-			};
-			
 			canvas.width = window.innerWidth;
 			canvas.height = window.innerHeight;
-			
-			function setButtonsCSSSprite(mode) {
-				var n = mode === "ps3" ? 0 : 100;
-				
-				var rules = document.styleSheets[0].rules;
-				
-				var found = false;
-				
-				for(var i = rules.length - 1; i >= 0 && !found; i--) {
-					if(rules[i].selectorText === ".game-button-icon") {
-						found = true;
-						rules[i].style["background-position-y"] = n + "%";
-					}
-				}
-			}
-			
+
 			function drawOverlayCanvas () {
 				var posX = canvas.width * 0.5;
 				var posY = canvas.height * 0.44;
@@ -185,42 +158,6 @@
 				context.closePath();
 			}
 			
-			global.gameOverlay = gui.Window.get();
-			global.gameOverlay.setAlwaysOnTop(true);
-		
-			window.onload = function() {
-				gui.Window.open('src/index.html', {
-					frame: false,
-					position: 'center',
-					fullscreen: false,
-					always_on_top: false,
-					resizable: false,
-					show_in_taskbar: true,
-					width: 1173,
-					height: 660,
-					title: 'PoEController - Menu',
-					icon: 'src/imgs/app-icon.png'
-				});
-			};
-
-			function hideGameOverlay() {
-				var canvas = document.getElementById('main-canvas');
-				canvas.style.display = 'none';
-			}
-
-			function showGameOverlay(input, mode) {
-				YIndex = input === "ps3" ? 0 : imageXSize; // select buttons in texture
-				setButtonsCSSSprite(input);
-				var canvas = document.getElementById('main-canvas');
-				updateOverlayCanvas(mode);
-				canvas.style.display = 'block';
-			}
-			
-			global.hideGameOverlay = hideGameOverlay;
-			global.showGameOverlay = showGameOverlay;
-			
-			global.hideGameOverlay();
-
 			var XIndex = {
 				DPAD_UP: 1,
 				DPAD_DOWN: 2,
@@ -239,10 +176,6 @@
 				TRIGGER_LEFT: 17,
 				TRIGGER_RIGHT: 18
 			};
-			
-			var YIndex = 52 * 1;
-			var imageXSize = 52;
-			var buttonSize = window.innerWidth * 0.015;
 			
 			var buttonImage = document.getElementById('buttons-image');
 			
@@ -348,40 +281,67 @@
 				$('#navigate-loot-position').show();
 				$('#navigate-open-menu').show();
 			}
-			
+
 			function updateOverlayCanvas (mode) {
+				var canvas = document.getElementById('main-canvas');
+				
 				canvas.width = window.innerWidth;
 				canvas.height = window.innerHeight;
 
 				context.clearRect(0, 0, canvas.width, canvas.height);
 
-				$('#msg-overlay').children().hide(0, function() {
-				
-					if(mode === GAME_MODE.ARPG) {
-						drawARPGCanvas();
-					} else if (MenuHelp) {
-						switch(mode) {
-							case GAME_MODE.WORLD_MAP:
-								showWorldMapHelp();
-								break;
-							case GAME_MODE.INVENTORY:
-							case GAME_MODE.STASH:
-							case GAME_MODE.SELL:
-							case GAME_MODE.REWARD_SCREEN:
-							case GAME_MODE.CRAFT_SCREEN:
-								showInventoryHelp(mode);
-								break;
-							case GAME_MODE.OPTIONS_MENU:
-								showOptionsHelp();
-								break;
-							case GAME_MODE.PASSIVE_SKILL_TREE:
-								showPassiveTreeHelp();
-						}
-					}
-				
-				});
+				$('#msg-overlay').children().hide(0, drawARPGCanvas);
 			}
 
+			function hideGameOverlay() {
+				var canvas = document.getElementById('main-canvas');
+				canvas.style.display = 'none';
+				$('#msg-overlay').children().hide();
+			}
+
+			function showGameOverlay(input, mode) {
+				YIndex = input === "ps3" ? 0 : imageXSize; // select buttons in texture
+				setButtonsCSSSprite(input);
+				var canvas = document.getElementById('main-canvas');
+				updateOverlayCanvas(mode);
+				canvas.style.display = 'block';
+			}
+
+			function setButtonsCSSSprite(mode) {
+				var n = mode === "ps3" ? 0 : 100;
+				
+				var rules = document.styleSheets[0].rules;
+				
+				var found = false;
+				
+				for(var i = rules.length - 1; i >= 0 && !found; i--) {
+					if(rules[i].selectorText === ".game-button-icon") {
+						found = true;
+						rules[i].style["background-position-y"] = n + "%";
+					}
+				}
+			}
+
+			var YIndex = 52 * 1;
+			var imageXSize = 52;
+			var buttonSize = window.innerWidth * 0.015;
+
+			var ARPGHelp = true;
+
+			global.hideGameOverlay = hideGameOverlay;
+			global.showGameOverlay = showGameOverlay;
+			
+			global.hideGameOverlay();
+			
+			ipcRenderer.on('game-start', (ev, inputMethod, arpgHelp) => {
+				ARPGHelp = arpgHelp;
+				global.showGameOverlay(inputMethod, GAME_MODE.ARPG);
+			});
+			
+			ipcRenderer.on('overlay-hide', () => {
+				global.hideGameOverlay();
+			});
+			
 		</script>
 	
 	</body>

@@ -1,0 +1,18 @@
+{
+	"debug": false,
+	"steamGame": false,
+	"gamePath": "C:\\Games\\Path of Exile\\PathOfExile_x64.exe",
+	"gameConfigPath": "%USERPROFILE%\\Documents\\My Games\\Path of Exile\\production_Config.ini",
+	"inputFunctions": {
+		"input":"xbox",
+		"q":"arpg.nothing",
+		"w":"arpg.nothing",
+		"e":"arpg.nothing",
+		"r":"arpg.nothing",
+		"right":"arpg.nothing",
+		"middle":"arpg.nothing"
+	},
+	"vid": 0,
+	"pid": 0,
+	"bluetooth": false
+}

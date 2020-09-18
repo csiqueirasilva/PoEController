@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>hardwareConfig</title>
+
+		<!-- Insert this line above script imports  -->
+		<script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
+
+		<script src="lib/jquery/jquery.min.js"></script>
+		<script src="lib/bootstrap/bootstrap.min.js"></script>
+		<script src="lib/select2/select2.min.js"></script>
+		<script src="lib/globals.js"></script>
+		<script src="lib/generalui.js"></script>
+		
+		<!-- Insert this line after script imports -->
+		<script>if (window.module) module = window.module;</script>		
+		
+		<link rel="stylesheet" type="text/css" href="lib/bootstrap/bootstrap.min.css" />
+		<link rel="stylesheet" type="text/css" href="lib/select2/select2.min.css" />
+		
+		<link rel="stylesheet" type="text/css" href="style.css" />
+		
+	</head>
+	<body id="main-menu-body" unselectable="on" onselectstart="return false;">
+		<div id="main-menu" class="container-fluid">
+			<div id="close-btn"></div>
+			
+			<div id="hardware-config-list" class="hardware-config-menu">
+				<label>Select controller hardware</label>
+				<div>
+					<select>
+					</select>
+				</div>
+			</div>
+			
+			<div id="hardware-wrapper-dump">
+				<label>VID: <span id="hardware-vid"></span></label>
+				<label>PID: <span id="hardware-pid"></span></label>
+				<label>Data DUMP (up to 16 bytes)</label>
+				<pre id="hardware-dump-area"></pre>
+				<label>Please open %APPDATA%\PoeController\user-settings.json and edit the values of vid and pid to match the ones for your device, close the application and try opening it again</label>
+			</div>
+			
+		</div>
+		
+		<script>
+			$('#hardware-config-list').change(function() {
+				var val = $('#hardware-config-list select').val().split('-');
+				var vid = val[0];
+				var pid = val[1];
+				$('#hardware-vid').html(vid);
+				$('#hardware-pid').html(pid);
+				ipcRenderer.send('hardware-connect-device', vid, pid, win.getTitle());
+			});
+		</script>
+	</body>
+</html>

@@ -1,190 +1,153 @@
 module.exports = {};
 
+const events = require('events');
+const eventEmitter = new events.EventEmitter();
+
 var robot = require('robotjs');
 var KEYS = require('./Enums').KEYS;
-var behaviors = require('./Behaviors').functions;
 var KeyHandler = require('./behaviors/KeyHandler');
 var FunctionLibrary = require('./FunctionLibrary');
-var MAX_INPUT_THUMBSTICK = require('./Enums').MAX_INPUT_THUMBSTICK;
-var Logger = require('./Logger');
-
-var RepeatActionInterval = 90;
+var ARPG = require('./modes/ARPG');
+var Movement = require('./behaviors/Movement');
+var Settings = require('../menu/UserSettings').Settings;
 
 robot.setMouseDelay(0);
 robot.setKeyboardDelay(0);
 
-function ResolveDpadInput(data, DpadMapping, InputMapping, BehaviorMapping, skipKeyUp) {
-
-	var buttons = parseInt(data / 4) * 4;
-
-	switch (buttons) {
-		case KEYS.DPAD_UP:
-
-			ActivateKey(DpadMapping, InputMapping, BehaviorMapping, KEYS.DPAD_UP, true, skipKeyUp);
-			for (var i = 12; i <= 28; i = i + 8) {
-				ActivateKey(DpadMapping, InputMapping, BehaviorMapping, i, false, skipKeyUp);
-			}
-
-			break;
-		case KEYS.DPAD_RIGHT:
-
-			ActivateKey(DpadMapping, InputMapping, BehaviorMapping, KEYS.DPAD_RIGHT, true, skipKeyUp);
-			for (var i = 4; i <= 28; i = i + 8) {
-				if (i !== 12) {
-					ActivateKey(DpadMapping, InputMapping, BehaviorMapping, i, false, skipKeyUp);
-				}
-			}
-
-			break;
-		case KEYS.DPAD_DOWN:
-
-			ActivateKey(DpadMapping, InputMapping, BehaviorMapping, KEYS.DPAD_DOWN, true, skipKeyUp);
-			for (var i = 4; i <= 28; i = i + 8) {
-				if (i !== 20) {
-					ActivateKey(DpadMapping, InputMapping, BehaviorMapping, i, false, skipKeyUp);
-				}
-			}
-
-			break;
-		case KEYS.DPAD_LEFT:
-
-			ActivateKey(DpadMapping, InputMapping, BehaviorMapping, KEYS.DPAD_LEFT, true, skipKeyUp);
-			for (var i = 4; i <= 20; i = i + 8) {
-				ActivateKey(DpadMapping, InputMapping, BehaviorMapping, i, false, skipKeyUp);
-			}
-
-			break;
-		default:
-
-		for (var i = 4; i <= 28; i = i + 8) {
-			ActivateKey(DpadMapping, InputMapping, BehaviorMapping, i, false, skipKeyUp);
-		}
-
-	}
-}
-
-function ClearHeldInput(KeysOfExile, InputKeys, DPADOfExile, InputDPAD, BehaviorOfExile) {
-	robot.mouseToggle("up");
-
-	for (var key in BehaviorOfExile) {
-		var ref = FunctionLibrary.indexOf(KeysOfExile, key);
-		if (ref === -1) {
-			ref = FunctionLibrary.indexOf(DPADOfExile, key);
-			if (InputDPAD[ref]) {
-				ActionKeyUp(key, BehaviorOfExile);
-			}
-		} else if (InputKeys[ref]) {
-			ActionKeyUp(key, BehaviorOfExile);
-		}
-	}
-}
-
-function ActionKeyUp(key, behaviorReference) {
-	KeyHandler.handle(key, "up");
-
-	var behavior = behaviorReference[key];
-	if (behavior instanceof Array && behavior.length > 1 && typeof behaviors[behavior[1]] === "function") {
-		behaviors[behavior[1]](behavior, key);
-	}
-}
-
-var ActionRepeatTimestamps = {};
-
-function ActivateKey(keys, reference, behaviorReference, index, pressed, skipKeyUp) {
-	
-	var timestamp = new Date().getTime();
-
-	if (keys[index]) {
-
-		var behavior = behaviorReference[keys[index]];
-
-		var behaviorIndex = null;
-
-		if (behavior.length > 0 && (typeof behaviors[behavior[0]]).charAt(0) === "f") {
-			behaviorIndex = behavior[0];
-		} else if (!behaviors[behavior[0]]) {
-			behaviorIndex = "arpg.nothing";
-		}
-
-		if (reference[index] && !pressed) {
-			reference[index] = false;
-			delete ActionRepeatTimestamps[behaviorIndex];
-			if (!skipKeyUp) {
-				ActionKeyUp(keys[index], behaviorReference);
-			}
-		} else if (!reference[index] && pressed) {
-			reference[index] = true;
-			ActionRepeatTimestamps[behaviorIndex] = timestamp;
-			behaviors[behaviorIndex](behavior, keys[index]);
-		} else if (behaviorIndex.charAt(0) === behaviorIndex.charAt(0).toUpperCase()) /* Repeatable Action */ {
-			if (ActionRepeatTimestamps[behaviorIndex] && (timestamp - ActionRepeatTimestamps[behaviorIndex]) > RepeatActionInterval) {
-				ActionRepeatTimestamps[behaviorIndex] = timestamp;
-				//Logger.info('repeating ' + behaviorIndex);
-				behaviors[behaviorIndex](behavior, keys[index]);
-			}
-		}
-	}
-}
-
-function ResetInputArrays(Keys, Dpad) {
-	delete ActionRepeatTimestamps;
-	ActionRepeatTimestamps = {};
-
-	for (var i = 1; i <= 128; i = i * 2) {
-		Keys[i] = false;
-	}
-
-	for (var i = 4; i <= 28; i = i + 8) {
-		Dpad[i] = false;
-	}
-}
-
-function MoveThumbstick(DataX, DataY, Max, Threshold, IfCallback, ElseCallback) {
+function MoveThumbstickRight(DataX, DataY, Max, Threshold) {
 	var x = (DataX - Max) / Max;
 	var y = (DataY - Max) / Max;
 
 	if (Math.abs(x) > Threshold || Math.abs(y) > Threshold) {
-		IfCallback(x, y);
-	} else {
-		ElseCallback();
+		var pos = robot.getMousePos();
+		var mouseSpeed = 3;
+		x = mouseSpeed * Math.sign(x) * Math.pow(x, 2);
+		y = mouseSpeed * Math.sign(y) * Math.pow(y, 2);
+		robot.moveMouse(pos.x + x * mouseSpeed, pos.y + y * mouseSpeed);
 	}
 }
-;
 
-var RIGHT_THUMBSTICK_THRESHOLD = 0.16;
+function MoveThumbstickLeft(DataX, DataY, Max, Threshold) {
+	var x = (DataX - Max) / Max;
+	var y = (DataY - Max) / Max;
 
-function RightThumbIfCallback(x, y) {
-	var pos = robot.getMousePos();
-	var mouseSpeed = 3;
-	x = mouseSpeed * Math.sign(x) * Math.pow(x, 2);
-	y = mouseSpeed * Math.sign(y) * Math.pow(y, 2);
-	robot.moveMouse(pos.x + x * mouseSpeed, pos.y + y * mouseSpeed);
+	if (Math.abs(x) > Threshold || Math.abs(y) > Threshold) {
+		var angle = Math.atan2(y, x);
+		Movement.setAngle(angle);
+		Movement.move(startMovementCallback);
+	} else if (moving) {
+		Movement.stop(stopMovementCallback);
+	}
 }
 
-function RightThumbElseCallback() {
+var moving = false;
+
+function stopMovementCallback() {
+	moving = false;
 }
 
-function LeftThumbstickMouse(data, cbIf, cbElse) {
-	// resolve left thumb axis
-	MoveThumbstick(data[1], data[3],
-		MAX_INPUT_THUMBSTICK,
-		RIGHT_THUMBSTICK_THRESHOLD,
-		cbIf || RightThumbIfCallback,
-		cbElse || RightThumbElseCallback);
+function startMovementCallback() {
+	if (!moving) {
+		moving = true;
+		setTimeout(function () {
+			robot.mouseToggle("down");
+		}, 20);
+	}
 }
 
-function RightThumbstickMouse(data) {
-	MoveThumbstick(data[5], data[7],
-		MAX_INPUT_THUMBSTICK,
-		RIGHT_THUMBSTICK_THRESHOLD,
-		RightThumbIfCallback,
-		RightThumbElseCallback);
-}
+eventEmitter.on('keydown', function(key) {
+	
+	if(Settings.debug) {
+		console.log('keydown: ' + FunctionLibrary.indexOf(KEYS, key));
+	}
+	
+	switch(key) {
+		case KEYS.KEY_UP:
+		case KEYS.KEY_DOWN:
+		case KEYS.KEY_LEFT:
+		case KEYS.KEY_RIGHT:
+		case KEYS.KEY_SHOULDER_LEFT:
+		case KEYS.KEY_SHOULDER_RIGHT: 
+		/* use configured behavior; keydown */
+			var fn = ARPG.behaviors[key];
+			
+			if(ARPG.functions[fn[0]] instanceof Function) {
+				ARPG.functions[fn[0]](null, ARPG.keys[key]);
+			}
+		break;
+		case KEYS.DPAD_UP:
+		case KEYS.DPAD_RIGHT:
+		case KEYS.DPAD_DOWN:
+		case KEYS.DPAD_LEFT:
+		case KEYS.L3: 
+			var k = ARPG.keys[key];
+			KeyHandler.handle(k, 'down');
+		break;
+		case KEYS.R3:
+			KeyHandler.handle('control', 'down');
+		break;
+		case KEYS.KEY_SHOULDER_LEFT2:
+			KeyHandler.handle('escape', 'down');
+		break;		
+		case KEYS.KEY_SHOULDER_RIGHT2:
+			KeyHandler.handle('left', 'down');
+		break;		
+		case KEYS.KEY_SELECT:
+			ARPG.functions['ARPG.Fixed.FetchLootHold']();
+		break;
+		case KEYS.KEY_START:
+			KeyHandler.handle('i', 'down');
+	}
+	
+});
 
-module.exports.activateKey = ActivateKey;
-module.exports.resetInputArrays = ResetInputArrays;
-module.exports.leftThumbstickMouse = LeftThumbstickMouse;
-module.exports.clearHeld = ClearHeldInput;
-module.exports.rightThumbstick = RightThumbstickMouse;
-module.exports.moveStick = MoveThumbstick;
-module.exports.dpad = ResolveDpadInput;
+eventEmitter.on('keyup', function(key) {
+	
+	if(Settings.debug) {
+		console.log('keyup: ' + FunctionLibrary.indexOf(KEYS, key));
+	}
+	
+	switch(key) {
+		case KEYS.KEY_UP:
+		case KEYS.KEY_DOWN:
+		case KEYS.KEY_LEFT:
+		case KEYS.KEY_RIGHT:
+		case KEYS.KEY_SHOULDER_LEFT:
+		case KEYS.KEY_SHOULDER_RIGHT: 
+		/* use configured behavior; keydown */
+			var fn = ARPG.behaviors[key];
+			if(ARPG.functions[fn[1]] instanceof Function) {
+				ARPG.functions[fn[1]](null, ARPG.keys[key]);
+			} else {
+				KeyHandler.handle(ARPG.keys[key], 'up');
+			}
+		break;
+		case KEYS.DPAD_UP:
+		case KEYS.DPAD_RIGHT:
+		case KEYS.DPAD_DOWN:
+		case KEYS.DPAD_LEFT:
+		case KEYS.L3: 
+			var k = ARPG.keys[key];
+			KeyHandler.handle(k, 'up');
+		break;
+		case KEYS.R3:
+			KeyHandler.handle('control', 'up');
+		break;
+		case KEYS.KEY_SHOULDER_LEFT2:
+			KeyHandler.handle('escape', 'up');
+		break;		
+		case KEYS.KEY_SHOULDER_RIGHT2:
+			KeyHandler.handle('left', 'up');
+		break;
+		case KEYS.KEY_SELECT:
+			ARPG.functions['ARPG.Fixed.FetchLootRelease']();
+		break;
+		case KEYS.KEY_START:
+			KeyHandler.handle('i', 'up');
+	}
+	
+});
+
+module.exports.emitter = eventEmitter;
+module.exports.moveStickL = MoveThumbstickLeft;
+module.exports.moveStickR = MoveThumbstickRight;

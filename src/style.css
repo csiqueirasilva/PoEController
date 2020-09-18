@@ -49,6 +49,29 @@ body {
 	top: 1%;
 }
 
+#hardware-wrapper-dump {
+	margin-left: 1%;
+    margin-top: 1%;
+}
+
+#hardware-wrapper-dump pre {
+	width: 500px;
+}
+
+#hardware-config-list {
+	margin-left: 1%;
+    margin-top: 1%;
+}
+
+.hardware-config-menu {
+	min-width: 400px;
+	z-index: 5;
+}
+
+.hardware-config-menu .select2 {
+	min-width: 400px;
+}
+
 .button-input {
 	min-width: 160px;
 	position: absolute;
@@ -265,6 +288,11 @@ label {
 	height: 2.7vw;
 	vertical-align: top;
 	padding-top: 0.9vw;
+}
+
+#flash-msg {
+	font-size: 2em;
+	color: red;
 }
 
 #start-to-close .game-button-icon {

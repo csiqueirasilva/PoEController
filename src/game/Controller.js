@@ -47,30 +47,19 @@ Indexes
 	32	- Up + Left
 	
 */
-
 var Window = require('./Window');
 
-var Logger = require('./Logger');
+var UserSettings = require('../menu/UserSettings').Settings;
 
 var HID = require ('node-hid');
 
 // Searches for Xbox 360 Controller, Xbox 360 Wifi Controller, Xbox One Controller and Xbox 360 Wireless Receiver
 // http://www.linux-usb.org/usb.ids
-var VID = 0x45E; // Microsoft
-var PID = [0x28E, 0x28F, 0x2D1, 0x719, 0x2A1];
+var VID = UserSettings.vid;//0x45E; // Microsoft
+var PID = UserSettings.pid;//[0x28E, 0x28F, 0x2D1, 0x719, 0x2A1];
 
 var HIDController = null;
 var controllerFound = false;
-
-Logger.log('info', 'device dump: %j', HID.devices());
-
-for(var i = 0; i < PID.length && HIDController === null; i++) {
-	try {
-		HIDController = new HID.HID(VID, PID[i]);
-	} catch (e) {
-		Logger.warn(e);
-	}
-}
 
 function addDataListener(cb) {
 	if(HIDController !== null) {
@@ -84,17 +73,65 @@ function removeDataListener(cb) {
 	}
 }
 
-if(HIDController !== null) {
-	controllerFound = true;
-	HIDController.addListener('error', function () {
-		Window.quit('[CONTROLLER DISCONNECTED] Error while reading information from the controller. Please ensure it is correctly connected and run PoEController again.');
-	});
-} else {
-	Window.quit("[CONTROLLER NOT FOUND] Error while connecting to xbox 360/one controller driver. Please ensure it is correctly connected and configured.");
+function load() {
+	
+	var ret = false;
+	
+	var devices = HID.devices();
+
+	try {
+		HIDController = new HID.HID(VID, PID);
+	} catch (e) {
+	}
+	
+	if(HIDController !== null) {
+		
+		controllerFound = true;
+		HIDController.addListener('error', function () {
+			Window.quit('[CONTROLLER DISCONNECTED] Error while reading information from the controller. Please ensure it is correctly connected and run PoEController again.');
+		});
+		Window.send('menuWindow', 'display-window-title', 'menuWindow');
+		ret = {};
+		ret.vid = VID;
+		ret.pid = PID;
+		
+	} else {
+		Window.send('hardwareConfig', 'display-window-title', 'hardwareConfig');
+		Window.send('hardwareConfig', 'hardware-get-list', devices);
+		Window.alert("[CONTROLLER NOT FOUND] Error while connecting to controller. Please select your device and check if it is connected and configured.");
+	}
+	
+	return ret;
 }
 
+function unload() {
+	if(HIDController !== null) {
+		HIDController.close();
+		HIDController = null;
+	}
+}
+
+var electron = require('electron');
+electron.ipcMain.on('hardware-connect-device', (ev, vid, pid, title) => {
+	if(HIDController !== null) {
+		HIDController.close();
+	}
+	
+	try {
+		HIDController = new HID.HID(vid, pid);
+		addDataListener((d) => {
+			Window.send(title, 'hardware-get-data', d);
+		});
+	} catch (e) {
+		HIDController = null;
+		Window.alert('Could not connect to selected device:' + e.message);
+	}
+});
+
 module.exports = {
-	found: controllerFound,
+	load: load,
+	found: () => controllerFound,
 	addDataListener: addDataListener,
-	removeDataListener: removeDataListener
+	removeDataListener: removeDataListener,
+	unload: unload
 };

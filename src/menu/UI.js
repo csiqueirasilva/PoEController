@@ -10,7 +10,7 @@
 	var menuCanvas = document.getElementById('reference-img');
 	var ctx = menuCanvas.getContext('2d');
 
-	var menuWindow = global.menuWindow;
+	var menuWindow = global.findWindowByTitle('menuWindow');
 	
 	var LABEL_IDS = {
 		DPAD_UP: 'button-dpad-up',
@@ -86,8 +86,8 @@
 	
 	function drawControllerReferencemenuCanvas(op) {
 		
-		menuCanvas.width = menuWindow.window.innerWidth;
-		menuCanvas.height = menuWindow.window.innerHeight;
+		menuCanvas.width = menuWindow.getBounds().width;
+		menuCanvas.height = menuWindow.getBounds().height;
 		
 		ctx.clearRect(0, 0, menuCanvas.width, menuCanvas.height);
 		

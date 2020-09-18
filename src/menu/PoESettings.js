@@ -1,8 +1,11 @@
 /* global module */
 
-module.exports = (function() {
+const UserSettings = require('./UserSettings');
 
-	var Window = require('../game/Window');
+let Width = 0;
+let Height = 0;
+
+module.exports = (function() {
 
 	var defaultActionKeysSettings = `[ACTION_KEYS]
 attack_in_place=16
@@ -45,7 +48,7 @@ zoom_out=34
 `;
 
 	var defaultKeyPickup = `
-key_pickup=1`;
+key_pickup=2`;
 	var defaultCorpseTargeting = `
 corpse_targeting=key`;
 	
@@ -56,52 +59,20 @@ resolution_height=%h
 resolution_width=%w
 screen_shake=false`;
 
-	function configFilePath(docFolder) {
-		return process.env['USERPROFILE'] + '\\' + docFolder + '\\My Games\\Path of Exile\\production_Config.ini';
+	var fs = require('fs');
+	var app = require('electron').app;
+	
+	if(app === undefined) {
+		app = require('electron').remote.app;
 	}
 
-	var fs = require('fs');
-	var gui = window.require('nw.gui');
-
-	var lastFilePath = null;
+	var lastFilePath = UserSettings.Settings.gameConfigPath.replace(/%([^%]+)%/g, (_,n) => process.env[n]);
 	
 	var originalConfigFileContents = null;
 	var originalActionKeys = null;
 	var originalKeyPickup = null;
 	var originalCorpseTargeting = null;
 	var originalVideoSettings = null;
-	
-	function getFilePath() {
-		var path;
-		var ret = null;
-		try {
-			path = configFilePath('Documents');
-			stats = fs.lstatSync(path);
-			if(stats.isFile) {
-				ret = path;
-			}
-		}
-		catch (e1) {
-			try {
-				path = configFilePath('My Documents');
-				stats = fs.lstatSync(path);
-				if(stats.isFile) {
-					ret = path;
-				}
-			} catch (e2) {
-				var dialog = require('dialog');
-				
-				dialog.info('Could not find Path of Exile\'s configuration file', 'Error', function () {
-					gui.App.closeAllWindows();
-					gui.App.quit();
-				});
-			}
-		}
-		
-		lastFilePath = ret;
-		
-		return ret;
-	}
 	
 	function rewriteConfigFile() {
 		console.log('reading config file ' + lastFilePath);
@@ -141,7 +112,7 @@ screen_shake=false`;
 			originalVideoSettings = match[0];
 		}
 		
-		videoSettings = videoSettings.replace("%w", Window.width).replace("%h", Window.height);
+		videoSettings = videoSettings.replace("%w", Width).replace("%h", Height);
 		
 		finalContent = finalContent.replace(originalVideoSettings, videoSettings);
 		
@@ -149,14 +120,21 @@ screen_shake=false`;
 	}
 
 	function restoreConfigFile() {
-		console.log('restoring config file');
-		fs.writeFileSync(lastFilePath, originalConfigFileContents);
+		if(lastFilePath !== null) {
+			console.log('restoring game config file ' + lastFilePath);
+			fs.writeFileSync(lastFilePath, originalConfigFileContents);
+		} else {
+			console.log('no lastFilePath to restore game config file');
+		}
 	}
 	
 	return {
-		getFilePath: getFilePath,
 		rewriteConfigFile: rewriteConfigFile,
-		restoreConfigFile: restoreConfigFile
+		restoreConfigFile: restoreConfigFile,
+		setScreenSize: function(w, h) {
+			Width = w;
+			Height = h;
+		}
 	};
 	
 })();

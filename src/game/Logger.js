@@ -1,9 +1,9 @@
 var winston = require('winston');
 var fs = require('fs');
-var Configuration = require('./Configuration');
+var UserSettings = require('../menu/UserSettings');
 var Window = require('./Window');
 
-var logFile = Configuration.DATA_PATH + '/output.log';
+var logFile = UserSettings.DATA_PATH + '/output.log';
 
 var logger = null;
 var error = false;

@@ -1,11 +1,19 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title>PoEController Menu</title>
+		<title>menuWindow</title>
+		
+		<!-- Insert this line above script imports  -->
+		<script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
 
 		<script src="lib/jquery/jquery.min.js"></script>
 		<script src="lib/bootstrap/bootstrap.min.js"></script>
 		<script src="lib/select2/select2.min.js"></script>
+		<script src="lib/globals.js"></script>
+		<script src="lib/generalui.js"></script>
+		
+		<!-- Insert this line after script imports -->
+		<script>if (window.module) module = window.module;</script>		
 		
 		<link rel="stylesheet" type="text/css" href="lib/bootstrap/bootstrap.min.css" />
 		<link rel="stylesheet" type="text/css" href="lib/select2/select2.min.css" />
@@ -13,14 +21,14 @@
 		<link rel="stylesheet" type="text/css" href="style.css" />
 		
 	</head>
-	<body id="main-menu-body" style="display: none;" unselectable="on" onselectstart="return false;">
+	<body id="main-menu-body" unselectable="on" onselectstart="return false;">
 		
 		<div id="main-menu" class="container-fluid">
 			
 			<div id="close-btn"></div>
 			
 			<div class="ui-element" id="select-input-method-box">
-				<label>Input Method</label>
+				<label>Icons layout</label>
 
 				<select class="form-control" id="select-input-method">
 					<option value="xbox">XBOX</option>
@@ -99,7 +107,7 @@
 			
 			<label id="label-char-movement">CHARACTER MOVEMENT</label>
 			<label id="label-mouse-cursor">MOUSE CURSOR (R3: CTRL)</label>
-			<label id="label-mouse-click">MOUSE CLICK (WITH ALT)</label>
+			<label id="label-mouse-click">MOUSE CLICK (WITH F)</label>
 			<label id="label-escape">ESCAPE</label>
 			<label id="label-loot-position">LOOT POSITION</label>
 			<label id="label-open-menu">OPEN MENU</label>
@@ -108,22 +116,18 @@
 			
 			<div id="start-area">
 				<div>
-					<label><span id="warning-msg">*** DO NOT MINIMIZE THIS SCREEN ***</span></label>
+					<label><!--span id="warning-msg"></span--></label>
 				</div>
 				<div>
 					<label><span id="flash-msg"></span></label>
 				</div>
 				<div>
-					<label><a target="_blank" href="https://github.com/csiqueirasilva/PoEController/blob/master/README.md">Click here to check the README file for more information</a></label>
+					<label><a style="cursor: pointer;" target="_blank" id="link-readme">Click here to check the README file for more information</a></label>
 				</div>
 				<div>
 				
 					<div id="arpg-help-checkbox" class="menu-choice-checkbox checkbox">
-						<label><input type="checkbox" checked="checked">Use ARPG mode on-screen help</label>
-					</div>
-					
-					<div id="menu-help-checkbox" class="menu-choice-checkbox checkbox">
-						<label><input type="checkbox" checked="checked">Use menus on-screen help</label>
+						<label><input type="checkbox">Use ARPG mode on-screen help</label>
 					</div>
 
 					<button id="btn-start" class="btn">Start gamepad</button>
@@ -133,66 +137,57 @@
 		</div>
 
 		<!-- imgs -->
-		<img style="display: none;" id="xbox-img" src="imgs/xbox.png" />
-		<img style="display: none;" id="ps3-img" src="imgs/ps3.png" />
+		<img style="display: none;" id="xbox-img" src="./imgs/xbox.png" />
+		<img style="display: none;" id="ps3-img" src="./imgs/ps3.png" />
 		<!-- imgs -->
 
 		<script>
-			var gui = require('nw.gui');
-			
 			global.$ = $;
 			global.document = document;
-			global.menuWindow = gui.Window.get();
-			
-			require('./game/Main');
+			global.menuWindow = win;
 		</script>
 		
 		<script src="./menu/UI.js"></script>
 		
 		<script>
 			
-			var UserSettings = require('./menu/UserSettings');
-			var PoESettings = require('./menu/PoESettings');
-			var KEYS = require('./game/Enums').KEYS;
-			var GAME_MODE = require('./game/Enums').GAME_MODE;
-			var GameModeARPG = require('./game/modes/ARPG');
-			var Game = require('./game/Game');
-			
 			global.menuWindow.on('focus', function() {
 				global.hideAllHelp();
 			});
 	
-			$('#arpg-help-checkbox').click(function() {
-				global.setARPGHelp($(this).is(':checked'));
-			});
-
-			$('#menu-help-checkbox').click(function() {
-				global.setMenuHelp($(this).is(':checked'));
-			});
-			
-			function updateGameOverlay (mode) {
-				global.showGameOverlay($('#select-input-method').val(), mode);
-			}
-	
-			// src: https://github.com/nwjs/nw.js/issues/1162
-			$('a[target=_blank]').on('click', function(){
-				require('nw.gui').Shell.openExternal( this.href );
-				return false;
-			});
-	
-			$('select').select2();
-	
 			$('#select-input-method').change();
 	
-			$('#btn-start').click(function() {
+			ipcRenderer.on('game-start', (ev, data) => {
+				global.findWindowByTitle('Overlay').focus();
+				$('#btn-start').prop('disabled', false);
+			});
+	
+			var timeoutFlash = null;
 			
-				UserSettings.Save();
+			function cancelFlashMsg() {
+				$('#flash-msg').hide();
+				clearTimeout(timeoutFlash);
+				timeoutFlash = null;
+			}
+	
+			function displayFlashMsg(msg) {
+				$('#flash-msg').html(msg);
+		 
+				$('#flash-msg').show()
+			
+				timeoutFlash = setTimeout(() => {
+					$('#flash-msg').hide();
+					timeoutFlash = null;
+				}, 5000);
+			}
+	
+			$('#btn-start').click(function() {
 			
 				var otherInputs = $('select, button, input').not(this);
 			
 				if($(this).html() === "Stop gamepad") {
-					global.hideGameOverlay();
-					Game.finish();
+					cancelFlashMsg();
+					ipcRenderer.send('game-finish', true);
 					$(this).html("Start gamepad");
 					otherInputs.prop('disabled', false);
 				} else {
@@ -207,52 +202,21 @@
 					inputArgs[KEYS.KEY_RIGHT] = $('#button-key-right select').val();
 					inputArgs[KEYS.KEY_DOWN] = $('#button-key-down select').val();
 					
-					GameModeARPG.setBehavior(inputArgs);
-
-					var btn = $(this);
+					var arpgHelp = $('#arpg-help-checkbox').find('input').is(':checked');
 					
-					Game.start(function() {
-						global.gameOverlay.focus();
-						setTimeout(function() {
-							updateGameOverlay(GAME_MODE.ARPG);
-							$('#flash-msg').hide();
-							btn.prop('disabled', false);
-						}, 6500);
-					});
+					ipcRenderer.send('game-start', inputArgs, $('#select-input-method').val(), arpgHelp);
 
-					$('#flash-msg').html("If you have Path of Exile Steam Version it will open (or focus the window, if already open).<br />If not, please open Path of Exile's game client.");
-					$('#flash-msg').show();
+					displayFlashMsg("Please open the game!");
 
 					$(this).html("Stop gamepad");
 				}
 			});
 
-			function QuitApplication() {
-				UserSettings.Save(function() {
-					PoESettings.restoreConfigFile();
-					gui.App.quit();
-				});
-			}
-				
-			global.menuWindow.on('close', function () {
-				QuitApplication();
-			});
-			
-			global.gameOverlay.on('close', function () {
-				QuitApplication();
-			});
-	
-			$('#close-btn').click(function () {
-				QuitApplication();
-			});
-	
 			$(window).load(function() {
-				PoESettings.getFilePath();
-				PoESettings.rewriteConfigFile();
 				UserSettings.Load(function() {
 					$('#main-menu-body').show();
 					$('#select-input-method').trigger('change');
-					global.menuWindow.focus();
+					global.findWindowByTitle('menuWindow').focus();
 				});
 			});
 	

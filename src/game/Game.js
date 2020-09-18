@@ -1,53 +1,40 @@
-/* global Function */
-
-/* global modules */
-
 module.exports = {};
 
-var Mode = require('./Mode');
-
 var GameModeARPG = require('./modes/ARPG');
-var GameModeDebug = require('./modes/Debug');
-var GameModeInventory = require('./modes/Inventory');
-var GameModeOptionsMenu = require('./modes/OptionsMenu');
-var GameModePassiveSkillTree = require('./modes/PassiveSkillTree');
-var GameModeWorldMap = require('./modes/WorldMap');
 
 var DEBUG_MODE = require('./Enums').DEBUG_MODE;
-var Logger = require('./Logger');
 var Window = require('./Window');
-var Input = require('./Input');
-var Worker = require('workerjs');
-var exec = require('child_process').exec;
+var Input = null;
+var child_process = require('child_process');
 var fs = require('fs');
 var Enums = require('./Enums');
 var GAME_MODE = Enums.GAME_MODE;
 var Controller = require('./Controller');
+var Settings = require('../menu/UserSettings').Settings;
+var shell = require('electron').shell;
+
+var successController = Controller.load();
+
+if(successController) {
+	Input = require('./inputs/i' + successController.vid + '_' + successController.pid);
+}
 
 var RightThumbstickMouseInterval = null;
 
 var LastInputData = null;
 
 function ControllerListener(data) {
-	Input.rightThumbstick(data);
-	Mode.solveInput(data);
+	Input.handleInput(data);
 }
 
-function StartControllerListener(callbackInitGame) {
+function StartControllerListener() {
 	Controller.addDataListener(ControllerListener);
 
 	if (!DEBUG_MODE) {
-		
-		exec("start steam://rungameid/238960", function (error, stdout, stderr) {
-			console.log(stdout);
-
-			if (error) {
-				return console.error(stderr);
-			}
-		});
-
-		if (typeof callbackInitGame === "function") {
-			callbackInitGame();
+		if(Settings.steamGame) {
+			shell.openExternal("steam://rungameid/238960");
+		} else {
+			child_process.execFile(Settings.gamePath);
 		}
 	}
 }
@@ -59,53 +46,23 @@ function RemoveControllerListener() {
 	LastInputData = null;
 }
 
-function GetModeById(id) {
-	var mode = null;
-	
-	switch (id) {
-		case GAME_MODE.DEBUG:
-			mode = GameModeDebug;
-			break;
-		case GAME_MODE.INVENTORY:
-			mode = GameModeInventory;
-			break;
-		case GAME_MODE.OPTIONS_MENU:
-			mode = GameModeOptionsMenu;
-			break;
-		case GAME_MODE.PASSIVE_SKILL_TREE:
-			mode = GameModePassiveSkillTree;
-			break;
-		case GAME_MODE.WORLD_MAP:
-			mode = GameModeWorldMap;
-			break;
-		default:
-			mode = GameModeARPG;
+var ipcMain = require('electron').ipcMain;
+
+ipcMain.on('game-start', (ev, data, inputMethod, arpgHelp) => {
+	var behaviorsArr = [];
+	for(var k in data) {
+		behaviorsArr[parseInt(k)] = data[k];
 	}
-	return mode;
-}
+	GameModeARPG.setBehavior(behaviorsArr);
+	StartControllerListener();
+	Window.send('Overlay', 'game-start', inputMethod, arpgHelp);
+	Window.send('menuWindow', 'game-start', true);
+});
 
-function SetModeById(id) {
-	var mode = GetModeById(id);
-	Mode.set(mode);
-}
+ipcMain.on('game-finish', () => {
+	Window.send('Overlay', 'overlay-hide', true);
+	RemoveControllerListener();
+});
 
-function ChangeModeById(id) {
-	var mode = GetModeById(id);
-	Mode.change(mode);
-}
-
-function Init() {
-	if (DEBUG_MODE) {
-		showAllDevTools();
-		SetModeById(GAME_MODE.DEBUG);
-		StartControllerListener();
-		PollGamepadEvents();
-	} else {
-		SetModeById(GAME_MODE.ARPG);
-	}
-}
-
-module.exports.init = Init;
 module.exports.start = StartControllerListener;
 module.exports.finish = RemoveControllerListener;
-module.exports.changeById = ChangeModeById;
