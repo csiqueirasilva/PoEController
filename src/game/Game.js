@@ -34,7 +34,11 @@ function StartControllerListener() {
 		if(Settings.steamGame) {
 			shell.openExternal("steam://rungameid/238960");
 		} else {
-			child_process.execFile(Settings.gamePath);
+			var cwd = Settings.gamePath.substring(0, Settings.gamePath.lastIndexOf("\\"));
+			console.log('game working dir: ' + cwd);
+			child_process.execFileSync(Settings.gamePath, {
+				cwd: cwd
+			});
 		}
 	}
 }
