@@ -244,23 +244,25 @@ function handleInput(data) {
 		pressed[KEYS.KEY_SHOULDER_LEFT2] = false;
 		emitter.emit('keyup', KEYS.KEY_SHOULDER_LEFT2);
 	}
+	*/
 	
-	if((data[6] & 0b00000010) && !pressed[KEYS.KEY_SHOULDER_RIGHT]) {
+	// Shoulder buttons
+	if((data[10] & 0b00100000) && !pressed[KEYS.KEY_SHOULDER_RIGHT]) {
 		pressed[KEYS.KEY_SHOULDER_RIGHT] = true;
 		emitter.emit('keydown', KEYS.KEY_SHOULDER_RIGHT);
-	} else if(pressed[KEYS.KEY_SHOULDER_RIGHT] && !(data[6] & 0b00000010)) {
+	} else if(pressed[KEYS.KEY_SHOULDER_RIGHT] && !(data[10] & 0b00100000)) {
 		pressed[KEYS.KEY_SHOULDER_RIGHT] = false;
 		emitter.emit('keyup', KEYS.KEY_SHOULDER_RIGHT);
 	}
 	
-	if((data[6] & 0b00000001) && !pressed[KEYS.KEY_SHOULDER_LEFT]) {
+	if((data[10] & 0b00010000) && !pressed[KEYS.KEY_SHOULDER_LEFT]) {
 		pressed[KEYS.KEY_SHOULDER_LEFT] = true;
 		emitter.emit('keydown', KEYS.KEY_SHOULDER_LEFT);
-	} else if(pressed[KEYS.KEY_SHOULDER_LEFT] && !(data[6] & 0b00000001)) {
+	} else if(pressed[KEYS.KEY_SHOULDER_LEFT] && !(data[10] & 0b00010000)) {
 		pressed[KEYS.KEY_SHOULDER_LEFT] = false;
 		emitter.emit('keyup', KEYS.KEY_SHOULDER_LEFT);
 	}
-	*/
+	
 }
 
 module.exports = {
