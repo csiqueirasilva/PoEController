@@ -9,6 +9,8 @@ const Controller = require('./src/game/Controller');
 const menuWidth = 1173;
 const menuHeight = 660;
 
+app.commandLine.appendSwitch('disable-renderer-backgrounding');
+
 function createWindow () {
 	
 	const hardwareConfig = new electron.BrowserWindow({
