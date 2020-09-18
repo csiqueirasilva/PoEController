@@ -36,7 +36,7 @@ function StartControllerListener() {
 		} else {
 			var cwd = Settings.gamePath.substring(0, Settings.gamePath.lastIndexOf("\\"));
 			console.log('game working dir: ' + cwd);
-			child_process.execFileSync(Settings.gamePath, {
+			child_process.execFile(Settings.gamePath, {
 				cwd: cwd
 			});
 		}
