@@ -225,26 +225,23 @@ function handleInput(data) {
 		emitter.emit('keyup', KEYS.L3);
 	}
 	
-	/* im leaving the shoulder triggers on comment since im not sure how they work from the spreadsheet
+	/* proposed solution for L2 and R2 */
 	
-	if((data[9] > 128) && !pressed[KEYS.KEY_SHOULDER_RIGHT2]) { // is shoulder trigger right
+	if((data[9] < 128) && !pressed[KEYS.KEY_SHOULDER_RIGHT2]) { // is shoulder trigger right
 		pressed[KEYS.KEY_SHOULDER_RIGHT2] = true;
 		emitter.emit('keydown', KEYS.KEY_SHOULDER_RIGHT2);
-	} else if(pressed[KEYS.KEY_SHOULDER_RIGHT2] && !(data[9] <= 128)) { // not shoulder trigger right
+	} else if(pressed[KEYS.KEY_SHOULDER_RIGHT2] && (data[9] >= 128)) { // not shoulder trigger right
 		pressed[KEYS.KEY_SHOULDER_RIGHT2] = false;
 		emitter.emit('keyup', KEYS.KEY_SHOULDER_RIGHT2);
 	}
 	
-	data[9] could be the byte that gives their range, but isnt there any other that indicate that the left one, the right one or both are being pressed?
-	
-	if((data[6] & 0b00000100) && !pressed[KEYS.KEY_SHOULDER_LEFT2]) {
+	if((data[9] > 128) && !pressed[KEYS.KEY_SHOULDER_LEFT2]) { // is shoulder trigger right
 		pressed[KEYS.KEY_SHOULDER_LEFT2] = true;
 		emitter.emit('keydown', KEYS.KEY_SHOULDER_LEFT2);
-	} else if(pressed[KEYS.KEY_SHOULDER_LEFT2] && !(data[6] & 0b00000100)) {
+	} else if(pressed[KEYS.KEY_SHOULDER_LEFT2] && (data[9] <= 128)) { // not shoulder trigger right
 		pressed[KEYS.KEY_SHOULDER_LEFT2] = false;
 		emitter.emit('keyup', KEYS.KEY_SHOULDER_LEFT2);
 	}
-	*/
 	
 	// Shoulder buttons
 	if((data[10] & 0b00100000) && !pressed[KEYS.KEY_SHOULDER_RIGHT]) {
