@@ -35,7 +35,7 @@ npm start
 - to create the installation package, there's a pack command set on package.json that uses electron-builder
 
 ```
-npm dist
+npm run dist
 ```
 
 # configuration file 

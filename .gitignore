@@ -1,5 +1,5 @@
 node_modules
-bin
+dist
 build/config.gyp
 build/poe-controller
 nbproject

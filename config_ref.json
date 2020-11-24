@@ -17,6 +17,6 @@
 	"useXInputBin": true,
 	"rightStickDeadzone": 0.16,
 	"leftStickDeadzone": 0.16,
-	"rightStickCursorSpeed": 3,
+	"rightStickCursorSpeed": 4,
 	"bluetooth": false
 }
