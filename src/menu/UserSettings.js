@@ -71,15 +71,21 @@ function persistUserSettings (cb) {
 }
 
 function loadUserSettings(cb) {
+
+	var readData = fs.readFileSync('config_ref.json');
 	
 	if(!fs.existsSync(configFilePath)) {
-		var data = fs.readFileSync('config_ref.json');
-		fs.writeFileSync(configFilePath, data);
+		fs.writeFileSync(configFilePath, readData);
 	}
 	
-	let readData = fs.readFileSync(configFilePath);	
-	
+	let data = fs.readFileSync(configFilePath);	
+
+	var settingsUser = JSON.parse(data);
 	var settings = JSON.parse(readData);
+
+	for(var key in settingsUser) {
+		settings[key] = settingsUser[key];
+	}
 	
 	if(settings && settings.debug) {
 		console.log('loaded user settings:');

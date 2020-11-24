@@ -10,6 +10,7 @@ var FunctionLibrary = require('./FunctionLibrary');
 var ARPG = require('./modes/ARPG');
 var Movement = require('./behaviors/Movement');
 var Settings = require('../menu/UserSettings').Settings;
+var Window = require('./Window');
 
 robot.setMouseDelay(0);
 robot.setKeyboardDelay(0);
@@ -20,7 +21,7 @@ function MoveThumbstickRight(DataX, DataY, Max, Threshold) {
 
 	if (Math.abs(x) > Threshold || Math.abs(y) > Threshold) {
 		var pos = robot.getMousePos();
-		var mouseSpeed = 3;
+		var mouseSpeed = Settings.rightStickCursorSpeed;
 		x = mouseSpeed * Math.sign(x) * Math.pow(x, 2);
 		y = mouseSpeed * Math.sign(y) * Math.pow(y, 2);
 		robot.moveMouse(pos.x + x * mouseSpeed, pos.y + y * mouseSpeed);

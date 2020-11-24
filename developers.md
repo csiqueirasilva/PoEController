@@ -2,7 +2,7 @@
 
 This application was made in the past just to allow some players to experience Path of Exile with a gamepad. When it was made, there was no console version of the game and some attempts were made to add a gamepad to it.
 
-Currently (September 2020), this application servers as an accessibility tool to some people to play the game.
+Currently (November 2020), this application servers as an accessibility tool to some people to play the game.
 
 The version v2.0 of this project was built using ElectronJS (version of the libraries in package.json), node v12.18.3 and npm v6.14.6.
 
@@ -32,6 +32,12 @@ npm install
 npm start
 ```
 
+- to create the installation package, there's a pack command set on package.json that uses electron-builder
+
+```
+npm dist
+```
+
 # configuration file 
 
 The configuration file for the application resides in **%APPDATA%\PoeController\user-settings.json**. It is copied from config_ref.json, on the root of the project, if it doesn't exists.
@@ -51,15 +57,21 @@ The configuration file for the application resides in **%APPDATA%\PoeController\
 		"right":"arpg.nothing",
 		"middle":"arpg.nothing"
 	},
-	"vid": 0, /* the vid of the gamepad */
-	"pid": 0, /* the pid of the gamepad */
-	"bluetooth": false /* check if gamepad is bluetooth */
+	"vid": 0, /* the vid of the gamepad; only used for non-xinput devices */
+	"pid": 0, /* the pid of the gamepad; only used for non-xinput devices */
+	"useXInputBin": true, /* if using an xinput device, this should be set to true so the application uses a special executable to get gamepad data */
+	"rightStickDeadzone": 0.16, /* deadzone for the right stick */
+	"leftStickDeadzone": 0.16, /* deadzone for the left stick */
+	"rightStickCursorSpeed": 3, /* mouse cursor speed when using the right stick */
+	"bluetooth": false /* check if gamepad is bluetooth; only used for non-xinput devices */
 }
 ```
 
 The input translators should reside in **src/game/inputs/**, in the format of i\<vid\>_\<pid\>.js with the application shipping with i1356_2508.js for PS4 controller (its what I have to test currently).
 
-If your controller is not detected, it opens a new interface where you can select the detected usb devices and check the pid/vid for it (and also it writes the first 16 bytes of data from the buffer, so you can do some quick input tests and check whats been read in binary data).
+There's an experimental xinput mode for the application, thats uses an executable written in C++ to relay data from the xinput API to node. If using this mode, there's a fixed input translator file, **src/game/inputs/xinput.js**. 
+
+If not using xinput binary translator and your controller is not detected, it opens a new interface where you can select the detected usb devices and check the pid/vid for it (and also it writes the first 16 bytes of data from the buffer, so you can do some quick input tests and check whats been read in binary data).
 
 <img src="screenshots/hardwareconfig1.png" alt="Main menu" width="100%" />
 
@@ -115,7 +127,7 @@ ipcMain.on('game-start', (ev, data, inputMethod, arpgHelp) => {
 });
 ```
 
-- the polling mechanism gets *data* array from the gamepad and relays it to Input.handleData(data); Input is the module that was required base on the detected gamepad vid and pid, and such scripts reside at **src/game/inputs/**, with the format **i\<vid\>_\<pid\>.js**. **src/game/Input** receives data from this vid/pid script, and abstracts the input into what they are supposed to do.
+- the polling mechanism gets *data* array from the gamepad and relays it to Input.handleData(data); Input is the module that was required base on the detected gamepad vid and pid, and such scripts reside at **src/game/inputs/**, with the format **i\<vid\>_\<pid\>.js** or using **xinput.js** if xinput mode is toggled ON. **src/game/Input** receives data from this vid/pid script, and abstracts the input into what they are supposed to do.
 
 - *game-finish* event gets called when the user presses "Stop Gamepad" button on *menuWindow*. This hides *Overlay* and stops reading data from the gamepad.
 

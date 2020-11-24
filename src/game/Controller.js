@@ -60,16 +60,24 @@ var PID = UserSettings.pid;//[0x28E, 0x28F, 0x2D1, 0x719, 0x2A1];
 
 var HIDController = null;
 var controllerFound = false;
+var intervalDataRead = null;
 
 function addDataListener(cb) {
-	if(HIDController !== null) {
-		HIDController.addListener('data', cb);
+	var readData = null;
+
+	if(HIDController !== null && intervalDataRead === null) {
+		intervalDataRead = setInterval(() => {
+			readData = HIDController.readSync();
+			cb(readData);
+			console.log(readData, 'interval read');
+		}, 5);
 	}
 }
 
-function removeDataListener(cb) {
-	if(HIDController !== null) {
-		HIDController.removeListener('data', cb);
+function removeDataListener() {
+	if(HIDController !== null && intervalDataRead !== null) {
+		clearInterval(intervalDataRead);
+		intervalDataRead = null;
 	}
 }
 

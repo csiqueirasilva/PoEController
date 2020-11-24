@@ -158,7 +158,6 @@
 			$('#select-input-method').change();
 	
 			ipcRenderer.on('game-start', (ev, data) => {
-				//global.findWindowByTitle('Overlay').focus();
 				$('#btn-start').prop('disabled', false);
 				win.blur();
 			});

@@ -1,5 +1,10 @@
 const electron = require('electron');
 const app = electron.app;
+
+app.commandLine.appendSwitch("disable-renderer-backgrounding");
+app.commandLine.appendSwitch("disable-background-timer-throttling");
+electron.powerSaveBlocker.start('prevent-app-suspension');
+
 const screen = electron.screen;
 const child_process = require('child_process');
 const PoESettings = require('./src/menu/PoESettings');
@@ -8,8 +13,6 @@ const Controller = require('./src/game/Controller');
 
 const menuWidth = 1173;
 const menuHeight = 660;
-
-app.commandLine.appendSwitch('disable-renderer-backgrounding');
 
 function createWindow () {
 	
@@ -26,11 +29,15 @@ function createWindow () {
 		webPreferences: {
 			nodeIntegration: true,
 			enableRemoteModule: true,
-			webSecurity: false
+			webSecurity: false,
+					pageVisibility: true,
+					backgroundThrottling: false
 		}
 	});
 	
 	hardwareConfig.hide();
+	
+	hardwareConfig.setMinimizable(false);
 	
 	hardwareConfig.loadFile('./src/config.html');
 
@@ -49,11 +56,15 @@ function createWindow () {
 			webPreferences: {
 				nodeIntegration: true,
 				enableRemoteModule: true,
-				webSecurity: false
+				webSecurity: false,
+					pageVisibility: true,
+					backgroundThrottling: false
 			}
 		});
 		
 		menuWindow.hide();
+		
+		menuWindow.setMinimizable(false);
 		
 		menuWindow.loadFile('./src/index.html');
 		
@@ -72,7 +83,9 @@ function createWindow () {
 				webPreferences: {
 					nodeIntegration: true,
 					enableRemoteModule: true,
-					webSecurity: false
+					webSecurity: false,
+					pageVisibility: true,
+					backgroundThrottling: false
 				}
 			});
 
@@ -83,7 +96,11 @@ function createWindow () {
 
 			win.setIgnoreMouseEvents(true, { forward: true });
 			
-			win.setAlwaysOnTop(true, 'pop-up-menu');
+			win.setMinimizable(false);
+			
+			win.webContents.setBackgroundThrottling(false);
+			
+			win.setAlwaysOnTop(true, 'screen-saver');
 			
 			ipcMain.on('window-request-screensize', () => {
 				let windows = electron.BrowserWindow.getAllWindows();
@@ -111,8 +128,16 @@ function createWindow () {
 			win.webContents.once('did-finish-load', () => {
 				PoESettings.rewriteConfigFile();
 				require('./src/game/Main');
+				win.hide();
 			});
 			
+			win.on('blur', () => {
+				// focus overlay if it is visible and loses focus; 
+				// fix xbox one controller not working without window focus
+				if(win.isVisible()) {
+					//win.focus();
+				}
+			});
 		});
 		
 	});

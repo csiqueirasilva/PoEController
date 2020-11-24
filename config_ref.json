@@ -14,5 +14,9 @@
 	},
 	"vid": 0,
 	"pid": 0,
+	"useXInputBin": true,
+	"rightStickDeadzone": 0.16,
+	"leftStickDeadzone": 0.16,
+	"rightStickCursorSpeed": 3,
 	"bluetooth": false
 }

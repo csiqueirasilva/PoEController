@@ -12,23 +12,51 @@ var GAME_MODE = Enums.GAME_MODE;
 var Controller = require('./Controller');
 var Settings = require('../menu/UserSettings').Settings;
 var shell = require('electron').shell;
-
-var successController = Controller.load();
-
-if(successController) {
-	Input = require('./inputs/i' + successController.vid + '_' + successController.pid);
-}
+const { spawn, execFile } = require("child_process");
 
 var RightThumbstickMouseInterval = null;
 
-var LastInputData = null;
+var forwardEvents = false;
 
-function ControllerListener(data) {
-	Input.handleInput(data);
+if(Settings.useXInputBin) {
+	let execPath = 'bin/xinput.exe';
+	let args = [];
+	
+	Input = require('./inputs/xinput');
+	
+	const proc = spawn(execPath, args);
+	const stream = proc.stdout;
+	
+	stream.on("data", chunk => {
+		//console.log(chunk);
+		
+		if(forwardEvents) {
+			Input.handleInput(chunk);
+		}
+	});
+	
+	Window.send('menuWindow', 'display-window-title', 'menuWindow');
+
+} else {
+	var successController = Controller.load();
+
+	if(successController) {
+		Input = require('./inputs/i' + successController.vid + '_' + successController.pid);
+	}
+	
+	function ControllerListener(data) {
+		//console.log(data);
+		
+		if(forwardEvents) {
+			Input.handleInput(data);
+		}
+	}
+
+	Controller.addDataListener(ControllerListener);
 }
 
 function StartControllerListener() {
-	Controller.addDataListener(ControllerListener);
+	forwardEvents = true;
 
 	if (!DEBUG_MODE) {
 		if(Settings.steamGame) {
@@ -44,10 +72,7 @@ function StartControllerListener() {
 }
 
 function RemoveControllerListener() {
-	Controller.removeDataListener(ControllerListener);
-	clearInterval(RightThumbstickMouseInterval);
-	RightThumbstickMouseInterval = null;
-	LastInputData = null;
+	forwardEvents = false;
 }
 
 var ipcMain = require('electron').ipcMain;

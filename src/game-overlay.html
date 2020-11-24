@@ -336,10 +336,12 @@
 			ipcRenderer.on('game-start', (ev, inputMethod, arpgHelp) => {
 				ARPGHelp = arpgHelp;
 				global.showGameOverlay(inputMethod, GAME_MODE.ARPG);
+				win.show();
 			});
 			
 			ipcRenderer.on('overlay-hide', () => {
 				global.hideGameOverlay();
+				win.hide();
 			});
 			
 		</script>

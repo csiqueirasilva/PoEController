@@ -235,10 +235,10 @@ function handleInput(data) {
 		emitter.emit('keyup', KEYS.KEY_SHOULDER_RIGHT2);
 	}
 	
-	if((data[9] > 128) && !pressed[KEYS.KEY_SHOULDER_LEFT2]) { // is shoulder trigger right
+	if((data[9] > 128) && !pressed[KEYS.KEY_SHOULDER_LEFT2]) { // is shoulder trigger left
 		pressed[KEYS.KEY_SHOULDER_LEFT2] = true;
 		emitter.emit('keydown', KEYS.KEY_SHOULDER_LEFT2);
-	} else if(pressed[KEYS.KEY_SHOULDER_LEFT2] && (data[9] <= 128)) { // not shoulder trigger right
+	} else if(pressed[KEYS.KEY_SHOULDER_LEFT2] && (data[9] <= 128)) { // not shoulder trigger left
 		pressed[KEYS.KEY_SHOULDER_LEFT2] = false;
 		emitter.emit('keyup', KEYS.KEY_SHOULDER_LEFT2);
 	}
