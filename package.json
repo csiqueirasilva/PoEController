@@ -24,7 +24,7 @@
   "devDependencies": {
     "electron": "^10.1.1",
     "electron-builder": "^22.8.0",
-    "electron-rebuild": "^2.0.3"
+    "electron-rebuild": "^3.2.9"
   },
   "build": {
     "appId": "PoEController",
